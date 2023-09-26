@@ -1,16 +1,5 @@
 import { LightningElement, api, track, wire } from 'lwc';
-
-import ACCT_ID_CASE from '@salesforce/schema/Case.AccountId';
-import ACCT_NAME_CASE from '@salesforce/schema/Case.Account_Name_Text__c';
-import CASE_NUMBER from '@salesforce/schema/Case.CaseNumber';
-import CASE_SUBJECT from '@salesforce/schema/Case.Subject';
-import Case from '@salesforce/schema/Case';
-import HAS_VM_TKT from '@salesforce/schema/Case.hasVisionMetrixTicket__c';
-import IS_VM_PARENT_TKT from '@salesforce/schema/Case.VisionMetrix_Parent_Case__c';
-import IS_VM_TKT_CHILD from '@salesforce/schema/Case.VisionMetrix_Child_Case__c';
-import PARENT_CASE from '@salesforce/schema/Case.ParentId';
-import RELATED_SOF from '@salesforce/schema/Case.Related_Service_Order__c';
-import { getRecord } from 'lightning/uiRecordApi';
+import { getRecord, updateRecord } from 'lightning/uiRecordApi';
 
 export default class VisionMetrixTab extends LightningElement {
     @api recordId;
@@ -26,7 +15,6 @@ export default class VisionMetrixTab extends LightningElement {
     isVMParentTkt;
     parentTicket;
     vmAccts = [ "ATT Wireless", "T-Mobile" ];
-    // fields = [ CASE_NUMBER, ACCT_ID_CASE, HAS_VM_TKT, ACCT_NAME_CASE,CASE_SUBJECT, IS_VM_TKT_CHILD, RELATED_SOF, IS_VM_PARENT_TKT, PARENT_CASE ];
     fields = [
         'Case.CaseNumber',
         'Case.AccountId',
@@ -68,5 +56,10 @@ export default class VisionMetrixTab extends LightningElement {
         console.log( 'hasCase: ' + this.hasCase );
         console.log( 'hasVMAcct: ' + this.hasVMAcct );
         console.log( 'parent ticket data: ' + this.parentTicket );
+
+        if( this.acctName && this.vmAccts.includes( this.acctName ) ) {
+            this.hasVMAcct = true;
+            console.log( 'Has VM Assc Acct: ' + this.hasVMAcct );
+        }
     }   
 }
