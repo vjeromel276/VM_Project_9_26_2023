@@ -1,0 +1,18 @@
+<template>
+    Visionmetrix Parent Tab
+    <!-- ticket part of ticket -->
+    <template if:true={hasCase}>
+        <h5>Has Case: {caseNumber}</h5>
+    </template>
+
+    <!-- account part of ticket -->
+    <template if:true={hasVMAcct}>
+        <h5>Account Name: {acctName}</h5>
+        <h5>Account Id: {acctId}</h5>
+    </template>
+    <!-- Order part of the ticket -->
+    <!-- visionmetrix part of the ticket -->
+    <template if:true={isVMChildTkt}>
+        <h5>VM Id: {vmId}</h5>
+    </template>
+</template>
