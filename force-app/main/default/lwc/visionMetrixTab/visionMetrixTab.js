@@ -4,9 +4,11 @@ import ACCT_ID_CASE from '@salesforce/schema/Case.AccountId';
 import ACCT_NAME_CASE from '@salesforce/schema/Case.Account_Name_Text__c';
 import CASE_NUMBER from '@salesforce/schema/Case.CaseNumber';
 import CASE_SUBJECT from '@salesforce/schema/Case.Subject';
+import Case from '@salesforce/schema/Case';
 import HAS_VM_TKT from '@salesforce/schema/Case.hasVisionMetrixTicket__c';
 import IS_VM_PARENT_TKT from '@salesforce/schema/Case.VisionMetrix_Parent_Case__c';
 import IS_VM_TKT_CHILD from '@salesforce/schema/Case.VisionMetrix_Child_Case__c';
+import PARENT_CASE from '@salesforce/schema/Case.ParentId';
 import RELATED_SOF from '@salesforce/schema/Case.Related_Service_Order__c';
 import { getRecord } from 'lightning/uiRecordApi';
 
@@ -16,14 +18,26 @@ export default class VisionMetrixTab extends LightningElement {
     @track caseData;
     @track acctId;
     @track acctName;
-    
+    @api caseSubject;
     hasCase;
     @api hasVMAcct=false;
     isVMChildTkt;
-    hasVMParentTkt;
+    hasVMTkt;
     isVMParentTkt;
+    parentTicket;
     vmAccts = [ "ATT Wireless", "T-Mobile" ];
-    fields = [ CASE_NUMBER, ACCT_ID_CASE, HAS_VM_TKT, ACCT_NAME_CASE,CASE_SUBJECT, IS_VM_TKT_CHILD, RELATED_SOF, IS_VM_PARENT_TKT ];
+    // fields = [ CASE_NUMBER, ACCT_ID_CASE, HAS_VM_TKT, ACCT_NAME_CASE,CASE_SUBJECT, IS_VM_TKT_CHILD, RELATED_SOF, IS_VM_PARENT_TKT, PARENT_CASE ];
+    fields = [
+        'Case.CaseNumber',
+        'Case.AccountId',
+        'Case.hasVisionMetrixTicket__c',
+        'Case.Account_Name_Text__c',
+        'Case.Subject',
+        'Case.VisionMetrix_Child_Case__c',
+        'Case.Related_Service_Order__c',
+        "Case.VisionMetrix_Parent_Case__c",
+        'Case.ParentId',
+    ];
     
     @wire( getRecord, { recordId: '$recordId', fields: '$fields' } )
     wiredRecord( { error, data } ) {
@@ -33,13 +47,14 @@ export default class VisionMetrixTab extends LightningElement {
             console.log( data );
             this.hasCase = true;
             this.caseData = data;
+            this.parentTicket = data.fields.ParentId.value;
             this.acctId = data.fields.AccountId.value;
             this.acctName = data.fields.Account_Name_Text__c.value;
             this.caseNumber = data.fields.CaseNumber.value;
             this.isVMChildTkt = data.fields.VisionMetrix_Child_Case__c.value;
             this.caseSubject = data.fields.Subject.value;
             this.relatedSOF = data.fields.Related_Service_Order__c.value;
-            this.hasVMParentTkt = data.fields.hasVisionMetrixTicket__c.value;
+            this.hasVMTkt = data.fields.hasVisionMetrixTicket__c.value;
             this.isVMParentTkt = data.fields.VisionMetrix_Parent_Case__c.value;
         }
         console.log( 'acctId: ' + this.acctId );
@@ -48,24 +63,10 @@ export default class VisionMetrixTab extends LightningElement {
         console.log( 'isVMChildTkt: ' + this.isVMChildTkt );
         console.log( 'caseSubject: ' + this.caseSubject );
         console.log( 'relatedSOF: ' + this.relatedSOF );
-        console.log( 'hasVMParentTkt: ' + this.hasVMParentTkt );
+        console.log( 'hasVMTkt: ' + this.hasVMTkt );
         console.log( 'isVMParentTkt: ' + this.isVMParentTkt );
         console.log( 'hasCase: ' + this.hasCase );
         console.log( 'hasVMAcct: ' + this.hasVMAcct );
-        
-        
-        const ticketNumber = this.caseNumber;
-        if( this.vmAccts.includes( this.acctName )) {
-            this.hasVMAcct = true;
-            console.log( 'hasVMAcct: ' + this.hasVMAcct );
-            if ( this.isVMChildTkt ) {
-               // pull vm ticket data
-            } else {
-                // create vm ticket
-                
-            }
-        }
-    }
-    
-    
+        console.log( 'parent ticket data: ' + this.parentTicket );
+    }   
 }

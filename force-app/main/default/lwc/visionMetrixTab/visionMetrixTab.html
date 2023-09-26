@@ -1,31 +1,27 @@
 <template>
-    Visionmetrix Tab
-    <!-- ticket part of ticket -->
-    <template if:true={caseData}>
-        <h5>Has Case: {caseNumber}</h5>
-    </template>
+    <lightning-card title="Visionmetrix Tab">
+        <!-- ticket part of ticket -->
+        <template if:true={caseNumber}>
+            <h5>Has Case: {caseNumber}</h5>
+        </template>
 
-    <!-- account part of ticket -->
-    <template if:true={hasVMAcct}>
-        <h5>Account Name: {acctName}</h5>
-        <h5>Account Id: {acctId}</h5>
-    </template>
-    <!-- Order part of the ticket -->
-    <!-- visionmetrix part of the ticket -->
-    <template if:true={isVMChildTkt}>
-        <h5>VM Id: {caseNumber}</h5>
-    </template>
-    <template if:false={isVMChildTkt}>
-        <h5>Is a VM Tracked Acct {hasVMAcct}</h5>
-        <h5>VM Child Tkt {isVMChildTkt}</h5>
-        <h5>Case Subject {caseSubject}</h5>
-        <h5>Related Order{relatedSOF}</h5>
-        <h5>Has Parent VM Case {hasVMParentTkt}</h5>
-        <h5>Is Parent VM Case{isVMParentTkt}</h5>
-        <lightning-button
-            label="Create VM Child Ticket"
-            onclick={createVMChildTicket}
-        ></lightning-button>
-    </template>
-
+        <!-- account part of ticket -->
+        <template if:true={hasVMAcct}>
+            <h5>Account Name: {acctName}</h5>
+            <h5>Account Id: {acctId}</h5>
+        </template>
+        <!-- Order part of the ticket -->
+        <!-- visionmetrix Parent part of the ticket -->
+        <template if:true={parentTicket}>
+            <h5>Parent Case Id: {parentTicket}</h5>
+        </template>
+        <template if:true={isVMChildTkt}>
+            <h5>Is a VM Tracked Acct: {hasVMAcct}</h5>
+            <h5>VM Child Tkt: {isVMChildTkt}</h5>
+            <h5>Case Subject: {caseSubject}</h5>
+            <h5>Related Order: {relatedSOF}</h5>
+            <h5>Has Parent VM Case: {hasVMTkt}</h5>
+            <h5>Is Parent VM Case: {isVMParentTkt}</h5>
+        </template>
+    </lightning-card>
 </template>
