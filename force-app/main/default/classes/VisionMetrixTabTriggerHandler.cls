@@ -1,10 +1,12 @@
-//* 
-// * Created by     : vlettau
-// * Date           : 2023-09-23
+//* ================================================================================================================
+//* Created by      : Vincent Lettau 
+//* Date            : 2023-09-23
 //* Description     : VisionMetrixTabTriggerHandler
-//*                 This class is used to handle the trigger logic for the VisionMetrix Support Ticket children
-//*                 tabs.  This class is called from the VisionMetrix.trigger
-//* ===========================================================================================================
+//*                 : This class is used to handle the trigger logic for the VisionMetrix Support Ticket children
+//*                 : This class is called from the VisionMetrix.trigger
+//* Last Updated By : Vincent Lettau
+//* Last Updated On : 2023-09-23
+//* ================================================================================================================
 
 public with sharing class VisionMetrixTabTriggerHandler {
     public VisionMetrixTabTriggerHandler() {}

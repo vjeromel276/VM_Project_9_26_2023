@@ -1,3 +1,11 @@
+//* ================================================================================================================
+//* Created by      : Vincent Lettau
+//* Date            : 2023-09-23
+//* Description     : VisionMetrixEventController
+//*                 : This class is used to handle the logic for the VisionMetrixEvent component
+//* Last Updated By : Vincent Lettau
+//* Last Updated On : 2023-09-27
+//* ================================================================================================================
 public with sharing class VisionMetrixEventController{
     @AuraEnabled(cacheable = true)
     public static List<VisionMetrix_Event__c> getVisionMetrixEvents(){
@@ -29,8 +37,7 @@ public with sharing class VisionMetrixEventController{
     public static Case getCaseId(String recordId){
         Case c = [SELECT Id, CaseNumber, hasVisionMetrixTicket__c, CreatedDate, Subject
                   FROM Case
-                  WHERE Id 
-                  = :recordId
+                  WHERE Id = :recordId
                   LIMIT 1];
         return c;
     }

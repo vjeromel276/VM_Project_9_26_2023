@@ -1,3 +1,14 @@
+//* ================================================================================================================
+//* Created by      : Vincent Lettau
+//* Date            : 2023-09-23
+//* Description     : VisionMetrixTab.js
+//*                 : This component is used to display the Vision Metrix tab on the Case record page.
+//*                 : It display the Vision Metrix tab if the case is a Vision Metrix parent case.
+//*                 : and it will also display the Vision Metrix tab if the case is a Vision Metrix child case.
+//* Last Updated By : Vincent Lettau
+//* Last Updated On : 2023-09-26
+//* ================================================================================================================
+
 import { LightningElement, api, track, wire } from 'lwc';
 import { getRecord, updateRecord } from 'lightning/uiRecordApi';
 

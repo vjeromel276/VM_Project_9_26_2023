@@ -1,3 +1,13 @@
+//* ================================================================================================================
+//* Created by     	: Vincent Lettau 
+//* Date            : 2023-09-23
+//* Description     : VisionMetrix Trigger
+//*                 : This trigger will start the VisionMetrix process
+//*                 : when a case is updated and the account name is in the list of
+//*                 : VisionMetrix tracked companies
+//* Last Updated By : Vincent Lettau
+//* Last Updated On : 2023-09-26
+//* ================================================================================================================
 trigger VisionMetrix on Case(after update ){
 	System.debug('VisionMetrix Trigger');
 	if (Disabled_Triggers__c.getValues('VisionMetrix') == null || Disabled_Triggers__c.getValues('VisionMetrix').Disabled__c == false){
