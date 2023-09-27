@@ -1,27 +1,79 @@
 <template>
-    <lightning-card title="Visionmetrix Tab">
-        <!-- ticket part of ticket -->
-        <template if:true={caseNumber}>
-            <h5>Has Case: {caseNumber}</h5>
-        </template>
-
-        <!-- account part of ticket -->
-        <template if:true={hasVMAcct}>
-            <h5>Account Name: {acctName}</h5>
-            <h5>Account Id: {acctId}</h5>
-        </template>
-        <!-- Order part of the ticket -->
+    <lightning-card>
         <!-- visionmetrix Parent part of the ticket -->
-        <template if:true={parentTicket}>
-            <h5>Parent Case Id: {parentTicket}</h5>
+        <template if:true={isVMParentTkt}>
+            <p class="slds-text-heading_small">VisionMetrix Parent Ticket</p>
+
+            <!-- ticket part of ticket -->
+            <template if:true={caseNumber}>
+                <h5>Case: {caseNumber}</h5>
+            </template>
+
+            <!-- account part of ticket -->
+            <template if:true={hasVMAcct}>
+                <h5>Account Name: {acctName}</h5>
+                <h5>Account Id: {acctId}</h5>
+            </template>
+            <!-- Order part of the ticket -->
+            <template if:true={relatedSOF}>
+                <h5>Order Name: {parentCaseNumber}</h5>
+                <h5>Order Id: {relatedSOF}</h5>
+            </template>
+
+            <lightning-button
+                label="Send"
+                onclick={sendToVisionMetrix}
+            >
+            </lightning-button>
+
+            <lightning-button
+                label="Create Child"
+                onclick={createChild}
+            >
+            </lightning-button>
+
+
+
         </template>
         <template if:true={isVMChildTkt}>
+            <p class="slds-text-heading_small">VisionMetrix Child Ticket</p>
+
+            <!-- ticket part of ticket -->
+            <template if:true={caseNumber}>
+                <h5>Case: {caseNumber}</h5>
+            </template>
+
+            <!-- account part of ticket -->
+            <template if:true={hasVMAcct}>
+                <h5>Account Name: {acctName}</h5>
+                <h5>Account Id: {acctId}</h5>
+            </template>
+            <!-- Order part of the ticket -->
+            <template if:true={relatedSOF}>
+                <h5>Order Name: {parentCaseNumber}</h5>
+                <h5>Order Id: {relatedSOF}</h5>
+            </template>
+
             <h5>Is a VM Tracked Acct: {hasVMAcct}</h5>
             <h5>VM Child Tkt: {isVMChildTkt}</h5>
             <h5>Case Subject: {caseSubject}</h5>
             <h5>Related Order: {relatedSOF}</h5>
             <h5>Has Parent VM Case: {hasVMTkt}</h5>
             <h5>Is Parent VM Case: {isVMParentTkt}</h5>
+
+            <lightning-button-group>
+                <lightning-button
+                    label="Attach"
+                    onclick={attachToParent}
+                >
+                </lightning-button>
+                <lightning-button
+                    label="Cancel"
+                    onclick={cancelChild}
+                >
+                </lightning-button>
+            </lightning-button-group>
+
         </template>
     </lightning-card>
 </template>

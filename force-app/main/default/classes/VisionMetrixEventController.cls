@@ -17,7 +17,6 @@ public with sharing class VisionMetrixEventController{
     public static List<Node__c> getRelatedNodes(String caseId){
         return [SELECT Id, Name, Service_ID__c, Node_Name_Link__c, Ring__r.Name, Ring__r.Project_Name__c, Vendor_Value__c, VisionMetrix_Circuit_Id__c
                 FROM Node__c];
-                
     }
 
     @AuraEnabled(cacheable = true)
@@ -30,7 +29,8 @@ public with sharing class VisionMetrixEventController{
     public static Case getCaseId(String recordId){
         Case c = [SELECT Id, CaseNumber, hasVisionMetrixTicket__c, CreatedDate, Subject
                   FROM Case
-                  WHERE Id = :recordId
+                  WHERE Id 
+                  = :recordId
                   LIMIT 1];
         return c;
     }

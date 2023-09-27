@@ -14,6 +14,8 @@ export default class VisionMetrixTab extends LightningElement {
     hasVMTkt;
     isVMParentTkt;
     parentTicket;
+    relatedSOF;
+    parentCaseNumber;
     vmAccts = [ "ATT Wireless", "T-Mobile" ];
     fields = [
         'Case.CaseNumber',
@@ -23,6 +25,7 @@ export default class VisionMetrixTab extends LightningElement {
         'Case.Subject',
         'Case.VisionMetrix_Child_Case__c',
         'Case.Related_Service_Order__c',
+        'Case.Related_Service_Order__r.Name',
         "Case.VisionMetrix_Parent_Case__c",
         'Case.ParentId',
     ];
