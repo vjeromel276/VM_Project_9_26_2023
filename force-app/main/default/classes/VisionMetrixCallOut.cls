@@ -177,6 +177,97 @@ public class VisionMetrixCallOut{
         // return null;
     }
 
+    public static String genParentPayload(String ticketId){
+        // Call the wrapper class
+        VisionMetrixWrappers.AddTicket ticketData = new VisionMetrixWrappers.AddTicket();
+
+        Case c = [SELECT Id, Description, Subject, NOC_Ticket_Assigment__c, Maintenance_Start__c, Maintenance_End__c, Related_Service_Order__c
+                  FROM Case
+                  WHERE Id = :ticketId
+                  LIMIT 1];
+
+        List<Case> childCases = [SELECT Id, Related_Service_Order__r.Id, Related_Service_Order__r.OSS_Service_ID__c, Related_Service_Order__c, Description, Subject, NOC_Ticket_Assigment__c, Maintenance_Start__c, Maintenance_End__c
+                                 FROM Case
+                                 WHERE ParentId = :ticketId
+                                 LIMIT 1];
+
+
+        if (childCases != null ){
+            List<String> circuitIds = new List<String>();
+
+            for(Case child : childCases){
+            System.debug('Child Case: ' + child.Id);
+            circuitIds.add(child.Related_Service_Order__r.OSS_Service_ID__c);
+        }
+
+            String circuitIdsToPass = String.join(circuitIds, ',');
+
+            //********Required Fields *********//
+            //^~ Ticket Id - Salesforce Ticket Case Number
+            ticketData.ticket_id = ticketId;
+            System.debug('Ticket Number: ' + ticketId);
+
+            //^~ Ticket Type - Ticket Type defaults to 'Exclusion Period'
+            ticketData.ticket_type = 'Exclusion Period';
+            System.debug('Ticket Type: ' + ticketData.ticket_type);
+
+            //^~ Circuit List - List of Circuits to be excluded
+            ticketData.circuits = String.valueOf(circuitIdsToPass);
+            System.debug('Circuits: ' + ticketData.circuits);
+
+            //^~ Open Status - Exclusion Period Open Status defaults to 'Closed'
+            ticketData.open_status = 'Closed';
+            System.debug('Open Status: ' + ticketData.open_status);
+
+            //^~ Severity - Exclusion Period Severity defaults to 'Low'
+            ticketData.severity = 'Low';
+            System.debug('Severity: ' + ticketData.severity);
+
+            //^~ Start Time - Maintenance Start Time
+            ticketData.start_time = Integer.valueOf(c.Maintenance_Start__c.getTime() / 1000);
+            System.debug('Maintenance Start: ' + ticketData.start_time);
+
+            //^~ End Time - Maintenance End Time
+            ticketData.end_time = Integer.valueOf(c.Maintenance_End__c.getTime() / 1000);
+            System.debug('Maintenance End: ' + ticketData.end_time);
+
+            //********Optional Fields*********//
+            //^~ Category - Default to Maintenance until the 1 to 1 mapping is complete
+            System.debug('Category: ');
+            //^~ Internal Notes - SF Generated Ticket
+            System.debug('Internal Notes: "SF GENERATED VM TICKET');
+            //^~ Exclusion Type - Exclusion Period Exclusion Type defaults to 'Smart'
+            ticketData.exclusion_type = 'Smart';
+            System.debug('Exclusion Type: ' + ticketData.exclusion_type);
+            //^~ Exclude From Reporting - Exclusion Period Exclude From Reporting defaults to 'No' should be 'Yes' for exclusions
+            ticketData.exclude_from_reporting = 'Yes';
+            System.debug('Exclude From Reporting: ' + ticketData.exclude_from_reporting);
+            //^~ Exclude From Monitoring Reporting - Exclusion Period Excluded From Monitoring defaults to 'No' should be 'Yes' for exclusions
+            ticketData.exclusde_from_mttr_reporting = 'Yes';
+            System.debug('Exclude From Monitoring Reporting: ' + ticketData.exclusde_from_mttr_reporting);
+            //^~ Description
+            ticketData.description = c.Description;
+            System.debug('Description: ' + ticketData.description);
+            //^~ Subject
+            ticketData.subject = c.Subject;
+            System.debug('Subject: ' + ticketData.subject);
+            //^~ Support Agent
+            ticketData.support_agent = c.NOC_Ticket_Assigment__c;
+            System.debug('Support Agent: ' + ticketData.support_agent);
+            //^ Match - Common tag to associate tickets together
+        } else{
+            //^If no Nodes are found, throw an error
+            System.debug('No Nodes found on ticket: ' + ticketId);
+            throw new System.QueryException('No Nodes found with the ticket number or ticket is not of correct type: ' + ticketId);
+        }
+
+
+        //******* Return the payload *******
+        System.debug('Exclusion Peiod Ticket: ' + ticketData.ticket_id);
+        return JSON.serialize(ticketData);
+        // return null;
+    }
+
     // Method to generate the payload for the ticket call outs
     public static String genNonExclusionPayload(String ticketId){
         return null;
@@ -206,7 +297,7 @@ public class VisionMetrixCallOut{
         String ticketPayload;
         if (isExclusion){
 
-            ticketPayload = genExclusionPayload(ticketId);
+            ticketPayload = genParentPayload(ticketId);
         } else{
             ticketPayload = genNonExclusionPayload(ticketId);
         }

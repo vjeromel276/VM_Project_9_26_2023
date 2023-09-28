@@ -29,6 +29,7 @@ trigger VisionMetrix on Case(after update ){
 					for (String str : vmCompName){
 						if (c.Related_Service_Order__c != null){
 							System.debug('Service Order: ' + c.Related_Service_Order__c);
+							
 							if (companyName == str){
 								// start visionmetrix process
 								Case[] cases = new Case[]{ c };
