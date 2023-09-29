@@ -89,11 +89,10 @@ public class VisionMetrixCallOut{
         //           FROM Case
         //           WHERE Id = :ticketId];
 
-        Case c = [SELECT Id, Related_Service_Order__r.Id, Related_Service_Order__r.Node__c,
-                    Description, Subject, NOC_Ticket_Assigment__c, Maintenance_Start__c, Maintenance_End__c
-                    FROM Case
-                    WHERE Id = :ticketId
-                    LIMIT 1];
+        Case c = [SELECT Id, Related_Service_Order__r.Id, Related_Service_Order__r.Node__c, Description, Subject, NOC_Ticket_Assigment__c, Maintenance_Start__c, Maintenance_End__c
+                  FROM Case
+                  WHERE Id = :ticketId
+                  LIMIT 1];
 
         Id serviceOrderId = c.Related_Service_Order__r.Id;
 
@@ -186,21 +185,26 @@ public class VisionMetrixCallOut{
                   WHERE Id = :ticketId
                   LIMIT 1];
 
-        List<Case> childCases = [SELECT Id, Related_Service_Order__r.Id, Related_Service_Order__r.OSS_Service_ID__c, Related_Service_Order__c, Description, Subject, NOC_Ticket_Assigment__c, Maintenance_Start__c, Maintenance_End__c
+        System.debug(c);
+
+        List<Case> childCases = [SELECT Id, ParentId, Related_Service_Order__r.Id, Related_Service_Order__r.OSS_Service_ID__c, Related_Service_Order__c, Description, Subject, NOC_Ticket_Assigment__c, Maintenance_Start__c, Maintenance_End__c
                                  FROM Case
                                  WHERE ParentId = :ticketId
-                                 LIMIT 1];
+                                 ];
 
+        System.debug('child case array: '+ childCases);
 
-        if (childCases != null ){
+        if (childCases != null){
             List<String> circuitIds = new List<String>();
 
-            for(Case child : childCases){
-            System.debug('Child Case: ' + child.Id);
-            circuitIds.add(child.Related_Service_Order__r.OSS_Service_ID__c);
-        }
+            for (Case child : childCases){
+                System.debug('Child Case: ' + child.Id);
+                circuitIds.add(child.Related_Service_Order__r.OSS_Service_ID__c);
+            }
 
             String circuitIdsToPass = String.join(circuitIds, ',');
+            System.debug('Circuit Id List: ' + circuitIds);
+            System.debug('Circuit Id joinrd string: ' + circuitIdsToPass);
 
             //********Required Fields *********//
             //^~ Ticket Id - Salesforce Ticket Case Number
