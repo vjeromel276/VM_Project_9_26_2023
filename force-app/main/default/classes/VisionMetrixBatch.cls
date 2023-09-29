@@ -47,7 +47,7 @@ global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulab
         }
     }
     global void execute(SchedulableContext SC){
-        Database.executeBatch(new BatchSupportTicketPendingUpdate(), BatchSize);
+        Database.executeBatch(new VisionMetrixBatch(), BatchSize);
     }
 
     global void finish(Database.BatchableContext BC){

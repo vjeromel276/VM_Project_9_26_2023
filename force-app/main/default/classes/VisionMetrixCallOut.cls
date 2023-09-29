@@ -291,7 +291,8 @@ public class VisionMetrixCallOut{
     }
 
     // Method to add a ticket to VisionMetrix takes SF Support Ticket Number as input
-    @AuraEnabled(cacheable = true)
+    // @AuraEnabled(cacheable = true)
+    @future(callout = true)
     public static void addVMTicket(String ticketId, Boolean isExclusion){
 
         String headerToken = visionMetrixLogin();
