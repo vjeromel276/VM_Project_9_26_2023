@@ -99,6 +99,11 @@ public with sharing class VisionMetrixWrappers{
         public String match;
     }
 
+    //add bulk vm tickets request wrapper
+    public class AddBulkVMTickets{
+        public String tickets;//required
+    }
+
     //add circuit to a ticket request wrapper
     public class AddCircuitToTicket{
         public String ticket_id;//required
