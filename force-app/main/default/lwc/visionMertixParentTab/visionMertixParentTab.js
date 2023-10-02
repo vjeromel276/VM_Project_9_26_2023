@@ -4,8 +4,6 @@ import ACCT_ID_CASE from '@salesforce/schema/Case.AccountId';
 import ACCT_NAME_CASE from '@salesforce/schema/Case.Account_Name_Text__c';
 import CASE_NUMBER from '@salesforce/schema/Case.CaseNumber';
 import HAS_VM_TKT from '@salesforce/schema/Case.hasVisionMetrixTicket__c';
-import { ShowToastEvent } from 'lightning/platformShowToastEvent';
-import addVMTicket from '@salesforce/apex/VisionMetrixCallOut.addVMTicket';
 import { getRecord } from 'lightning/uiRecordApi';
 
 export default class VisionMertixParentTab extends LightningElement {
