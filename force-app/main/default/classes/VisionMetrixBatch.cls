@@ -3,7 +3,7 @@
 //  * @group             :
 //  * @last modified on  : 09-19-2023
 //  * @last modified by  : vlettau@everstream.net
-global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulable, Database.Stateful{
+global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulable, Database.Stateful,Database.AllowsCallouts{
     //*@AccountId array items
     // T-mobile 0010B00001skFrkQAE
     // Att wireline 0013g00000Tfxq2AAB
@@ -15,10 +15,12 @@ global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulab
     global Integer recordsUpdated = 0;
     global Boolean ExecuteNextJob = false;
     global static Integer BatchSize = 10;
+    String loginToken='';
     public VisionMetrixBatch(){
     }
 
     global Database.QueryLocator start(Database.BatchableContext context){
+        loginToken = VisionMetrixCallOut.visionMetrixLogin();
         // Query for Customer Communication Cases with Record Type "Customer Communication" and type "Maintenance"
         return Database.getQueryLocator([SELECT Id, AccountId, ParentId, RecordTypeId, Case_Record_Type__c, VisionMetrix_Parent_Case__c, NotificationType__c
                                          FROM Case
@@ -34,15 +36,17 @@ global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulab
             // Collect parent case IDs that meet the criteria
             for (Case c : scope){
                 System.debug('Added Case Id to list: ' + c.Id);
-                parentIds.add(c.ParentId);
+                parentIds.add(c.Id);
             }
 
             if (parentIds.size() > 0){
                 // Generate VisionMetrix cases by calling the addVMTicket method for each parent case
-                for (String parentId : parentIds){
-                    System.debug('Parent Case being passed: ' + parentId);
-                    VisionMetrixCallOut.addVMTicket(parentId, true);
-                }
+                // for (String parentId : parentIds){
+                //     System.debug('Parent Case being passed: ' + parentId);
+                //     VisionMetrixCallOut.addVMTicket(parentId, true);
+                // }
+                recordsUpdated = parentIds.size();
+                VisionMetrixCallOut.addBulkVMTicket(parentIds, loginToken);
             }
         }
     }

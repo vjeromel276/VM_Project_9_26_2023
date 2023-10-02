@@ -276,10 +276,11 @@ public class VisionMetrixCallOut{
         return JSON.serialize(bulkticketData);
     }
 
-    @future(callout = true)
-    public static void addBulkVMTicket(List<String> ticketIds){
+   
+    public static void addBulkVMTicket(List<String> ticketIds,String token){
         Boolean isExclusion = true;
-        String headerToken = visionMetrixLogin();
+        // String headerToken = visionMetrixLogin();
+        String headerToken = token;
         Http http = new Http();
         HttpRequest request = new HttpRequest();
         String ticketPayload;
@@ -320,7 +321,7 @@ public class VisionMetrixCallOut{
 
     // Method to add a ticket to VisionMetrix takes SF Support Ticket Number as input
     // @AuraEnabled(cacheable = true)
-    @future(callout = true)
+    
     public static void addVMTicket(String ticketId, Boolean isExclusion){
         String headerToken = visionMetrixLogin();
         Http http = new Http();
@@ -433,7 +434,7 @@ public class VisionMetrixCallOut{
     }
 
     //& Method calls the VisionMetrix API to get the latest events and will create a new ticket in Salesforce or attach the event to an existing ticket
-    @future(callout = true)
+    
     public static void getLatestEvents(){
         String headerToken = visionMetrixLogin();
         HttpRequest request = new HttpRequest();
