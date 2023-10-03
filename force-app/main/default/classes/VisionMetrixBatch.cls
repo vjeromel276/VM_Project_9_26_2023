@@ -46,7 +46,9 @@ global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulab
                 //     VisionMetrixCallOut.addVMTicket(parentId, true);
                 // }
                 recordsUpdated = parentIds.size();
+                System.debug('+++++++++++++++++++Start of Parent Case+++++++++++++++++++++++++++++++++++++++++++++++++++');
                 VisionMetrixCallOut.addBulkVMTicket(parentIds, loginToken);
+                System.debug('+++++++++++++++++++End of Parent Case+++++++++++++++++++++++++++++++++++++++++++++++++++');
             }
         }
     }

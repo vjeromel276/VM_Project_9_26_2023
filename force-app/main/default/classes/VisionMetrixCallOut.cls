@@ -193,6 +193,8 @@ public class VisionMetrixCallOut{
                 List<String> circuitIds = new List<String>();
                 for (Case child : childCases){
                     if (child != null){
+
+                        System.debug('+++++++++++++++++++Start of Child Case+++++++++++++++++++++++++++++++++++++++++++++++++++');
                         System.debug('Child Case: ' + child);
                         String circuit = child.Related_Service_Order__r.OSS_Service_ID__c;
                         System.debug('Circuit Id: ' + circuit);
@@ -256,7 +258,9 @@ public class VisionMetrixCallOut{
                         ticketData.support_agent = child.NOC_Ticket_Assigment__c;
                         System.debug('Support Agent: ' + ticketData.support_agent);
                         //^ Match - Common tag to associate tickets together
-                    }else{
+
+                        System.debug('+++++++++++++++++++End of Child Case+++++++++++++++++++++++++++++++++++++++++++++++++++');
+                    } else{
                         //^If no Nodes are found, throw an error
                         System.debug('Child was null: ' + ticketId);
                         // throw new System.QueryException('No Nodes found with the ticket number or ticket is not of correct type: ' + ticketId);
@@ -276,8 +280,9 @@ public class VisionMetrixCallOut{
         return JSON.serialize(bulkticketData);
     }
 
-   
-    public static void addBulkVMTicket(List<String> ticketIds,String token){
+    public static void addBulkVMTicket(List<String> ticketIds, String token){
+
+        System.debug('+++++++++++++++++++Start of addBulkVMTicket Method+++++++++++++++++++++++++++++++++++++++++++++++++++');
         Boolean isExclusion = true;
         // String headerToken = visionMetrixLogin();
         String headerToken = token;
@@ -301,6 +306,7 @@ public class VisionMetrixCallOut{
         HttpResponse response = http.send(request);
         // If the request is successful, parse the JSON response.
         handleResponse(response);
+        System.debug('+++++++++++++++++++End of addBulkVMTicket Method+++++++++++++++++++++++++++++++++++++++++++++++++++');
     }
 
     // Method to generate the payload for the ticket call outs
@@ -321,7 +327,6 @@ public class VisionMetrixCallOut{
 
     // Method to add a ticket to VisionMetrix takes SF Support Ticket Number as input
     // @AuraEnabled(cacheable = true)
-    
     public static void addVMTicket(String ticketId, Boolean isExclusion){
         String headerToken = visionMetrixLogin();
         Http http = new Http();
@@ -434,7 +439,7 @@ public class VisionMetrixCallOut{
     }
 
     //& Method calls the VisionMetrix API to get the latest events and will create a new ticket in Salesforce or attach the event to an existing ticket
-    
+    @future(callout = true)
     public static void getLatestEvents(){
         String headerToken = visionMetrixLogin();
         HttpRequest request = new HttpRequest();
