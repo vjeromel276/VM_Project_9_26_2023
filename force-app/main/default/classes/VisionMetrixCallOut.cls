@@ -285,7 +285,7 @@ public class VisionMetrixCallOut{
 
         //******* Return the payload *******
         System.debug('Exclusion Peiod Ticket: ' + JSON.serialize(bulkticketData));
-        for(VisionMetrixWrappers.AddTicket t : bulkticketData.tickets){
+        for (VisionMetrixWrappers.AddTicket t : bulkticketData.tickets){
             System.debug('Ticket Id: ' + t.ticket_id);
             System.debug('Ticket Type: ' + t.ticket_type);
             System.debug('Circuits: ' + t.circuits);
