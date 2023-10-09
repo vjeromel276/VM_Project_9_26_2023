@@ -101,7 +101,7 @@ public with sharing class VisionMetrixWrappers{
 
     //add bulk vm tickets request wrapper
     public class AddBulkVMTickets{
-        public List<AddTicket> tickets;//required
+        public String tickets;//required
     }
 
     //add circuit to a ticket request wrapper
