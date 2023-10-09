@@ -3,7 +3,7 @@
 //  * @group             :
 //  * @last modified on  : 09-19-2023
 //  * @last modified by  : vlettau@everstream.net
-global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulable, Database.Stateful,Database.AllowsCallouts{
+global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulable, Database.Stateful, Database.AllowsCallouts{
     //*@AccountId array items
     // T-mobile 0010B00001skFrkQAE
     // Att wireline 0013g00000Tfxq2AAB
@@ -15,43 +15,43 @@ global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulab
     global Integer recordsUpdated = 0;
     global Boolean ExecuteNextJob = false;
     global static Integer BatchSize = 10;
-    String loginToken='';
+    String loginToken = '';
     public VisionMetrixBatch(){
     }
 
     global Database.QueryLocator start(Database.BatchableContext context){
         loginToken = VisionMetrixCallOut.visionMetrixLogin();
         // Query for Customer Communication Cases with Record Type "Customer Communication" and type "Maintenance"
-        return Database.getQueryLocator([SELECT Id, AccountId, ParentId, RecordTypeId, Case_Record_Type__c, VisionMetrix_Parent_Case__c, NotificationType__c
+        // need to make this the place where assign the parent ticket data to the individual vm tickets
+        return Database.getQueryLocator([SELECT Id, AccountId, ParentId, RecordTypeId, Case_Record_Type__c, VisionMetrix_Parent_Case__c, NotificationType__c, Description, Subject, NOC_Ticket_Assigment__c, Maintenance_Start__c, Maintenance_End__c
                                          FROM Case
                                          WHERE Case_Record_Type__c = 'Client Communication' AND NotificationType__c = 'Maintenance' AND VisionMetrix_Parent_Case__c = true AND AccountId IN ('0010B00001skFrkQAE', '0013g00000Tfxq2AAB', '001U000001jMJS6IAO', '0013g00000TfxtOAAR', '0010B00001p6Z3VQAU', '001U000001jMJVdIAO') AND ParentId = null]);
     }
 
     global void execute(Database.BatchableContext context, List<Case> scope){
         System.debug('scope: ' + scope.size() + ' records.');
-        List<String> parentIds = new List<String>();
+        List<Case> parentCases = new List<Case>();
 
         if (Test.isRunningTest() || scope != NULL && scope.size() > 0){
             recordsParsed = scope.size();
             // Collect parent case IDs that meet the criteria
             for (Case c : scope){
-                System.debug('Added Case Id to list: ' + c.Id);
-                parentIds.add(c.Id);
+                System.debug('Added Case Id to list: ' + c);
+                parentCases.add(c);
             }
 
-            if (parentIds.size() > 0){
+            if (parentCases.size() > 0){
                 // Generate VisionMetrix cases by calling the addVMTicket method for each parent case
-                // for (String parentId : parentIds){
+                // for (String parentId : parentCases){
                 //     System.debug('Parent Case being passed: ' + parentId);
                 //     VisionMetrixCallOut.addVMTicket(parentId, true);
                 // }
-                recordsUpdated = parentIds.size();
-                System.debug('+++++++++++++++++++Start of Parent Case+++++++++++++++++++++++++++++++++++++++++++++++++++');
-                VisionMetrixCallOut.addBulkVMTicket(parentIds, loginToken);
-                System.debug('+++++++++++++++++++End of Parent Case+++++++++++++++++++++++++++++++++++++++++++++++++++');
+                recordsUpdated = parentCases.size();
+                VisionMetrixCallOut.addBulkVMTicket(parentCases, loginToken);
             }
         }
     }
+
     global void execute(SchedulableContext SC){
         Database.executeBatch(new VisionMetrixBatch(), BatchSize);
     }
@@ -79,10 +79,9 @@ global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulab
     global static void start(Integer minute){
 
         String jobName = 'VisionMetrixBatch';
-        if (Test.isRunningTest()||minute == NULL){
+        if (Test.isRunningTest() || minute == NULL){
             Database.executebatch(new VisionMetrixBatch(), BatchSize);
-        }  else
-        if(Test.isRunningTest()||minute != NULL){
+        } else if (Test.isRunningTest() || minute != NULL){
             jobName = jobName += ' - ' + minute + ' - ' + DateTime.now().format();
             String cron = '0 ' + String.valueOf(minute) + ' * * * ?';
             System.schedule(jobName, cron, new VisionMetrixBatch());
@@ -90,7 +89,6 @@ global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulab
     }
 
     // global static void start(Integer hour){
-
     //     String jobName = 'VisionMetrixBatch';
     //     if (Test.isRunningTest() || hour == NULL){
     //         Database.executebatch(new VisionMetrixBatch(), BatchSize);
@@ -101,9 +99,10 @@ global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulab
     //     }
     // }
 }
+
 /* Commands to schedule every Day (run via "Execute Anonymous" as API Integration)
 
  VisionMetrixBatch.start(30);
- 
+
 
  */
