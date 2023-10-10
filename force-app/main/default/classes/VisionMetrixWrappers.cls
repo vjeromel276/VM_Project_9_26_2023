@@ -104,6 +104,13 @@ public with sharing class VisionMetrixWrappers{
         public List<AddTicket> tickets;//required
         // public String match;
     }
+    
+    //add bulk vm tickets request wrapper
+    public class EditCircuitInVisionMetrix{
+        public String old_circuit_alias;//required
+        public String new_circuit_alias;//required
+        // public String match;
+    }
 
     //add circuit to a ticket request wrapper
     public class AddCircuitToTicket{

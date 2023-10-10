@@ -1,24 +1,24 @@
-public class VisionMetrixCallOut{
+public class VisionMetrixCallOut {
     // Practice Methoid used to test the call out
-    public static void practiceMethod(String name){
+    public static void practiceMethod(String name) {
         List<String> b = name.split('\\.');
-        for (String x : b){
+        for ( String x : b ) {
             System.debug(x);
         }
     }
 
     // Method to generate the payload for the login call out
-    private static String genAuthPayload(){
+    private static String genAuthPayload() {
         VisionMetrixWrappers.InitLogin login = new VisionMetrixWrappers.InitLogin();
         // System.debug(login);
         return JSON.serialize(login);
     }
 
     // Method to  get the token for the header
-    public static String visionMetrixLogin(){
+    public static String visionMetrixLogin() {
 
-        Http http = new Http();
-        HttpRequest request = new HttpRequest();
+        Http http = new Http(  );
+        HttpRequest request = new HttpRequest(  );
 
         String authPayload = genAuthPayload();
         request.setEndpoint('https://rest-api2.visionmetrix.net/1.1/login/');
@@ -33,19 +33,19 @@ public class VisionMetrixCallOut{
         HttpResponse response = http.send(request);
 
         // If the request is successful, parse the JSON response.
-        if (response.getStatusCode() == 200){
+        if ( response.getStatusCode() == 200 ) {
             // Deserializes the JSON string into collections of primitive data types.
-            Map<String, Object> results = (Map<String, Object>)JSON.deserializeUntyped(response.getBody());
+            Map<String, Object> results = ( Map<String, Object> )JSON.deserializeUntyped(response.getBody());
             // System.debug(results);
 
             String token = results.get('token').toString();
             // System.debug(token);
             return token;
-        } else{
+        } else {
             System.debug('***********************************************RESPONSE***********************************************');
             Object[] keys = response.getHeaderKeys();
             Map<String, String> headers = new Map<String, String>();
-            for (Object key : keys){
+            for ( Object key : keys ) {
 
                 System.debug(key + ' : ' + response.getHeader(key.toString()));
             }
@@ -56,21 +56,21 @@ public class VisionMetrixCallOut{
     }
 
     // Method to handle the http response
-    public static List<Object> handleResponse(HttpResponse response){
+    public static List<Object> handleResponse(HttpResponse response) {
         // If the request is successful, parse the JSON response.
-        if (response.getStatusCode() == 200){
+        if ( response.getStatusCode() == 200 ) {
             // Deserializes the JSON string into collections of primitive data types.
-            Map<String, Object> results = (Map<String, Object>)JSON.deserializeUntyped(response.getBody());
-            for (String key : results.keySet()){
+            Map<String, Object> results = ( Map<String, Object> )JSON.deserializeUntyped(response.getBody());
+            for ( String key : results.keySet() ) {
                 System.debug(key + ' : ' + results.get(key));
             }
             System.debug(results);
             return results.values();
-        } else{
+        } else {
             System.debug('***********************************************RESPONSE***********************************************');
             Object[] keys = response.getHeaderKeys();
             Map<String, String> headers = new Map<String, String>();
-            for (Object key : keys){
+            for ( Object key : keys ) {
 
                 System.debug(key + ' : ' + response.getHeader(key.toString()));
             }
@@ -81,7 +81,7 @@ public class VisionMetrixCallOut{
     }
 
     // Method to generate the payload for the ticket call outs
-    public static String genExclusionPayload(String ticketId){
+    public static String genExclusionPayload(String ticketId) {
         // Call the wrapper class
         VisionMetrixWrappers.AddTicket ticketData = new VisionMetrixWrappers.AddTicket();
 
@@ -89,7 +89,8 @@ public class VisionMetrixCallOut{
         //           FROM Case
         //           WHERE Id = :ticketId];
 
-        Case c = [SELECT Id, Related_Service_Order__r.Id, Related_Service_Order__r.Node__c, Description, Subject, NOC_Ticket_Assigment__c, Maintenance_Start__c, Maintenance_End__c
+        Case c = [SELECT Id, Related_Service_Order__r.Id, Related_Service_Order__r.Node__c, Description, Subject, 
+                         NOC_Ticket_Assigment__c, Maintenance_Start__c, Maintenance_End__c
                   FROM Case
                   WHERE Id = :ticketId
                   LIMIT 1];
@@ -102,11 +103,11 @@ public class VisionMetrixCallOut{
                                   FROM Node__c
                                   WHERE Service_Order_Agreement__c = :serviceOrderId];
 
-        if (nodeList != null){
+        if ( nodeList != null ) {
 
             List<Id> nodeIds = new List<Id>();
             // Loop through the list of Node records and do something with each one if we want to
-            for (Node__c n : nodeList){
+            for ( Node__c n : nodeList ) {
                 nodeIds.add(n.Id);
                 System.debug('Node: ' + n.Name);
             }
@@ -163,10 +164,10 @@ public class VisionMetrixCallOut{
             ticketData.support_agent = c.NOC_Ticket_Assigment__c;
             System.debug('Support Agent: ' + ticketData.support_agent);
             //^ Match - Common tag to associate tickets together
-        } else{
+        } else {
             //^If no Nodes are found, throw an error
             System.debug('No Nodes found on ticket: ' + ticketId);
-            throw new System.QueryException('No Nodes found with the ticket number or ticket is not of correct type: ' + ticketId);
+            throw new System.QueryException( 'No Nodes found with the ticket number or ticket is not of correct type: ' + ticketId );
         }
 
 
@@ -176,13 +177,13 @@ public class VisionMetrixCallOut{
         // return null;
     }
 
-    public static String genParentPayload(List<Case> tickets){
+    public static String genParentPayload(List<Case> tickets) {
         // bulk Parent ticket wrapper
         VisionMetrixWrappers.AddBulkVMTickets bulkticketData = new VisionMetrixWrappers.AddBulkVMTickets();
         // ticket list wrapper to hold the list of Parent tickets
         List<VisionMetrixWrappers.AddTicket> ticketList = new List<VisionMetrixWrappers.AddTicket>();
         // for each parent ticekt id in the list of ticket ids
-        for (Case ticket : tickets){
+        for ( Case ticket : tickets ) {
             // initalize variables to hold the circuit ids
             List<String> circuitIds = new List<String>();
             String circuitIdsToPass = '';
@@ -197,23 +198,25 @@ public class VisionMetrixCallOut{
             ticketData.ticket_type = 'Exclusion Period';
             System.debug('Ticket Type: ' + ticketData.ticket_type);
 
-            List<Case> childCases = [SELECT Id, ParentId, Related_Service_Order__r.Id, Related_Service_Order__r.OSS_Service_ID__c, Related_Service_Order__c, Description, Subject, NOC_Ticket_Assigment__c, Maintenance_Start__c, Maintenance_End__c
+            List<Case> childCases = [SELECT Id, ParentId, Related_Service_Order__r.Id, Related_Service_Order__r.OSS_Service_ID__c, 
+                                            Related_Service_Order__c, Description, Subject, NOC_Ticket_Assigment__c, 
+                                            Maintenance_Start__c, Maintenance_End__c
                                      FROM Case
                                      WHERE ParentId = :ticket.Id];
 
             System.debug('child case array: ' + childCases + ' for ticket: ' + ticket);
 
-            if (childCases != null){
+            if ( childCases != null ) {
                 // make sure the parent has a child
-                for (Case child : childCases){
-                    if (child != null){
+                for ( Case child : childCases ) {
+                    if ( child != null ) {
                         System.debug('Child Case: ' + child);
                         //switch to reg servie id
                         String circuit = child.Related_Service_Order__r.OSS_Service_ID__c;
                         System.debug('Circuit Id: ' + circuit);
                         circuitIds.add(circuit);
 
-                    } else{
+                    } else {
                         //^ If the child is null throw an error
                         System.debug('Child was null: ');
                         // throw new System.QueryException('No Nodes found with the ticket number or ticket is not of correct type: ' + ticketId);
@@ -221,10 +224,10 @@ public class VisionMetrixCallOut{
 
 
                 }
-            } else{
+            } else {
                 //^ No child cases found throw an error
                 System.debug('No Children found on ticket: ' + ticket.Id);
-                throw new System.QueryException('No Nodes found with the ticket number or ticket is not of correct type: ' + ticket.Id);
+                throw new System.QueryException( 'No Nodes found with the ticket number or ticket is not of correct type: ' + ticket.Id );
             }
 
             circuitIdsToPass = String.join(circuitIds, ',');
@@ -285,7 +288,7 @@ public class VisionMetrixCallOut{
 
         //******* Return the payload *******
         System.debug('Exclusion Peiod Ticket: ' + JSON.serialize(bulkticketData));
-        for(VisionMetrixWrappers.AddTicket t : bulkticketData.tickets){
+        for ( VisionMetrixWrappers.AddTicket t : bulkticketData.tickets ) {
             System.debug('Ticket Id: ' + t.ticket_id);
             System.debug('Ticket Type: ' + t.ticket_type);
             System.debug('Circuits: ' + t.circuits);
@@ -303,14 +306,14 @@ public class VisionMetrixCallOut{
         return JSON.serialize(bulkticketData);
     }
 
-    public static void addBulkVMTicket(List<Case> tickets, String token){
+    public static void addBulkVMTicket(List<Case> tickets, String token) {
 
         System.debug('+++++++++++++++++++Start of addBulkVMTicket Method+++++++++++++++++++++++++++++++++++++++++++++++++++');
         Boolean isExclusion = true;
         String headerToken = visionMetrixLogin();
         // String headerToken = token;
-        Http http = new Http();
-        HttpRequest request = new HttpRequest();
+        Http http = new Http(  );
+        HttpRequest request = new HttpRequest(  );
         String ticketPayload;
 
         ticketPayload = genParentPayload(tickets);
@@ -331,12 +334,12 @@ public class VisionMetrixCallOut{
     }
 
     // Method to generate the payload for the ticket call outs
-    public static String genNonExclusionPayload(String ticketId){
+    public static String genNonExclusionPayload(String ticketId) {
         return null;
     }
 
     //method to generate the payload for adding circuits to an existing vm ticket
-    public static String genAddCircuitPayload(String vmTicketNumber, String selectedNodes){
+    public static String genAddCircuitPayload(String vmTicketNumber, String selectedNodes) {
         VisionMetrixWrappers.AddCircuitToTicket ticketData = new VisionMetrixWrappers.AddCircuitToTicket();
         ticketData.ticket_id = vmTicketNumber;
         ticketData.circuit_alias = selectedNodes;
@@ -347,16 +350,15 @@ public class VisionMetrixCallOut{
     }
 
     // Method to add a ticket to VisionMetrix takes SF Support Ticket Number as input
-    // @AuraEnabled(cacheable = true)
-    public static void addVMTicket(String ticketId, Boolean isExclusion){
+    public static void addVMTicket(String ticketId, Boolean isExclusion) {
         String headerToken = visionMetrixLogin();
-        Http http = new Http();
-        HttpRequest request = new HttpRequest();
+        Http http = new Http(  );
+        HttpRequest request = new HttpRequest(  );
         String ticketPayload;
-        if (isExclusion){
+        if ( isExclusion ) {
 
             ticketPayload = genExclusionPayload(ticketId);
-        } else{
+        } else {
             ticketPayload = genNonExclusionPayload(ticketId);
         }
         request.setEndpoint('https://rest-api2.visionmetrix.net/1.1/tickets/add/');
@@ -375,12 +377,12 @@ public class VisionMetrixCallOut{
 
     // Method to get a ticket from VisionMetrix takes SF Support Ticket Number as input
     //! This method is not working
-    public static void getVMTicket(String ticketId){
+    public static void getVMTicket(String ticketId) {
         String headerToken = visionMetrixLogin();
         String urlEnd = 'tickets/get?ticket_id=' + ticketId;
         String endpoint = 'https://rest-api2.visionmetrix.net/1.1/' + urlEnd;
-        Http http = new Http();
-        HttpRequest request = new HttpRequest();
+        Http http = new Http(  );
+        HttpRequest request = new HttpRequest(  );
         System.debug(endpoint);
         request.setEndpoint(endpoint.trim());
         request.setMethod('GET');
@@ -396,10 +398,10 @@ public class VisionMetrixCallOut{
         handleResponse(response);
     }
 
-    public static void editVMTicket(String ticketId, List<Id> selectedNodes){
+    public static void editVMTicket(String ticketId, List<Id> selectedNodes) {
         String headerToken = visionMetrixLogin();
-        Http http = new Http();
-        HttpRequest request = new HttpRequest();
+        Http http = new Http(  );
+        HttpRequest request = new HttpRequest(  );
         String ticketPayload = genExclusionPayload(ticketId);
         request.setEndpoint('https://rest-api2.visionmetrix.net/1.1/tickets/edit/');
         request.setMethod('POST');
@@ -416,10 +418,10 @@ public class VisionMetrixCallOut{
 
     //^ Method to add a circuit to an existing VisionMetrix ticket by calling genAddCircuitPayload()
     @AuraEnabled
-    public static void addCircuitToVMTicket(String vmTicketNumber, String selectedNodes){
+    public static void addCircuitToVMTicket(String vmTicketNumber, String selectedNodes) {
         String headerToken = visionMetrixLogin();
-        Http http = new Http();
-        HttpRequest request = new HttpRequest();
+        Http http = new Http(  );
+        HttpRequest request = new HttpRequest(  );
         String ticketPayload = genAddCircuitPayload(vmTicketNumber, selectedNodes);
         request.setEndpoint('https://rest-api2.visionmetrix.net/1.1/tickets/addCircuitToTicket/');
         request.setMethod('POST');
@@ -435,10 +437,10 @@ public class VisionMetrixCallOut{
     }
 
     @AuraEnabled
-    public static void removeCircuitFromTicket(String vmTicketNumber, String selectedNodes){
+    public static void removeCircuitFromTicket(String vmTicketNumber, String selectedNodes) {
         String headerToken = visionMetrixLogin();
-        Http http = new Http();
-        HttpRequest request = new HttpRequest();
+        Http http = new Http(  );
+        HttpRequest request = new HttpRequest(  );
         String ticketPayload = genAddCircuitPayload(vmTicketNumber, selectedNodes);
         request.setEndpoint('https://rest-api2.visionmetrix.net/1.1/tickets/removeCircuitFromTicket/');
         request.setMethod('POST');
@@ -455,33 +457,37 @@ public class VisionMetrixCallOut{
 
     // invocableMethod for getting the latest events from VisionMetrix called from a flow
     @invocableMethod(label = 'Get Latest Events')
-    public static void getLatestEventsInvocable(){
+    public static void getLatestEventsInvocable() {
         getLatestEvents();
     }
 
-    //& Method calls the VisionMetrix API to get the latest events and will create a new ticket in Salesforce or attach the event to an existing ticket
+    /**
+     * Method calls the VisionMetrix API to get the latest events and will create a new ticket in Salesforce or attach the event to an existing ticket
+     * getLatestEvents()
+     * @insert newEvent - the event to be handled
+     */
     @future(callout = true)
-    public static void getLatestEvents(){
+    public static void getLatestEvents() {
         String headerToken = visionMetrixLogin();
-        HttpRequest request = new HttpRequest();
+        HttpRequest request = new HttpRequest(  );
         request.setEndpoint('https://rest-api2.visionmetrix.net/1.1/event/latest/');
         request.setMethod('GET');
         request.setHeader('Content-Type', 'application/json');
         request.setHeader('X-ocularip-username', 'everstreampcol1');
         request.setHeader('X-ocularip-token', headerToken);
         request.setHeader('X-ocularip-company', 'Everstream');
-        HttpResponse response = new Http().send(request);
-        Map<String, Object> results = (Map<String, Object>)JSON.deserializeUntyped(response.getBody());
+        HttpResponse response = new Http(  ).send(request);
+        Map<String, Object> results = ( Map<String, Object> )JSON.deserializeUntyped(response.getBody());
         String success = results.get('success').toString();
         // System.debug('success: ' + success);
-        if (success == 'false'){
-            throw new System.QueryException('Callout failed with error: ' + results.get('error').toString());
+        if ( success == 'false' ) {
+            throw new System.QueryException( 'Callout failed with error: ' + results.get('error').toString() );
         }
         String event = results.get('events').toString();
         System.debug('event: ' + event);
-        List<String> eventList = event.split('}, ');
-        if (eventList.size() > 1){
-            for (String eventString : eventList){
+        List<String> eventList = event.split( '}, ' );
+        if ( eventList.size() > 1 ) {
+            for ( String eventString : eventList ) {
                 eventString = eventString.replace('(', '');
                 eventString = eventString.replace(')', '');
                 eventString = eventString.replace('{', '');
@@ -491,13 +497,13 @@ public class VisionMetrixCallOut{
                 Map<String, String> eventMap = new Map<String, String>();
                 VisionMetrix_Event__c newEvent = new VisionMetrix_Event__c();
 
-                if (kvps.size() > 1){
+                if ( kvps.size() > 1 ) {
 
-                    for (String kvp : kvps){
+                    for ( String kvp : kvps ) {
                         // System.debug(kvp);
                         List<String> kvpList = kvp.split('=');
                         // System.debug(kvpList);
-                        if (kvpList.size() > 1){
+                        if ( kvpList.size() > 1 ) {
                             kvpList[0] = kvpList[0].trim().deleteWhitespace();
                             kvpList[1] = kvpList[1].trim().deleteWhitespace();
                             // kvpList[0] is the key, kvpList[1] is the value add to map
@@ -508,17 +514,17 @@ public class VisionMetrixCallOut{
                 }
 
                 // eventMap has the key value pairs for the event the key matches the field name in the VM_Event__c object
-                if (eventMap.size() > 1){
+                if ( eventMap.size() > 1 ) {
                     //^ Category
-                    if (eventMap.get('category') != null && eventMap != null){
+                    if ( eventMap.get('category') != null && eventMap != null ) {
                         newEvent.Category__c = eventMap.get('category').trim().deleteWhitespace();
                     }
                     //^ Circuit Name
-                    if (eventMap.get('circuit_name') != null && eventMap != null){
+                    if ( eventMap.get('circuit_name') != null && eventMap != null ) {
                         String circuitName = eventMap.get('circuit_name').trim().deleteWhitespace();
                         newEvent.Circuit__c = circuitName;
                         List<String> circuitNameList = circuitName.split('\\.');
-                        if (circuitNameList.size() > 1){
+                        if ( circuitNameList.size() > 1 ) {
                             // newEvent.Vendor__c = circuitNameList[0];
                             // newEvent.Market__c = circuitNameList[1];
                             // newEvent.Ring__c = circuitNameList[2];
@@ -528,48 +534,48 @@ public class VisionMetrixCallOut{
                         }
                     }
                     //^ Direction
-                    if (eventMap.get('direction') != null && eventMap != null){
+                    if ( eventMap.get('direction') != null && eventMap != null ) {
                         System.debug('direction: ' + eventMap.get('direction'));
                         newEvent.Direction__c = eventMap.get('direction');
                     }
                     //^ VisionMetrix Event Id
-                    if (eventMap.get('id') != null && eventMap != null){
+                    if ( eventMap.get('id') != null && eventMap != null ) {
                         newEvent.Event_Id_In_VisionMetrix__c = eventMap.get('id').trim().deleteWhitespace();
                     }
                     //^ Event Name
-                    if (eventMap.get('event_name') != null && eventMap != null){
+                    if ( eventMap.get('event_name') != null && eventMap != null ) {
                         newEvent.Event_Name__c = eventMap.get('event_name').trim().deleteWhitespace();
                     }
                     //^ KPI
-                    if (eventMap.get('kpi') != null && eventMap != null){
+                    if ( eventMap.get('kpi') != null && eventMap != null ) {
                         newEvent.KPI__c = eventMap.get('kpi').trim().deleteWhitespace();
                     }
                     //^ Node Name
-                    if (eventMap.get('node_name') != null && eventMap != null){
+                    if ( eventMap.get('node_name') != null && eventMap != null ) {
                         newEvent.Node_Name__C = eventMap.get('node_name').trim().deleteWhitespace();
                     }
                     //^ Secondary Circuit Name
-                    if (eventMap.get('secondary_circuit_name') != null && eventMap != null){
+                    if ( eventMap.get('secondary_circuit_name') != null && eventMap != null ) {
                         newEvent.Secondary_Circuit_Name__c = eventMap.get('secondary_circuit_name');
                         //TODO: Add logic to get the related service order agreement from the secondary circuit name
                     }
                     //^ Severity
-                    if (eventMap.get('severity') != null && eventMap != null){
-                        if (eventMap.get('severity').Contains('nfo')){
+                    if ( eventMap.get('severity') != null && eventMap != null ) {
+                        if ( eventMap.get('severity').Contains('nfo') ) {
                             newEvent.Severity__c = 'Informational';
-                        } else if (eventMap.get('severity').Contains('inor')){
+                        } else if ( eventMap.get('severity').Contains('inor') ) {
                             newEvent.Severity__c = 'Minor';
-                        } else if (eventMap.get('severity').Contains('ajor')){
+                        } else if ( eventMap.get('severity').Contains('ajor') ) {
                             newEvent.Severity__c = 'Major';
-                        } else if (eventMap.get('severity').Contains('ritical')){
+                        } else if ( eventMap.get('severity').Contains('ritical') ) {
                             newEvent.Severity__c = 'Critical';
                         }
                     }
                     //^ Start Time
-                    if (eventMap.get('start_time') == null || eventMap.get('start_time') == ''){
+                    if ( eventMap.get('start_time') == null || eventMap.get('start_time') == '' ) {
                         newEvent.Start_Time__c = null;
                         // System.debug('Start Time should be null and is....... ' + eventMap.get('start_time'));
-                    } else{
+                    } else {
                         String sdt = eventMap.get('start_time').trim().deleteWhitespace();
                         Long sldt = Long.valueOf(sdt) * 1000;
                         newEvent.Start_Time__c = Datetime.newInstance(sldt);
@@ -578,9 +584,9 @@ public class VisionMetrixCallOut{
                     //^ Start Time
 
                     //^ End Time
-                    if (eventMap.get('end_time') == null || eventMap.get('end_time') == ''){
+                    if ( eventMap.get('end_time') == null || eventMap.get('end_time') == '' ) {
                         newEvent.End_Time__c = null;
-                    } else{
+                    } else {
                         String sdt = eventMap.get('end_time').trim().deleteWhitespace();
                         Long eldt = Long.valueOf(sdt) * 1000;
                         newEvent.End_Time__c = Datetime.newInstance(eldt);
@@ -591,15 +597,19 @@ public class VisionMetrixCallOut{
                     insert newEvent;
                 }
             }
-        } else{
+        } else {
             System.debug('No new events found');
         }
     }
 
-    // method to handle the event and create a ticket in Salesforce
-    public static void handleEvent(VisionMetrix_Event__c newEvent){
-        if (newEvent != null){
-            Case c = new Case();
+    /**
+     * method to handle the event and create a ticket in Salesforce
+     * handleEvent()
+     * @param newEvent - the event to be handled
+     */
+    public static void handleEvent(VisionMetrix_Event__c newEvent) {
+        if ( newEvent != null ) {
+            Case c = new Case(  );
             c.RecordTypeId = '012U0000000DpFKIA0';
             c.Subject = newEvent.Event_Name__c + ' | ' + newEvent.Secondary_Circuit_Name__c + ' | ' + newEvent.Severity__c;
             c.Description = newEvent.Circuit__c;
@@ -609,10 +619,15 @@ public class VisionMetrixCallOut{
         }
     }
 
-    public static void getLatestEventsFiltered(List<String> filterTerms){
+    /**
+     * Method to retrieve a filtered list of events from VisionMetrix
+     * getLatestEventsFiltered()
+     * @param response - the response from the callout
+     */
+    public static void getLatestEventsFiltered(List<String> filterTerms) {
         // String headerToken = visionMetrixLogin();
         String headerToken = '4ac5ee08b1c5a901b52b84b3a7a8cd948f3460ee';
-        HttpRequest request = new HttpRequest();
+        HttpRequest request = new HttpRequest(  );
         request.setEndpoint('https://rest-api2.visionmetrix.net/1.1/event/latest/');
         request.setMethod('GET');
         // request.setHeader('Content-Type', 'application/json');
@@ -620,9 +635,50 @@ public class VisionMetrixCallOut{
         request.setHeader('X-ocularip-username', 'everstreampcol1');
         request.setHeader('X-ocularip-token', headerToken);
         request.setHeader('X-ocularip-company', 'Everstream');
-        HttpResponse response = new Http().send(request);
-        Map<String, Object> results = (Map<String, Object>)JSON.deserializeUntyped(response.getBody());
+        HttpResponse response = new Http(  ).send(request);
+        Map<String, Object> results = ( Map<String, Object> )JSON.deserializeUntyped(response.getBody());
         System.debug(results);
+    }
+
+    /**
+     * Method to update the circuit id in VisionMetrix
+     * genEditCircuitPayload()
+     * @param oldId - the old circuit id
+     * @param newId - the new circuit id
+     * @return - the wrapper class as a string
+     */
+    public static String genEditCircuitPayload(String oldId, String newId) {
+        VisionMetrixWrappers.EditCircuitInVisionMetrix circuitIdChange = new VisionMetrixWrappers.EditCircuitInVisionMetrix();
+        circuitIdChange.old_circuit_alias = oldId;
+        circuitIdChange.new_circuit_alias = newId;
+        System.debug('Circuit Id Change Payload: ' + circuitIdChange);
+        return JSON.serialize(circuitIdChange);
+    }
+
+    /**
+     * Method to update the circuit id in VisionMetrix
+     * updateCircuitIdInVM()
+     * @param oldId - the old circuit id
+     * @param newId - the new circuit id
+     */
+    public static void updateCircuitIdInVM(String oldId, String newId) {
+        String headerToken = visionMetrixLogin();
+        Http http = new Http(  );
+        HttpRequest request = new HttpRequest(  );
+        String ticketPayload = genEditCircuitPayload(oldId, newId);
+        request.setEndpoint('https://rest-api2.visionmetrix.net/1.1/circuits/edit/');
+        request.setMethod('POST');
+        request.setHeader('X-ocularip-username', 'everstreampcol1');
+        request.setHeader('X-ocularip-token', headerToken);
+        request.setHeader('X-ocularip-company', 'Everstream');
+        request.setHeader('Content-Type', 'application/json');
+        request.setHeader('Content-Length', String.valueOf(ticketPayload.length()));
+        request.setHeader('Connection', 'keep-alive');
+        request.setHeader('Accept-Encoding', 'gzip, deflate, br');
+        request.setBody(ticketPayload);
+        HttpResponse response = http.send(request);
+        // If the request is successful, parse the JSON response.
+        handleResponse(response);
     }
 
 }
