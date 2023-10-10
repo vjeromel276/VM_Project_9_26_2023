@@ -7,14 +7,30 @@ public class VisionMetrixCallOut {
         }
     }
 
-    // Method to generate the payload for the login call out
+    /**
+     * genAuthPayload()
+     *
+     * Method to generate the payload for the login call outs
+     *
+     * @return                          String                  the payload for the callout
+     *
+     * @uses        InitLogin           VisionMetrixWrapper     to create the login wrapper
+     */
     private static String genAuthPayload() {
         VisionMetrixWrappers.InitLogin login = new VisionMetrixWrappers.InitLogin();
         // System.debug(login);
         return JSON.serialize(login);
     }
 
-    // Method to  get the token for the header
+    /**
+     * visionMetrixLogin()
+     *
+     * Method to login to VisionMetrix and get the token for the header
+     *
+     * @return                          String          the token for the header
+     *
+     * @uses        genAuthPayload()    Function        to generate the payload for the callout
+     */
     public static String visionMetrixLogin() {
 
         Http http = new Http(  );
@@ -55,7 +71,14 @@ public class VisionMetrixCallOut {
         }
     }
 
-    // Method to handle the http response
+    /**
+     * handleResponse()
+     *
+     * Method to handle the response from the call outs
+     *
+     * @param       response            HttpResponse    the response from the call out
+     * @return                          List<Object>    the list of values from the response
+     */
     public static List<Object> handleResponse(HttpResponse response) {
         // If the request is successful, parse the JSON response.
         if ( response.getStatusCode() == 200 ) {
@@ -80,7 +103,14 @@ public class VisionMetrixCallOut {
         }
     }
 
-    // Method to generate the payload for the ticket call outs
+    /**
+     * genExclusionPayload()
+     *
+     * Method to generate the payload for the exclusion call outs
+     *
+     * @param       ticketId            String          the VisionMetrix ticket number
+     * @return                          String          the payload for the callout
+     */
     public static String genExclusionPayload(String ticketId) {
         // Call the wrapper class
         VisionMetrixWrappers.AddTicket ticketData = new VisionMetrixWrappers.AddTicket();
@@ -177,6 +207,16 @@ public class VisionMetrixCallOut {
         // return null;
     }
 
+    /**
+     * genParentPayload()
+     *
+     * Method to generate the payload for the Parent ticket call outs
+     *
+     * @param       tickets             List<Case>              the list of VisionMetrix ticket numbers
+     * @return                          String                  the payload for the callout
+     *
+     * @uses        AddBulkVMTickets    VisionMetrixWrapper     to create the bulk ticket wrapper
+     */
     public static String genParentPayload(List<Case> tickets) {
         // bulk Parent ticket wrapper
         VisionMetrixWrappers.AddBulkVMTickets bulkticketData = new VisionMetrixWrappers.AddBulkVMTickets();
@@ -304,8 +344,19 @@ public class VisionMetrixCallOut {
             System.debug('Support Agent: ' + t.support_agent);
         }
         return JSON.serialize(bulkticketData);
-    }
+    } /**************************************************************************************************************************************** */
 
+    /**
+     * addBulkVMTicket()
+     *
+     * Method to add a new VisionMetrix ticket
+     *
+     * @param       tickets             List<Case>      the list of VisionMetrix ticket numbers
+     * @param       token               String          the token for the header
+     *
+     * @uses        visionMetrixLogin()                 to get the token for the header
+     * @uses        genParentPayload()                  to generate the payload for the callout
+     */
     public static void addBulkVMTicket(List<Case> tickets, String token) {
 
         System.debug('+++++++++++++++++++Start of addBulkVMTicket Method+++++++++++++++++++++++++++++++++++++++++++++++++++');
@@ -331,14 +382,34 @@ public class VisionMetrixCallOut {
         // If the request is successful, parse the JSON response.
         handleResponse(response);
         System.debug('+++++++++++++++++++End of addBulkVMTicket Method+++++++++++++++++++++++++++++++++++++++++++++++++++');
-    }
+    } /**************************************************************************************************************************************** */
 
-    // Method to generate the payload for the ticket call outs
+    /**
+     * genNonExclusionPayload()
+     *
+     * Method to generate the payload for the nonExclusion call outs
+     *
+     * @param       ticketId            String      the VisionMetrix ticket number
+     *
+     * @uses        visionMetrixLogin()             to get the token for the header
+     * @uses        genExclusionPayload()           to generate the payload for the callout
+     *
+     * @return      String                          the payload for the callout
+     */
     public static String genNonExclusionPayload(String ticketId) {
         return null;
-    }
+    } /**************************************************************************************************************************************** */
 
-    //method to generate the payload for adding circuits to an existing vm ticket
+    /**
+     * genAddCircuitPayload()
+     *
+     * Method to generate the payload for the addCircuitToTicket call outs
+     *
+     * @param       vmTicketNumber      String      the VisionMetrix ticket number
+     * @param       selectedNodes       String      the circuit alias to be added to the ticket
+     * @return      String                          the payload for the callout
+     * @uses        visionMetrixLogin()             to get the token for the header
+     */
     public static String genAddCircuitPayload(String vmTicketNumber, String selectedNodes) {
         VisionMetrixWrappers.AddCircuitToTicket ticketData = new VisionMetrixWrappers.AddCircuitToTicket();
         ticketData.ticket_id = vmTicketNumber;
@@ -347,9 +418,15 @@ public class VisionMetrixCallOut {
         System.debug('Circuit Alias: ' + ticketData.circuit_alias);
         System.debug('Ids added to Exclusion Peiod Ticket: ' + ticketData.ticket_id);
         return JSON.serialize(ticketData);
-    }
+    } /**************************************************************************************************************************************** */
 
-    // Method to add a ticket to VisionMetrix takes SF Support Ticket Number as input
+    /**
+     * Method to add a new VisionMetrix ticket
+     * @param ticketId - the VisionMetrix ticket number
+     * @param isExclusion - boolean to determine if the ticket is an exclusion or not
+     * @uses visionMetrixLogin() to get the token for the header
+     * @uses genExclusionPayload() to generate the payload for the callout
+     */
     public static void addVMTicket(String ticketId, Boolean isExclusion) {
         String headerToken = visionMetrixLogin();
         Http http = new Http(  );
@@ -373,10 +450,13 @@ public class VisionMetrixCallOut {
         HttpResponse response = http.send(request);
         // If the request is successful, parse the JSON response.
         handleResponse(response);
-    }
+    } /**************************************************************************************************************************************** */
 
-    // Method to get a ticket from VisionMetrix takes SF Support Ticket Number as input
-    //! This method is not working
+    /**
+     * Method to get an existing VisionMetrix ticket
+     * @param ticketId - the VisionMetrix ticket number
+     * @uses visionMetrixLogin() to get the token for the header
+     */
     public static void getVMTicket(String ticketId) {
         String headerToken = visionMetrixLogin();
         String urlEnd = 'tickets/get?ticket_id=' + ticketId;
@@ -396,8 +476,15 @@ public class VisionMetrixCallOut {
         // If the request is successful, parse the JSON response.
         System.debug(response.getStatus());
         handleResponse(response);
-    }
+    } /**************************************************************************************************************************************** */
 
+    /**
+     * Method to edit an existing VisionMetrix ticket
+     * @param ticketId - the VisionMetrix ticket number
+     * @param selectedNodes - the circuit alias to be added to the ticket
+     * @uses visionMetrixLogin() to get the token for the header
+     * @uses genExclusionPayload() to generate the payload for the callout
+     */
     public static void editVMTicket(String ticketId, List<Id> selectedNodes) {
         String headerToken = visionMetrixLogin();
         Http http = new Http(  );
@@ -414,9 +501,14 @@ public class VisionMetrixCallOut {
         HttpResponse response = http.send(request);
         // If the request is successful, parse the JSON response.
         handleResponse(response);
-    }
+    } /**************************************************************************************************************************************** */
 
-    //^ Method to add a circuit to an existing VisionMetrix ticket by calling genAddCircuitPayload()
+    /**
+     * Method to add a circuit to an existing VisionMetrix ticket
+     * @param vmTicketNumber - the VisionMetrix ticket number
+     * @param selectedNodes - the circuit alias to be added to the ticket
+     * @uses genAddCircuitPayload() to generate the payload for the callout
+     */
     @AuraEnabled
     public static void addCircuitToVMTicket(String vmTicketNumber, String selectedNodes) {
         String headerToken = visionMetrixLogin();
@@ -434,8 +526,14 @@ public class VisionMetrixCallOut {
         HttpResponse response = http.send(request);
         // If the request is successful, parse the JSON response.
         handleResponse(response);
-    }
+    } /**************************************************************************************************************************************** */
 
+    /**
+     * Method to remove a circuit from an existing VisionMetrix ticket
+     * @param vmTicketNumber - the VisionMetrix ticket number
+     * @param selectedNodes - the circuit alias to be removed from the ticket
+     * @uses genAddCircuitPayload() to generate the payload for the callout
+     */
     @AuraEnabled
     public static void removeCircuitFromTicket(String vmTicketNumber, String selectedNodes) {
         String headerToken = visionMetrixLogin();
@@ -453,18 +551,23 @@ public class VisionMetrixCallOut {
         HttpResponse response = http.send(request);
         // If the request is successful, parse the JSON response.
         handleResponse(response);
-    }
+    } /**************************************************************************************************************************************** */
 
     // invocableMethod for getting the latest events from VisionMetrix called from a flow
     @invocableMethod(label = 'Get Latest Events')
     public static void getLatestEventsInvocable() {
         getLatestEvents();
-    }
+    }/**************************************************************************************************************************************** */
 
     /**
-     * Method calls the VisionMetrix API to get the latest events and will create a new ticket in Salesforce or attach the event to an existing ticket
      * getLatestEvents()
-     * @insert newEvent - the event to be handled
+     *
+     * Method calls the VisionMetrix API to get the latest events and will create a new ticket in Salesforce or attach the event to an existing ticket
+     *
+     * @insert      newEvent                VisionMetrix_Event__c       the event to be handled
+     *
+     * @uses        visionMetrixLogin()     Function                    to get the token for the header
+     *
      */
     @future(callout = true)
     public static void getLatestEvents() {
@@ -600,12 +703,16 @@ public class VisionMetrixCallOut {
         } else {
             System.debug('No new events found');
         }
-    }
+    }/***************************************************************************************************************************************** */
 
     /**
-     * method to handle the event and create a ticket in Salesforce
      * handleEvent()
-     * @param newEvent - the event to be handled
+     *
+     * method to handle the event and create a ticket in Salesforce
+     *
+     * @param       newEvent            VisionMetrix_Event__c               the event to be handled
+     *
+     * @uses        visionMetrixLogin() Function                            to get the token for the header
      */
     public static void handleEvent(VisionMetrix_Event__c newEvent) {
         if ( newEvent != null ) {
@@ -617,12 +724,16 @@ public class VisionMetrixCallOut {
             c.Origin = 'Proactive';
             insert c;
         }
-    }
+    }/**************************************************************************************************************************************** */
 
     /**
      * Method to retrieve a filtered list of events from VisionMetrix
+     *
      * getLatestEventsFiltered()
-     * @param response - the response from the callout
+     *
+     * @param       response            String                  the response from the callout
+     *
+     * @uses        visionMetrixLogin() Function                to get the token for the header
      */
     public static void getLatestEventsFiltered(List<String> filterTerms) {
         // String headerToken = visionMetrixLogin();
@@ -638,14 +749,19 @@ public class VisionMetrixCallOut {
         HttpResponse response = new Http(  ).send(request);
         Map<String, Object> results = ( Map<String, Object> )JSON.deserializeUntyped(response.getBody());
         System.debug(results);
-    }
+    } /**************************************************************************************************************************************** */
 
     /**
-     * Method to update the circuit id in VisionMetrix
      * genEditCircuitPayload()
-     * @param oldId - the old circuit id
-     * @param newId - the new circuit id
-     * @return - the wrapper class as a string
+     *
+     * Method to update the circuit id in VisionMetrix
+     *
+     * @param       oldId               String                  old circuit id
+     * @param       newId               String                  the new circuit id
+     *
+     * @uses        circuitIdChange     VisionMetrixWrappers    the wrapper class to hold the old and new circuit ids
+     *
+     * @return                          String                   the payload for the callout
      */
     public static String genEditCircuitPayload(String oldId, String newId) {
         VisionMetrixWrappers.EditCircuitInVisionMetrix circuitIdChange = new VisionMetrixWrappers.EditCircuitInVisionMetrix();
@@ -653,13 +769,19 @@ public class VisionMetrixCallOut {
         circuitIdChange.new_circuit_alias = newId;
         System.debug('Circuit Id Change Payload: ' + circuitIdChange);
         return JSON.serialize(circuitIdChange);
-    }
+    } /**************************************************************************************************************************************** */
 
     /**
-     * Method to update the circuit id in VisionMetrix
      * updateCircuitIdInVM()
-     * @param oldId - the old circuit id
-     * @param newId - the new circuit id
+     *
+     * Method to update the circuit id in VisionMetrix
+     *
+     * @param       oldId               String      the old circuit id
+     * @param       newId               String      the new circuit id
+     *
+     * @uses        visionMetrixLogin()             to get the token for the header
+     * @uses        genEditCircuitPayload()         to generate the payload for the callout
+     * @uses        handleResponse()                to handle the response from the callout
      */
     public static void updateCircuitIdInVM(String oldId, String newId) {
         String headerToken = visionMetrixLogin();
@@ -679,6 +801,5 @@ public class VisionMetrixCallOut {
         HttpResponse response = http.send(request);
         // If the request is successful, parse the JSON response.
         handleResponse(response);
-    }
-
+    }/**************************************************************************************************************************************** */
 }

@@ -7,7 +7,7 @@ import HAS_VM_TKT from '@salesforce/schema/Case.hasVisionMetrixTicket__c';
 import { getRecord } from 'lightning/uiRecordApi';
 
 export default class VisionMertixParentTab extends LightningElement {
-     @api recordId;
+    @api recordId;
     @api caseNumber;
     @track caseData;
     @track acctId;
