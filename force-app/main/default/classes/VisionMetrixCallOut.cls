@@ -1,5 +1,21 @@
+/**
+ * @name              : VisionMetrixCallOut.cls
+ * @description       : this class is used to make callouts to the VisionMetrix API
+ * @author            : vlettau@everstream.net
+ * @group             : Enterprise Technology
+ * @Created on        : 7-11-2023  
+ * @last modified by  : vlettau@everstream.net
+ * @last modified on  : 10-11-2023  
+ **/
 public class VisionMetrixCallOut {
-    // Practice Methoid used to test the call out
+    /**
+     * practiceMethod()
+     * 
+     * Method to practice using the split method
+     * 
+     * @param       name                String          the name to be split
+     * 
+     */
     public static void practiceMethod(String name) {
         List<String> b = name.split('\\.');
         for ( String x : b ) {

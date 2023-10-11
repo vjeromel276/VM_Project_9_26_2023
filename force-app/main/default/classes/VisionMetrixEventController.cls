@@ -1,11 +1,12 @@
-//* ================================================================================================================
-//* Created by      : Vincent Lettau
-//* Date            : 2023-09-23
-//* Description     : VisionMetrixEventController
-//*                 : This class is used to handle the logic for the VisionMetrixEvent component
-//* Last Updated By : Vincent Lettau
-//* Last Updated On : 2023-09-27
-//* ================================================================================================================
+/**
+ * @name              : VisionMetrixEventController
+ * @description       : this controller is for the VisionMetrixEvent component
+ * @author            : vlettau@everstream.net
+ * @group             : Enterprise Technology
+ * @Created on        : 10-11-2023  
+ * @last modified by  : vlettau@everstream.net
+ * @last modified on  : 10-11-2023  
+ **/
 public with sharing class VisionMetrixEventController{
     @AuraEnabled(cacheable = true)
     public static List<VisionMetrix_Event__c> getVisionMetrixEvents(){
