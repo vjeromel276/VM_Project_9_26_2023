@@ -3,26 +3,11 @@
  * @description       : this class is used to make callouts to the VisionMetrix API
  * @author            : vlettau@everstream.net
  * @group             : Enterprise Technology
- * @Created on        : 7-11-2023  
+ * @Created on        : 7-11-2023
  * @last modified by  : vlettau@everstream.net
- * @last modified on  : 10-11-2023  
+ * @last modified on  : 10-11-2023
  **/
 public class VisionMetrixCallOut {
-    /**
-     * practiceMethod()
-     * 
-     * Method to practice using the split method
-     * 
-     * @param       name                String          the name to be split
-     * 
-     */
-    public static void practiceMethod(String name) {
-        List<String> b = name.split('\\.');
-        for ( String x : b ) {
-            System.debug(x);
-        }
-    }
-
     /**
      * genAuthPayload()
      *
@@ -360,8 +345,9 @@ public class VisionMetrixCallOut {
             System.debug('Support Agent: ' + t.support_agent);
         }
         return JSON.serialize(bulkticketData);
-    } /**************************************************************************************************************************************** */
+    }
 
+    /**************************************************************************************************************************************** */
     /**
      * addBulkVMTicket()
      *
@@ -398,8 +384,9 @@ public class VisionMetrixCallOut {
         // If the request is successful, parse the JSON response.
         handleResponse(response);
         System.debug('+++++++++++++++++++End of addBulkVMTicket Method+++++++++++++++++++++++++++++++++++++++++++++++++++');
-    } /**************************************************************************************************************************************** */
+    }
 
+    /**************************************************************************************************************************************** */
     /**
      * genNonExclusionPayload()
      *
@@ -414,8 +401,9 @@ public class VisionMetrixCallOut {
      */
     public static String genNonExclusionPayload(String ticketId) {
         return null;
-    } /**************************************************************************************************************************************** */
+    }
 
+    /**************************************************************************************************************************************** */
     /**
      * genAddCircuitPayload()
      *
@@ -434,8 +422,9 @@ public class VisionMetrixCallOut {
         System.debug('Circuit Alias: ' + ticketData.circuit_alias);
         System.debug('Ids added to Exclusion Peiod Ticket: ' + ticketData.ticket_id);
         return JSON.serialize(ticketData);
-    } /**************************************************************************************************************************************** */
+    }
 
+    /**************************************************************************************************************************************** */
     /**
      * Method to add a new VisionMetrix ticket
      * @param ticketId - the VisionMetrix ticket number
@@ -466,8 +455,9 @@ public class VisionMetrixCallOut {
         HttpResponse response = http.send(request);
         // If the request is successful, parse the JSON response.
         handleResponse(response);
-    } /**************************************************************************************************************************************** */
+    }
 
+    /**************************************************************************************************************************************** */
     /**
      * Method to get an existing VisionMetrix ticket
      * @param ticketId - the VisionMetrix ticket number
@@ -492,8 +482,9 @@ public class VisionMetrixCallOut {
         // If the request is successful, parse the JSON response.
         System.debug(response.getStatus());
         handleResponse(response);
-    } /**************************************************************************************************************************************** */
+    }
 
+    /**************************************************************************************************************************************** */
     /**
      * Method to edit an existing VisionMetrix ticket
      * @param ticketId - the VisionMetrix ticket number
@@ -517,8 +508,9 @@ public class VisionMetrixCallOut {
         HttpResponse response = http.send(request);
         // If the request is successful, parse the JSON response.
         handleResponse(response);
-    } /**************************************************************************************************************************************** */
+    }
 
+    /**************************************************************************************************************************************** */
     /**
      * Method to add a circuit to an existing VisionMetrix ticket
      * @param vmTicketNumber - the VisionMetrix ticket number
@@ -542,8 +534,9 @@ public class VisionMetrixCallOut {
         HttpResponse response = http.send(request);
         // If the request is successful, parse the JSON response.
         handleResponse(response);
-    } /**************************************************************************************************************************************** */
+    }
 
+    /**************************************************************************************************************************************** */
     /**
      * Method to remove a circuit from an existing VisionMetrix ticket
      * @param vmTicketNumber - the VisionMetrix ticket number
@@ -567,14 +560,16 @@ public class VisionMetrixCallOut {
         HttpResponse response = http.send(request);
         // If the request is successful, parse the JSON response.
         handleResponse(response);
-    } /**************************************************************************************************************************************** */
+    }
 
+    /**************************************************************************************************************************************** */
     // invocableMethod for getting the latest events from VisionMetrix called from a flow
     @invocableMethod(label = 'Get Latest Events')
     public static void getLatestEventsInvocable() {
         getLatestEvents();
-    }/**************************************************************************************************************************************** */
+    }
 
+    /**************************************************************************************************************************************** */
     /**
      * getLatestEvents()
      *
@@ -719,8 +714,9 @@ public class VisionMetrixCallOut {
         } else {
             System.debug('No new events found');
         }
-    }/***************************************************************************************************************************************** */
+    }
 
+    /***************************************************************************************************************************************** */
     /**
      * handleEvent()
      *
@@ -740,8 +736,9 @@ public class VisionMetrixCallOut {
             c.Origin = 'Proactive';
             insert c;
         }
-    }/**************************************************************************************************************************************** */
+    }
 
+    /**************************************************************************************************************************************** */
     /**
      * Method to retrieve a filtered list of events from VisionMetrix
      *
@@ -765,8 +762,9 @@ public class VisionMetrixCallOut {
         HttpResponse response = new Http(  ).send(request);
         Map<String, Object> results = ( Map<String, Object> )JSON.deserializeUntyped(response.getBody());
         System.debug(results);
-    } /**************************************************************************************************************************************** */
+    }
 
+    /**************************************************************************************************************************************** */
     /**
      * genEditCircuitPayload()
      *
@@ -785,8 +783,9 @@ public class VisionMetrixCallOut {
         circuitIdChange.new_circuit_alias = newId;
         System.debug('Circuit Id Change Payload: ' + circuitIdChange);
         return JSON.serialize(circuitIdChange);
-    } /**************************************************************************************************************************************** */
+    }
 
+    /**************************************************************************************************************************************** */
     /**
      * updateCircuitIdInVM()
      *
@@ -817,5 +816,95 @@ public class VisionMetrixCallOut {
         HttpResponse response = http.send(request);
         // If the request is successful, parse the JSON response.
         handleResponse(response);
-    }/**************************************************************************************************************************************** */
+    }
+
+    /**************************************************************************************************************************************** */
+    /**
+     * pullAllCircuits()
+     *
+     * Method to pull all circuits from VisionMetrix
+     *
+     * @uses        visionMetrixLogin()             to get the token for the header
+     * @uses        handleResponse()                to handle the response from the callout
+     *
+     */
+    public static void pullAllCircuits() {
+        String headerToken = visionMetrixLogin();
+        String urlEnd = 'https://rest-api2.visionmetrix.net/1.1/circuits/query/';
+        String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[IN]';
+
+        HttpRequest request = new HttpRequest(  );
+        System.debug('endpoint' + endpoint);
+        request.setEndpoint(endpoint.trim());
+        request.setMethod('GET');
+        request.setHeader('Content-Type', 'application/json,utf-8');
+        request.setHeader('X-ocularip-username', 'everstreampcol1');
+        request.setHeader('X-ocularip-token', headerToken);
+        request.setHeader('X-ocularip-company', 'Everstream');
+        HttpResponse response = new Http(  ).send(request);
+
+        System.debug('**********************************************');
+        System.debug(response.getBody());
+        System.debug('**********************************************');
+
+        System.debug('Response Body: ' + response.getBody().get('circuits').toString());
+        // Map<String, Object> results = ( Map<String, Object> )JSON.deserializeUntyped(response.getBody());
+        // String success = results.get('success').toString();
+        // System.debug('success: ' + success);
+        // if ( success == 'false' ) {
+        //     throw new System.QueryException( 'Callout failed with error: ' + results.get('error').toString() );
+        // } else {
+        //     String circuits = results.get('circuits').toString();
+        //     System.debug('circuits: ' + circuits);
+        // List<String> circuitList = circuits.split('}, ');
+        // if ( circuitList.size() > 1 ) {
+        //     for ( String circuitString : circuitList ) {
+        //         // System.debug('circuitString: ' + circuitString);
+        //         circuitString = circuitString.replace('(', '');
+        //         circuitString = circuitString.replace(')', '');
+        //         circuitString = circuitString.replace('{', '');
+        //         List<String> kvps = circuitString.split(',');
+        //         // System.debug('kvps: ' + kvps);
+
+        //         Map<String, String> eventMap = new Map<String, String>();
+
+        //         // if ( kvps.size() > 1 ) {
+
+        //         //     for ( String kvp : kvps ) {
+        //         //         System.debug('kvp = ' + kvp);
+        //         //         List<String> kvpList = kvp.split('=');
+        //         //         // System.debug(kvpList);
+        //         //         if ( kvpList.size() > 1 ) {
+        //         //             kvpList[0] = kvpList[0].trim().deleteWhitespace();
+        //         //             kvpList[1] = kvpList[1].trim().deleteWhitespace();
+        //         //             // kvpList[0] is the key, kvpList[1] is the value add to map
+        //         //             // System.debug('Label: ' + kvpList[0] + ' - Value:' + kvpList[1]);
+        //         //             eventMap.put(kvpList[0], kvpList[1]);
+        //         //         }
+        //         //     }
+        //         // }
+        //         // for(String key : eventMap.keySet()) {
+        //         //     String anotherKey = 'secondary_name';
+        //         //     if(key=='circuit_alias') {
+        //         //         System.debug('Key: ' + key + ' - Value: ' + eventMap.get(key));
+        //         //         System.debug('Key: ' + anotherKey + ' - Value: ' + eventMap.get(anotherKey));
+        //         //     }
+
+        //         // }
+        //     }
+        // }
+        //}
+    }
+
+    public static Map<String, Object> processResponseBody(String responseBody) {
+        Map<String, Object> responseMap = new Map<String, Object>();
+        Map<String, Object> parameterMap = new Map<String, Object>();
+        List<Object> jsonList = ( List<Object> )JSON.deserialize(responseBody, List<Object>.class);
+        for ( Object jsonObject : jsonList ) {
+            parameterMap = ( Map<String, Object> )jsonObject;
+            responseMap.put((String) parameterMap.get('name'), parameterMap.get('value'));
+        }
+        return responseMap;
+    }
+
 }
