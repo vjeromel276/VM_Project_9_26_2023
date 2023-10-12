@@ -847,7 +847,7 @@ public class VisionMetrixCallOut {
         System.debug(response.getBody());
         System.debug('**********************************************');
 
-        System.debug('Response Body: ' + response.getBody().get('circuits').toString());
+        // If the request is successful, parse the JSON response.
         // Map<String, Object> results = ( Map<String, Object> )JSON.deserializeUntyped(response.getBody());
         // String success = results.get('success').toString();
         // System.debug('success: ' + success);
@@ -896,15 +896,6 @@ public class VisionMetrixCallOut {
         //}
     }
 
-    public static Map<String, Object> processResponseBody(String responseBody) {
-        Map<String, Object> responseMap = new Map<String, Object>();
-        Map<String, Object> parameterMap = new Map<String, Object>();
-        List<Object> jsonList = ( List<Object> )JSON.deserialize(responseBody, List<Object>.class);
-        for ( Object jsonObject : jsonList ) {
-            parameterMap = ( Map<String, Object> )jsonObject;
-            responseMap.put((String) parameterMap.get('name'), parameterMap.get('value'));
-        }
-        return responseMap;
-    }
+    
 
 }
