@@ -849,10 +849,13 @@ public class VisionMetrixCallOut {
         // System.debug('blob: '+blobBodyString.remove(str));
         System.debug('String: '+stringBody.remove(str));
         String editedBody = stringBody.remove(str);
+        editedBody = editedBody.remove('"circuits":[');
+        System.debug('editedBody: '+editedBody);
 
         List<String> eventList = editedBody.deleteWhitespace().trim().split( '},' );
         // List<String> eventList = editedBody.split( '}' );
         // System.debug('eventList: ' + eventList);
+
         if ( eventList.size() > 1 ) {
             for ( String eventString : eventList ) {
                 eventString = eventString.replace('(', '');
@@ -869,20 +872,64 @@ public class VisionMetrixCallOut {
                     for ( String kvp : kvps ) {
                         // System.debug(kvp);
                         List<String> kvpList = kvp.split(':');
-                        // System.debug(kvpList);
+                        System.debug(kvpList);
                         if ( kvpList.size() > 1 ) {
                             kvpList[0] = kvpList[0].trim().deleteWhitespace().replace('"', '').replace('[', '').replace(']', '');
                             kvpList[1] = kvpList[1].trim().deleteWhitespace().replace('"', '').replace('[', '').replace(']', '');
                             // kvpList[0] is the key, kvpList[1] is the value add to map
-                            // System.debug('Label: ' + kvpList[0] + ' - Value:' + kvpList[1]);
+                            System.debug('Label: ' + kvpList[0] + ' - Value:' + kvpList[1]);
                             eventMap.put(kvpList[0], kvpList[1]);
                         }
                     }
                 }
-                for(String key : eventMap.keySet()){
-                    System.debug('key: '+key);
-                    System.debug('value: '+eventMap.get(key));
-                }
+                if(eventMap!=null && eventMap.size()>0){
+                    // eventMap has the key value pairs for the event the key matches the field name in the VM_Event__c object
+                    if ( eventMap.size() > 1 ) {
+                        // //^ Circuit Name
+                        // if ( eventMap.get('circuit_alias') != null && eventMap != null ) {
+                        //     String circuitName = eventMap.get('circuit_alias').trim().deleteWhitespace();
+                        //     newCircuit.Circuit_Name__c = circuitName;
+                        //     List<String> circuitNameList = circuitName.split('\\.');
+                        //     if ( circuitNameList.size() > 1 ) {
+                        //         System.debug('circuitNameList: ' + circuitNameList);
+                        //         // newCircuit.Vendor__c = circuitNameList[0];
+                        //         // newCircuit.Market__c = circuitNameList[1];
+                        //         // newCircuit.Ring__c = circuitNameList[2];
+                        //         // newCircuit.Node__c = circuitNameList[3];
+                        //         // String VLAN = circuitNameList[4];
+                        //         // newCircuit.VLAN__c = VLAN != null ? VLAN : '';
+                        //     }
+                        // }
+                        //^ Circuit Alias
+                        if ( eventMap.get('circuit_alias') != null && eventMap != null ) {
+                            newCircuit.Circuit_Alias__c = eventMap.get('circuit_alias').trim().deleteWhitespace();
+                        }
+                        //^ Secondary Circuit Name
+                        if ( eventMap.get('secondary_name') != null && eventMap != null ) {
+                            newCircuit.Secondary_Name__c = eventMap.get('secondary_name').trim().deleteWhitespace();
+                        }
+                        //^ Start Time
+                        if ( eventMap.get('start_time') == null || eventMap.get('start_time') == '' ) {
+                            newEvent.Start_Time__c = null;
+                            // System.debug('Start Time should be null and is....... ' + eventMap.get('start_time'));
+                        } else {
+                            String sdt = eventMap.get('start_time').trim().deleteWhitespace();
+                            Long sldt = Long.valueOf(sdt) * 1000;
+                            newEvent.Start_Time__c = Datetime.newInstance(sldt);
+                            // System.debug('Start Time is: ' + eventMap.get('start_time'));
+                        }
+                        //^ Circuit Image
+                        if ( eventMap.get('circuit_image') != null && eventMap != null ) {
+                            newCircuit.Circuit_Image__c = eventMap.get('circuit_image').trim().deleteWhitespace();
+                        }
+                        //^ Circuit Description could be look up to VLAN on SOF 
+                        if ( eventMap.get('circuit_description') != null && eventMap != null ) {
+                            newCircuit.Circuit_Description__c = eventMap.get('circuit_description').trim().deleteWhitespace();
+                        }
+                        //^ Circuit Status
+                        if ( eventMap.get('status') != null && eventMap != null ){
+                            newCircuit.Circuit_Status__c = eventMap.get('status').trim().deleteWhitespace();
+                        }
             }
         } else {
             System.debug('No new events found');
