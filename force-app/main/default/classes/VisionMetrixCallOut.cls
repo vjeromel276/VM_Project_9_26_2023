@@ -923,8 +923,8 @@ public class VisionMetrixCallOut {
                             newCircuit.Circuit_Image__c = eventMap.get('circuit_image').trim().deleteWhitespace();
                         }
                         //^ Circuit Description could be look up to VLAN on SOF 
-                        if ( eventMap.get('circuit_description') != null && eventMap != null ) {
-                            newCircuit.Circuit_Description__c = eventMap.get('circuit_description').trim().deleteWhitespace();
+                        if ( eventMap.get('description') != null && eventMap != null ) {
+                            newCircuit.Circuit_Description__c = eventMap.get('description').trim().deleteWhitespace();
                         }
                         //^ Circuit Status
                         if ( eventMap.get('status') != null && eventMap != null ){
@@ -934,13 +934,9 @@ public class VisionMetrixCallOut {
                         if ( eventMap.get('bandwidth') != null && eventMap != null ){
                             newCircuit.Bandwidth__c = eventMap.get('bandwidth').trim().deleteWhitespace();
                         }
-                        //^ Circuit Bandwidth
-                        if ( eventMap.get('bandwidth') != null && eventMap != null ){
-                            newCircuit.Bandwidth__c = eventMap.get('bandwidth').trim().deleteWhitespace();
-                        }
                         //^ Circuit Max Ordering Bandwidth
-                        if ( eventMap.get('max_ordering_bandwidth ') != null && eventMap != null ){
-                            newCircuit.Max_Ordering_Bandwidth__c = eventMap.get('max_ordering_bandwidth ').trim().deleteWhitespace();
+                        if ( eventMap.get('max_ordering_bandwidth') != null && eventMap != null ){
+                            newCircuit.Max_Ordering_Bandwidth__c = eventMap.get('max_ordering_bandwidth').trim().deleteWhitespace();
                         }
                         //^ Circuit EIR
                         if ( eventMap.get('eir') != null && eventMap != null ){
@@ -1010,6 +1006,8 @@ public class VisionMetrixCallOut {
                         if ( eventMap.get('ethernet_profile_description') != null && eventMap != null ){
                             newCircuit.Ethernet_Profile_Desc__c = eventMap.get('ethernet_profile_description').trim().deleteWhitespace();
                         }
+
+                        insert newCircuit;
                     }
                 }
             }
