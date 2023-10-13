@@ -843,14 +843,49 @@ public class VisionMetrixCallOut {
         request.setHeader('X-ocularip-company', 'Everstream');
         HttpResponse response = new Http(  ).send(request);
 
-        System.debug('**********************************************');
-        System.debug(response.getBodyAsBlob());
-        System.debug('**********************************************');
-        Blob blobBody = response.getBodyAsBlob();
-        String body = blobBody.toString();
-        // String body = EncodingUtil.base64Encode(blobBody);
-        System.debug('**********************************************');
+        System.debug('response body: '+response.getBody());
+        String stringBody = response.getBody();
         String str = '\\';
-        System.debug(body.remove(str));
-    }
+        // System.debug('blob: '+blobBodyString.remove(str));
+        System.debug('String: '+stringBody.remove(str));
+        String editedBody = stringBody.remove(str);
+
+        List<String> eventList = editedBody.deleteWhitespace().trim().split( '},' );
+        // List<String> eventList = editedBody.split( '}' );
+        // System.debug('eventList: ' + eventList);
+        if ( eventList.size() > 1 ) {
+            for ( String eventString : eventList ) {
+                eventString = eventString.replace('(', '');
+                eventString = eventString.replace(')', '');
+                eventString = eventString.replace('{', '');
+                List<String> kvps = eventString.split(',');
+                // System.debug('kvps: ' + kvps);
+
+                Map<String, String> eventMap = new Map<String, String>();
+                VisionMetrix_Circuit__c newCircuit = new VisionMetrix_Circuit__c();
+
+                if ( kvps.size() > 1 ) {
+
+                    for ( String kvp : kvps ) {
+                        // System.debug(kvp);
+                        List<String> kvpList = kvp.split(':');
+                        // System.debug(kvpList);
+                        if ( kvpList.size() > 1 ) {
+                            kvpList[0] = kvpList[0].trim().deleteWhitespace().replace('"', '').replace('[', '').replace(']', '');
+                            kvpList[1] = kvpList[1].trim().deleteWhitespace().replace('"', '').replace('[', '').replace(']', '');
+                            // kvpList[0] is the key, kvpList[1] is the value add to map
+                            // System.debug('Label: ' + kvpList[0] + ' - Value:' + kvpList[1]);
+                            eventMap.put(kvpList[0], kvpList[1]);
+                        }
+                    }
+                }
+                for(String key : eventMap.keySet()){
+                    System.debug('key: '+key);
+                    System.debug('value: '+eventMap.get(key));
+                }
+            }
+        } else {
+            System.debug('No new events found');
+        }
+    }/**************************************************************************************************** */
 }
