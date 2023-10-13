@@ -831,7 +831,20 @@ public class VisionMetrixCallOut {
     public static void pullAllCircuits() {
         String headerToken = visionMetrixLogin();
         String urlEnd = 'https://rest-api2.visionmetrix.net/1.1/circuits/query/';
-        String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[IN]';
+        String endpoint = urlEnd + '?type=DOMAIN&argument=cONSUMERS%20|%20CMS%20[MI]';//complete 101323
+        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[IL]';//complete 101323
+        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[IN]';//complete 101323
+        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[MI]';//TOO MANY
+        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[MO]';//complete 101323
+        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[OHCL]';//TOO MANY
+        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[OHCO]';//TOO MANY
+        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[PA]';//complete 101323
+        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[WI]';//TOO MANY
+        // String endpoint = urlEnd + '?type=DOMAIN&argument=ATT%20Mobility%20|%20ATTM%20[MI]';//complete 101323
+        // String endpoint = urlEnd + '?type=DOMAIN&argument=ATT%20Mobility%20|%20ATTM%20[OH]';//complete 101323
+        // String endpoint = urlEnd + '?type=DOMAIN&argument=ATT%20Mobility%20|%20ATTM%20[PA]';//too many
+        // String endpoint = urlEnd + '?type=DOMAIN&argument=ATT%20Wireline%20|%20ATTW%20[MI]';//complete 101323
+        // String endpoint = urlEnd + '?type=DOMAIN&argument=ATT%20Wireline%20|%20ATTW%20[OH]';//complete 101323
 
         HttpRequest request = new HttpRequest(  );
         System.debug('endpoint' + endpoint);
@@ -856,7 +869,7 @@ public class VisionMetrixCallOut {
         // List<String> eventList = editedBody.split( '}' );
         // System.debug('eventList: ' + eventList);
 
-        if ( eventList.size() > 1 ) {
+        if ( eventList.size() > 0 ) {
             for ( String eventString : eventList ) {
                 eventString = eventString.replace('(', '');
                 eventString = eventString.replace(')', '');
