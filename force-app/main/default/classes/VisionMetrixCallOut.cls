@@ -898,21 +898,20 @@ public class VisionMetrixCallOut {
                 if(eventMap!=null && eventMap.size()>0){
                     // eventMap has the key value pairs for the event the key matches the field name in the VM_Event__c object
                     if ( eventMap.size() > 1 ) {
-                        //^ Circuit Name
-                        // if ( eventMap.get('circuit_alias') != null && eventMap != null ) {
-                        //     String circuitName = eventMap.get('circuit_alias').trim().deleteWhitespace();
-                        //     newCircuit.Circuit_Name__c = circuitName;
-                        //     List<String> circuitNameList = circuitName.split('\\.');
-                        //     if ( circuitNameList.size() > 1 ) {
-                        //         System.debug('circuitNameList: ' + circuitNameList);
-                        //         // newCircuit.Vendor__c = circuitNameList[0];
-                        //         // newCircuit.Market__c = circuitNameList[1];
-                        //         // newCircuit.Ring__c = circuitNameList[2];
-                        //         // newCircuit.Node__c = circuitNameList[3];
-                        //         // String VLAN = circuitNameList[4];
-                        //         // newCircuit.VLAN__c = VLAN != null ? VLAN : '';
-                        //     }
-                        // }
+                        //^ Circuit 
+                        if ( eventMap.get('circuit_alias') != null && eventMap != null ) {
+                            String circuitName = eventMap.get('circuit_alias').trim().deleteWhitespace();
+                            List<String> circuitNameList = circuitName.split('\\.');
+                            if ( circuitNameList.size() > 1 ) {
+                                // System.debug('circuitNameList: ' + circuitNameList);
+                                System.debug('Vendor' + circuitNameList[0]);
+                                System.debug('Market' + circuitNameList[1]);
+                                System.debug(  'Ring' + circuitNameList[2]);
+                                System.debug(  'Node' + circuitNameList[3]);
+                                System.debug(  'VLAN' + circuitNameList[4]);
+                                // vlanFieldVariable = VLAN != null ? VLAN : '';
+                            }
+                        }
                         //^ Circuit Alias
                         if ( eventMap.get('circuit_alias') != null && eventMap != null ) {
                             newCircuit.Circuit_Alias__c = eventMap.get('circuit_alias').trim().deleteWhitespace();
