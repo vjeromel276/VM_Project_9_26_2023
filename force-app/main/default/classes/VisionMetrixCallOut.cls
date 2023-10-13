@@ -844,58 +844,13 @@ public class VisionMetrixCallOut {
         HttpResponse response = new Http(  ).send(request);
 
         System.debug('**********************************************');
-        System.debug(response.getBody());
+        System.debug(response.getBodyAsBlob());
         System.debug('**********************************************');
-
-        // If the request is successful, parse the JSON response.
-        // Map<String, Object> results = ( Map<String, Object> )JSON.deserializeUntyped(response.getBody());
-        // String success = results.get('success').toString();
-        // System.debug('success: ' + success);
-        // if ( success == 'false' ) {
-        //     throw new System.QueryException( 'Callout failed with error: ' + results.get('error').toString() );
-        // } else {
-        //     String circuits = results.get('circuits').toString();
-        //     System.debug('circuits: ' + circuits);
-        // List<String> circuitList = circuits.split('}, ');
-        // if ( circuitList.size() > 1 ) {
-        //     for ( String circuitString : circuitList ) {
-        //         // System.debug('circuitString: ' + circuitString);
-        //         circuitString = circuitString.replace('(', '');
-        //         circuitString = circuitString.replace(')', '');
-        //         circuitString = circuitString.replace('{', '');
-        //         List<String> kvps = circuitString.split(',');
-        //         // System.debug('kvps: ' + kvps);
-
-        //         Map<String, String> eventMap = new Map<String, String>();
-
-        //         // if ( kvps.size() > 1 ) {
-
-        //         //     for ( String kvp : kvps ) {
-        //         //         System.debug('kvp = ' + kvp);
-        //         //         List<String> kvpList = kvp.split('=');
-        //         //         // System.debug(kvpList);
-        //         //         if ( kvpList.size() > 1 ) {
-        //         //             kvpList[0] = kvpList[0].trim().deleteWhitespace();
-        //         //             kvpList[1] = kvpList[1].trim().deleteWhitespace();
-        //         //             // kvpList[0] is the key, kvpList[1] is the value add to map
-        //         //             // System.debug('Label: ' + kvpList[0] + ' - Value:' + kvpList[1]);
-        //         //             eventMap.put(kvpList[0], kvpList[1]);
-        //         //         }
-        //         //     }
-        //         // }
-        //         // for(String key : eventMap.keySet()) {
-        //         //     String anotherKey = 'secondary_name';
-        //         //     if(key=='circuit_alias') {
-        //         //         System.debug('Key: ' + key + ' - Value: ' + eventMap.get(key));
-        //         //         System.debug('Key: ' + anotherKey + ' - Value: ' + eventMap.get(anotherKey));
-        //         //     }
-
-        //         // }
-        //     }
-        // }
-        //}
+        Blob blobBody = response.getBodyAsBlob();
+        String body = blobBody.toString();
+        // String body = EncodingUtil.base64Encode(blobBody);
+        System.debug('**********************************************');
+        String str = '\\';
+        System.debug(body.remove(str));
     }
-
-    
-
 }
