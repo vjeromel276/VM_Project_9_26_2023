@@ -829,20 +829,24 @@ public class VisionMetrixCallOut {
      *
      */
     public static void pullAllCircuits() {
+        List<VisionMetrix_Circuit__c> circuitList = new List<VisionMetrix_Circuit__c>();
         String headerToken = visionMetrixLogin();
         String urlEnd = 'https://rest-api2.visionmetrix.net/1.1/circuits/query/';
-        String endpoint = urlEnd + '?type=DOMAIN&argument=cONSUMERS%20|%20CMS%20[MI]';//complete 101323
+        // String endpoint = urlEnd + '?type=DOMAIN&argument=EV%20Backbone%20|%20';//!incomplete
+        // String endpoint = urlEnd + '?type=DOMAIN&argument=Verizon%20|%20VZW%20[MI]';//complete 101323
+        // String endpoint = urlEnd + '?type=DOMAIN&argument=Verizon%20|%20VZW%20[OH]';//complete 101323
+        // String endpoint = urlEnd + '?type=DOMAIN&argument=Consumers%20|%20CMS%20[MI]';//complete 101323
         // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[IL]';//complete 101323
         // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[IN]';//complete 101323
-        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[MI]';//TOO MANY
+        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[MI]';//TOO MANY//!said too complicated regex
         // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[MO]';//complete 101323
-        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[OHCL]';//TOO MANY
-        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[OHCO]';//TOO MANY
+        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[OHCL]';//TOO MANY complete 101523
+        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[OHCO]';//TOO MANY complete 101523
         // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[PA]';//complete 101323
-        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[WI]';//TOO MANY
+        String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[WI]';//TOO MANY//!said too complicated regex
         // String endpoint = urlEnd + '?type=DOMAIN&argument=ATT%20Mobility%20|%20ATTM%20[MI]';//complete 101323
         // String endpoint = urlEnd + '?type=DOMAIN&argument=ATT%20Mobility%20|%20ATTM%20[OH]';//complete 101323
-        // String endpoint = urlEnd + '?type=DOMAIN&argument=ATT%20Mobility%20|%20ATTM%20[PA]';//too many
+        // String endpoint = urlEnd + '?type=DOMAIN&argument=ATT%20Mobility%20|%20ATTM%20[PA]';//too many complete 101523
         // String endpoint = urlEnd + '?type=DOMAIN&argument=ATT%20Wireline%20|%20ATTW%20[MI]';//complete 101323
         // String endpoint = urlEnd + '?type=DOMAIN&argument=ATT%20Wireline%20|%20ATTW%20[OH]';//complete 101323
 
@@ -865,7 +869,9 @@ public class VisionMetrixCallOut {
         editedBody = editedBody.remove('"circuits":[');
         System.debug('editedBody: '+editedBody);
 
-        List<String> eventList = editedBody.deleteWhitespace().trim().split( '},' );
+        editedBody = editedBody.deleteWhitespace().trim();
+
+        List<String> eventList = editedBody.split( '},' );
         // List<String> eventList = editedBody.split( '}' );
         // System.debug('eventList: ' + eventList);
 
@@ -899,19 +905,19 @@ public class VisionMetrixCallOut {
                     // eventMap has the key value pairs for the event the key matches the field name in the VM_Event__c object
                     if ( eventMap.size() > 1 ) {
                         //^ Circuit 
-                        if ( eventMap.get('circuit_alias') != null && eventMap != null ) {
-                            String circuitName = eventMap.get('circuit_alias').trim().deleteWhitespace();
-                            List<String> circuitNameList = circuitName.split('\\.');
-                            if ( circuitNameList.size() > 1 ) {
-                                // System.debug('circuitNameList: ' + circuitNameList);
-                                System.debug('Vendor' + circuitNameList[0]);
-                                System.debug('Market' + circuitNameList[1]);
-                                System.debug(  'Ring' + circuitNameList[2]);
-                                System.debug(  'Node' + circuitNameList[3]);
-                                System.debug(  'VLAN' + circuitNameList[4]);
-                                // vlanFieldVariable = VLAN != null ? VLAN : '';
-                            }
-                        }
+                        // if ( eventMap.get('circuit_alias') != null && eventMap != null ) {
+                        //     String circuitName = eventMap.get('circuit_alias').trim().deleteWhitespace();
+                        //     List<String> circuitNameList = circuitName.split('\\.');
+                        //     if ( circuitNameList.size() > 1 ) {
+                        //         // System.debug('circuitNameList: ' + circuitNameList);
+                        //         System.debug('Vendor' + circuitNameList[0]);
+                        //         System.debug('Market' + circuitNameList[1]);
+                        //         System.debug(  'Ring' + circuitNameList[2]);
+                        //         System.debug(  'Node' + circuitNameList[3]);
+                        //         System.debug(  'VLAN' + circuitNameList[4]);
+                        //         // vlanFieldVariable = VLAN != null ? VLAN : '';
+                        //     }
+                        // }
                         //^ Circuit Alias
                         if ( eventMap.get('circuit_alias') != null && eventMap != null ) {
                             newCircuit.Circuit_Alias__c = eventMap.get('circuit_alias').trim().deleteWhitespace();
@@ -1019,10 +1025,13 @@ public class VisionMetrixCallOut {
                             newCircuit.Ethernet_Profile_Desc__c = eventMap.get('ethernet_profile_description').trim().deleteWhitespace();
                         }
 
-                        insert newCircuit;
+                        // insert newCircuit;
+                        circuitList.add(newCircuit);//!use when bulk inserting
                     }
+                    
                 }
             }
+            System.enqueueJob(new QueueableCircuitInsert(circuitList));//!use when bulk inserting
         } else {
             System.debug('No new events found');
         }

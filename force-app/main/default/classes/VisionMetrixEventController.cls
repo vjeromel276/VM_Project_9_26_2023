@@ -105,4 +105,39 @@ public with sharing class VisionMetrixEventController{
         update nodesToUpdate;
     }
 
+    /**
+     * where the vm event circuit id is equal to the vm circuit id pass the vm circuit id's sf record id to vm event circuit look up fields
+     */
+    @AuraEnabled
+    public static void attachVmEventToCircuit(){
+        List<VisionMetrix_Event__c> events = [
+            SELECT Id, Name, VisionMetrix_Circuit__c, Circuit__c
+            FROM VisionMetrix_Event__c
+            WHERE VisionMetrix_Circuit__c = null
+            AND Circuit__c != null
+        
+        ];
+        Map<VisionMetrix_Event__c,String> eventCircuitMap = new Map<VisionMetrix_Event__c,String>();
+        for (VisionMetrix_Event__c event : events){
+            eventCircuitMap.put(event,event.Circuit__c);
+        }
+        List<VisionMetrix_Circuit__c> circuits = [
+            SELECT Id, Name, Circuit_Alias__c
+            FROM VisionMetrix_Circuit__c
+            WHERE Circuit_Alias__c IN :eventCircuitMap.values()
+        ];
+        Map<String,Id> circuitIdMap = new Map<String,Id>();
+        for (VisionMetrix_Circuit__c circuit : circuits){
+            circuitIdMap.put(circuit.Circuit_Alias__c,circuit.Id);
+        }
+        List<VisionMetrix_Event__c> eventsToUpdate = new List<VisionMetrix_Event__c>();
+        for (VisionMetrix_Event__c event : eventCircuitMap.keySet()){
+            event.VisionMetrix_Circuit__c = circuitIdMap.get(eventCircuitMap.get(event));
+            eventsToUpdate.add(event);
+        }
+        update eventsToUpdate;
+        
+    }
+        //VisionMetrix_Event__r.Circuit__c = VisionMetrix_Circuit__r.Circuit_Alias__c
+        //VisionMetrix_Event__r.VisionMetrix_Circuit__c = VisionMetrix_Circuit__r.Id
 }
