@@ -908,86 +908,104 @@ public class VisionMetrixCallOut {
 
         // eventMap has the key value pairs for the event the key matches the field name in the VisionMetrix_Circuit__c object
             if ( circuitMap.size() > 1 ) {
-                //^ Category
+                //^ circuit_name
                 if ( circuitMap.get('circuit_alias') != null && circuitMap != null ) {
+                    newCircuit.Circuit_Alias__c = circuitMap.get('circuit_alias').trim().deleteWhitespace();
                 }
-                //^ Circuit Name
+                //^ secondary_name
                 if ( circuitMap.get('secondary_name') != null && circuitMap != null ) {
-                    
+                    newCircuit.Secondary_Name__c = circuitMap.get('secondary_name').trim().deleteWhitespace();
                 }
                 //^ Start Time
                 if ( circuitMap.get('start_time') == null || circuitMap.get('start_time') == '' ) {
+                    newCircuit.Start_Time__c = null;
                 } else {
-                    
+                    newCircuit.Start_Time__c = Datetime.newInstance(Long.valueOf(circuitMap.get('start_time').trim().deleteWhitespace()) * 1000);
                 }
-                //^ VisionMetrix Event Id
+                //^ circuit_image
                 if ( circuitMap.get('circuit_image') != null && circuitMap != null ) {
+                    newCircuit.Circuit_Image__c = circuitMap.get('circuit_image').trim().deleteWhitespace();
                 }
-                //^ Event Name
+                //^ description
                 if ( circuitMap.get('description') != null && circuitMap != null ) {
+                    newCircuit.Circuit_Description__c = circuitMap.get('description').trim().deleteWhitespace();
                 }
-                //^ KPI
+                //^ status
                 if ( circuitMap.get('status') != null && circuitMap != null ) {
+                    newCircuit.Circuit_Status__c = circuitMap.get('status').trim().deleteWhitespace();
                 }
-                //^ Node Name
+                //^ bandwidth
                 if ( circuitMap.get('bandwidth') != null && circuitMap != null ) {
+                    newCircuit.Bandwidth__c = circuitMap.get('bandwidth').trim().deleteWhitespace();
                 }
-                //^ Secondary Circuit Name
+                //^ max_ordering_bandwidth
                 if ( circuitMap.get('max_ordering_bandwidth') != null && circuitMap != null ) {
+                    newCircuit.Max_Ordering_Bandwidth__c = circuitMap.get('max_ordering_bandwidth').trim().deleteWhitespace();
                     //TODO: Add logic to get the related service order agreement from the secondary circuit name
                 }
-                //^ Severity
+                //^ eir
                 if ( circuitMap.get('eir') != null && circuitMap != null ) {
-                    
+                    newCircuit.Circuit_EIR__c = circuitMap.get('eir').trim().deleteWhitespace();                  
                 }                
                 //^granularity
                 if ( circuitMap.get('granularity') != null && circuitMap != null ) {
-                    
-                } 
+                    newCircuit.Circuit_Granularity__c = circuitMap.get('granularity').trim().deleteWhitespace();                    
+                }
+                //^ mrc
                 if ( circuitMap.get('mrc') != null && circuitMap != null ) {
-                    
-                } 
+                    newCircuit.Circuit_MRC__c = circuitMap.get('mrc').trim().deleteWhitespace();                    
+                }
+                //^ event_notifications_enabled
                 if ( circuitMap.get('event_notifications_enabled') != null && circuitMap != null ) {
-                    
+                    newCircuit.Custom_Notifications_Enabled__c = circuitMap.get('event_notifications_enabled').trim().deleteWhitespace();
                 } 
-                if ( circuitMap.get('custom_notifications_enabled') != null && circuitMap != null ) {
-                    
-                } 
+                //^ derive_1_way_data_enabled
                 if ( circuitMap.get('derive_1_way_data_enabled') != null && circuitMap != null ) {
-                    
+                    newCircuit.One_Way_Data_Enabled__c = circuitMap.get('derive_1_way_data_enabled').trim().deleteWhitespace();
                 } 
+                //^ system_a_name
                 if ( circuitMap.get('system_a_name') != null && circuitMap != null ) {
-                    
+                    newCircuit.System_A_Name__c = circuitMap.get('system_a_name').trim().deleteWhitespace();
                 } 
+                //^ system_a_alias
                 if ( circuitMap.get('system_a_alias') != null && circuitMap != null ) {
-                    
+                    newCircuit.System_A_Alias__c = circuitMap.get('system_a_alias').trim().deleteWhitespace();
                 } 
+                //^ system_a_ip_address
                 if ( circuitMap.get('system_a_ip_address') != null && circuitMap != null ) {
-                    
+                    newCircuit.System_A_IPAddress__c = circuitMap.get('system_a_ip_address').trim().deleteWhitespace();
                 } 
+                //^ system_a_manufacturer
                 if ( circuitMap.get('system_a_manufacturer') != null && circuitMap != null ) {
-                    
+                    newCircuit.System_A_Manufacturer__c = circuitMap.get('system_a_manufacturer').trim().deleteWhitespace();
                 } 
+                //^ system_a_model
                 if ( circuitMap.get('system_a_model') != null && circuitMap != null ) {
-                    
+                    newCircuit.System_A_Model__c = circuitMap.get('system_a_model').trim().deleteWhitespace();
                 } 
+                //^ system_z_name
                 if ( circuitMap.get('system_z_name') != null && circuitMap != null ) {
-                    
+                    newCircuit.System_Z_Name__c = circuitMap.get('system_z_name').trim().deleteWhitespace();
                 } 
+                //^ system_z_alias
                 if ( circuitMap.get('system_z_alias') != null && circuitMap != null ) {
-                    
+                    newCircuit.System_Z_Alias__c = circuitMap.get('system_z_alias').trim().deleteWhitespace();
                 } 
+                //^ system_z_ip_address
                 if ( circuitMap.get('system_z_ip_address') != null && circuitMap != null ) {
-                    
+                    newCircuit.System_Z_IPAddress__c = circuitMap.get('system_z_ip_address').trim().deleteWhitespace();
                 } 
+                //^ system_z_manufacturer
                 if ( circuitMap.get('system_z_manufacturer') != null && circuitMap != null ) {
-                    
+                    newCircuit.System_Z_Manufacturer__c = circuitMap.get('system_z_manufacturer').trim().deleteWhitespace();
                 } 
+                //^ system_z_model
                 if ( circuitMap.get('system_z_model') != null && circuitMap != null ) {
-                    
+                    newCircuit.System_Z_Model__c = circuitMap.get('system_z_model').trim().deleteWhitespace();
                 } 
+                //^ ethernet_profile_description
                 if ( circuitMap.get('ethernet_profile_description') != null && circuitMap != null ) {
-                    
+                    newCircuit.Ethernet_Profile_Desc__c = circuitMap.get('ethernet_profile_description').trim().deleteWhitespace();
                 }
 
                 //& this will be what make support tickets out of the events
