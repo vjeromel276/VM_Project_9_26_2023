@@ -4,5 +4,21 @@
     "**/bower_components": true,
     "**/.sfdx": true
   },
-  "salesforcedx-vscode-core.show-cli-success-msg": false
+  "salesforcedx-vscode-core.show-cli-success-msg": false,
+  "editor.formatOnType": true,
+  "editor.formatOnPaste": true,
+  "aurahelper.apexFormat.operator.addWhitespaceAfterOpenParenthesisOperator": true,
+  "aurahelper.apexFormat.operator.addWhitespaceBeforeCloseParenthesisOperator": true,
+  "aurahelper.apexFormat.punctuation.addNewLineAfterCloseCurlyBracket": true,
+  "aurahelper.apexFormat.punctuation.addWhitespaceAfterOpenGuardParenthesis": true,
+  "aurahelper.apexFormat.punctuation.addWhitespaceBeforeCloseGuardParenthesis": true,
+  "aurahelper.apexFormat.punctuation.addWhitespaceBeforeOpenCurlyBracket": true,
+  "aurahelper.apexFormat.punctuation.maxBlankLines": 1,
+  "editor.defaultFormatter": "VisualStudioExptTeam.vscodeintellicode",
+  "editor.formatOnSaveMode": "file",
+  "editor.formatOnSave": true,
+  "notebook.formatOnSave.enabled": true,
+  "aurahelper.documentation.useStandardJavaComments": true,
+  "aurahelper.apexFormat.query.maxProjectionFieldPerLine": 4,
+  "apexdox.docblock.alignItems": true
 }

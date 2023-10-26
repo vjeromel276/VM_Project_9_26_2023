@@ -58,7 +58,8 @@ public class VisionMetrixCallOut {
             String token = results.get('token').toString();
             // System.debug(token);
             return token;
-        } else {
+        }
+        else {
             System.debug('***********************************************RESPONSE***********************************************');
             Object[] keys = response.getHeaderKeys();
             Map<String, String> headers = new Map<String, String>();
@@ -90,7 +91,8 @@ public class VisionMetrixCallOut {
             }
             System.debug(results);
             return results.values();
-        } else {
+        }
+        else {
             System.debug('***********************************************RESPONSE***********************************************');
             Object[] keys = response.getHeaderKeys();
             Map<String, String> headers = new Map<String, String>();
@@ -195,12 +197,12 @@ public class VisionMetrixCallOut {
             ticketData.support_agent = c.NOC_Ticket_Assigment__c;
             System.debug('Support Agent: ' + ticketData.support_agent);
             //^ Match - Common tag to associate tickets together
-        } else {
+        }
+        else {
             //^If no Nodes are found, throw an error
             System.debug('No Nodes found on ticket: ' + ticketId);
             throw new System.QueryException( 'No Nodes found with the ticket number or ticket is not of correct type: ' + ticketId );
         }
-
 
         //******* Return the payload *******
         System.debug('Exclusion Peiod Ticket: ' + ticketData.ticket_id);
@@ -255,17 +257,18 @@ public class VisionMetrixCallOut {
                         //switch to reg servie id
                         String circuit = child.Related_Service_Order__r.OSS_Service_ID__c;
                         System.debug('Circuit Id: ' + circuit);
-                        circuitIds.add(circuit);
+                        circuitIds.add(circuit) ;
 
-                    } else {
+                    }
+                    else {
                         //^ If the child is null throw an error
                         System.debug('Child was null: ');
                         // throw new System.QueryException('No Nodes found with the ticket number or ticket is not of correct type: ' + ticketId);
                     }
 
-
                 }
-            } else {
+            }
+            else {
                 //^ No child cases found throw an error
                 System.debug('No Children found on ticket: ' + ticket.Id);
                 throw new System.QueryException( 'No Nodes found with the ticket number or ticket is not of correct type: ' + ticket.Id );
@@ -440,7 +443,8 @@ public class VisionMetrixCallOut {
         if ( isExclusion ) {
 
             ticketPayload = genExclusionPayload(ticketId);
-        } else {
+        }
+        else {
             ticketPayload = genNonExclusionPayload(ticketId);
         }
         request.setEndpoint('https://rest-api2.visionmetrix.net/1.1/tickets/add/');
@@ -580,7 +584,7 @@ public class VisionMetrixCallOut {
      * @uses        visionMetrixLogin()     Function                    to get the token for the header
      *
      */
-    @future(callout = true)
+    // @future(callout = true)
     public static void getLatestEvents() {
         String headerToken = visionMetrixLogin();
         HttpRequest request = new HttpRequest(  );
@@ -591,128 +595,19 @@ public class VisionMetrixCallOut {
         request.setHeader('X-ocularip-token', headerToken);
         request.setHeader('X-ocularip-company', 'Everstream');
         HttpResponse response = new Http(  ).send(request);
+
         Map<String, Object> results = ( Map<String, Object> )JSON.deserializeUntyped(response.getBody());
         String success = results.get('success').toString();
-        // System.debug('success: ' + success);
+        String events = results.get('events').toString();
+        VisionMetrixHelperMethod.handleCircuits(response);
         if ( success == 'false' ) {
             throw new System.QueryException( 'Callout failed with error: ' + results.get('error').toString() );
         }
-        String event = results.get('events').toString();
-        System.debug('event: ' + event);
-        List<String> eventList = event.split( '}, ' );
-        if ( eventList.size() > 1 ) {
-            for ( String eventString : eventList ) {
-                eventString = eventString.replace('(', '');
-                eventString = eventString.replace(')', '');
-                eventString = eventString.replace('{', '');
-                List<String> kvps = eventString.split(',');
-                // System.debug('kvps: ' + kvps);
+        else if ( success == 'true' && events != null ) {
 
-                Map<String, String> eventMap = new Map<String, String>();
-                VisionMetrix_Event__c newEvent = new VisionMetrix_Event__c();
-
-                if ( kvps.size() > 1 ) {
-
-                    for ( String kvp : kvps ) {
-                        // System.debug(kvp);
-                        List<String> kvpList = kvp.split('=');
-                        // System.debug(kvpList);
-                        if ( kvpList.size() > 1 ) {
-                            kvpList[0] = kvpList[0].trim().deleteWhitespace();
-                            kvpList[1] = kvpList[1].trim().deleteWhitespace();
-                            // kvpList[0] is the key, kvpList[1] is the value add to map
-                            // System.debug('Label: ' + kvpList[0] + ' - Value:' + kvpList[1]);
-                            eventMap.put(kvpList[0], kvpList[1]);
-                        }
-                    }
-                }
-
-                // eventMap has the key value pairs for the event the key matches the field name in the VM_Event__c object
-                if ( eventMap.size() > 1 ) {
-                    //^ Category
-                    if ( eventMap.get('category') != null && eventMap != null ) {
-                        newEvent.Category__c = eventMap.get('category').trim().deleteWhitespace();
-                    }
-                    //^ Circuit Name
-                    if ( eventMap.get('circuit_name') != null && eventMap != null ) {
-                        String circuitName = eventMap.get('circuit_name').trim().deleteWhitespace();
-                        newEvent.Circuit__c = circuitName;
-                        List<String> circuitNameList = circuitName.split('\\.');
-                        if ( circuitNameList.size() > 1 ) {
-                            // newEvent.Vendor__c = circuitNameList[0];
-                            // newEvent.Market__c = circuitNameList[1];
-                            // newEvent.Ring__c = circuitNameList[2];
-                            // newEvent.Node__c = circuitNameList[3];
-                            // String VLAN = circuitNameList[4];
-                            // newEvent.VLAN__c = VLAN != null ? VLAN : '';
-                        }
-                    }
-                    //^ Direction
-                    if ( eventMap.get('direction') != null && eventMap != null ) {
-                        System.debug('direction: ' + eventMap.get('direction'));
-                        newEvent.Direction__c = eventMap.get('direction');
-                    }
-                    //^ VisionMetrix Event Id
-                    if ( eventMap.get('id') != null && eventMap != null ) {
-                        newEvent.Event_Id_In_VisionMetrix__c = eventMap.get('id').trim().deleteWhitespace();
-                    }
-                    //^ Event Name
-                    if ( eventMap.get('event_name') != null && eventMap != null ) {
-                        newEvent.Event_Name__c = eventMap.get('event_name').trim().deleteWhitespace();
-                    }
-                    //^ KPI
-                    if ( eventMap.get('kpi') != null && eventMap != null ) {
-                        newEvent.KPI__c = eventMap.get('kpi').trim().deleteWhitespace();
-                    }
-                    //^ Node Name
-                    if ( eventMap.get('node_name') != null && eventMap != null ) {
-                        newEvent.Node_Name__C = eventMap.get('node_name').trim().deleteWhitespace();
-                    }
-                    //^ Secondary Circuit Name
-                    if ( eventMap.get('secondary_circuit_name') != null && eventMap != null ) {
-                        newEvent.Secondary_Circuit_Name__c = eventMap.get('secondary_circuit_name');
-                        //TODO: Add logic to get the related service order agreement from the secondary circuit name
-                    }
-                    //^ Severity
-                    if ( eventMap.get('severity') != null && eventMap != null ) {
-                        if ( eventMap.get('severity').Contains('nfo') ) {
-                            newEvent.Severity__c = 'Informational';
-                        } else if ( eventMap.get('severity').Contains('inor') ) {
-                            newEvent.Severity__c = 'Minor';
-                        } else if ( eventMap.get('severity').Contains('ajor') ) {
-                            newEvent.Severity__c = 'Major';
-                        } else if ( eventMap.get('severity').Contains('ritical') ) {
-                            newEvent.Severity__c = 'Critical';
-                        }
-                    }
-                    //^ Start Time
-                    if ( eventMap.get('start_time') == null || eventMap.get('start_time') == '' ) {
-                        newEvent.Start_Time__c = null;
-                        // System.debug('Start Time should be null and is....... ' + eventMap.get('start_time'));
-                    } else {
-                        String sdt = eventMap.get('start_time').trim().deleteWhitespace();
-                        Long sldt = Long.valueOf(sdt) * 1000;
-                        newEvent.Start_Time__c = Datetime.newInstance(sldt);
-                        // System.debug('Start Time is: ' + eventMap.get('start_time'));
-                    }
-                    //^ Start Time
-
-                    //^ End Time
-                    if ( eventMap.get('end_time') == null || eventMap.get('end_time') == '' ) {
-                        newEvent.End_Time__c = null;
-                    } else {
-                        String sdt = eventMap.get('end_time').trim().deleteWhitespace();
-                        Long eldt = Long.valueOf(sdt) * 1000;
-                        newEvent.End_Time__c = Datetime.newInstance(eldt);
-                    }
-
-                    //& this will be what make support tickets out of the events
-                    // handleEvent(newEvent);
-                    insert newEvent;
-                }
-            }
-        } else {
-            System.debug('No new events found');
+            VisionMetrixHelperMethod.handleLatestEvents(response);
+        }else{
+            throw new System.QueryException( 'Callout succeded no Events retunred' );
         }
     }
 
@@ -720,21 +615,24 @@ public class VisionMetrixCallOut {
     /**
      * handleEvent()
      *
-     * method to handle the event and create a ticket in Salesforce
+     * method to handle the event and create a nms alert in Salesforce
      *
      * @param       newEvent            VisionMetrix_Event__c               the event to be handled
      *
      * @uses        visionMetrixLogin() Function                            to get the token for the header
      */
-    public static void handleEvent(VisionMetrix_Event__c newEvent) {
+    public static void vmEventToAlert(VisionMetrix_Event__c newEvent) {
         if ( newEvent != null ) {
-            Case c = new Case(  );
-            c.RecordTypeId = '012U0000000DpFKIA0';
-            c.Subject = newEvent.Event_Name__c + ' | ' + newEvent.Secondary_Circuit_Name__c + ' | ' + newEvent.Severity__c;
-            c.Description = newEvent.Circuit__c;
-            c.Type__c = 'Vision Metrics';
-            c.Origin = 'Proactive';
-            insert c;
+            //~ these events should already be filtered for severity
+            if ( newEvent.Severity__c == 'Major' && newEvent.Severity__c == 'Critical' ) {
+                NMS_Alert__c alert = new NMS_Alert__c();
+                alert.Identifier__c = newEvent.Event_Name__c + ' | VisionMetrix - Event | ' + newEvent.Start_Time__c;
+                alert.Message__c = newEvent.Event_Name__c + ' | ' + newEvent.Severity__c;
+                alert.Service_ID__c = newEvent.Secondary_Circuit_Name__c;
+                alert.AlertType__c = 'VisionMetrix';
+                alert.Source__c = 'VisionMetrix';
+                insert alert;
+            }
         }
     }
 
@@ -832,23 +730,23 @@ public class VisionMetrixCallOut {
         List<VisionMetrix_Circuit__c> circuitList = new List<VisionMetrix_Circuit__c>();
         String headerToken = visionMetrixLogin();
         String urlEnd = 'https://rest-api2.visionmetrix.net/1.1/circuits/query/';
-        // String endpoint = urlEnd + '?type=DOMAIN&argument=EV%20Backbone%20|%20';//!incomplete
-        // String endpoint = urlEnd + '?type=DOMAIN&argument=Verizon%20|%20VZW%20[MI]';//complete 101323
-        // String endpoint = urlEnd + '?type=DOMAIN&argument=Verizon%20|%20VZW%20[OH]';//complete 101323
-        // String endpoint = urlEnd + '?type=DOMAIN&argument=Consumers%20|%20CMS%20[MI]';//complete 101323
-        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[IL]';//complete 101323
-        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[IN]';//complete 101323
-        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[MI]';//TOO MANY//!said too complicated regex
-        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[MO]';//complete 101323
-        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[OHCL]';//TOO MANY complete 101523
-        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[OHCO]';//TOO MANY complete 101523
-        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[PA]';//complete 101323
-        String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[WI]';//TOO MANY//!said too complicated regex
-        // String endpoint = urlEnd + '?type=DOMAIN&argument=ATT%20Mobility%20|%20ATTM%20[MI]';//complete 101323
-        // String endpoint = urlEnd + '?type=DOMAIN&argument=ATT%20Mobility%20|%20ATTM%20[OH]';//complete 101323
-        // String endpoint = urlEnd + '?type=DOMAIN&argument=ATT%20Mobility%20|%20ATTM%20[PA]';//too many complete 101523
-        // String endpoint = urlEnd + '?type=DOMAIN&argument=ATT%20Wireline%20|%20ATTW%20[MI]';//complete 101323
-        // String endpoint = urlEnd + '?type=DOMAIN&argument=ATT%20Wireline%20|%20ATTW%20[OH]';//complete 101323
+        // String endpoint = urlEnd + '?type=DOMAIN&argument=EV%20Backbone%20|%20';//!incomplete - may noty need
+        // String endpoint = urlEnd + '?type=DOMAIN&argument=Verizon%20|%20VZW%20[MI]';// complete 102523
+        // String endpoint = urlEnd + '?type=DOMAIN&argument=Verizon%20|%20VZW%20[OH]';// complete 102523
+        // String endpoint = urlEnd + '?type=DOMAIN&argument=Consumers%20|%20CMS%20[MI]';// complete 102523
+        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[IL]';//complete 102523
+        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[IN]';//complete 102523
+        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[MI]';//complete 102523
+        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[MO]';//complete 102523
+        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[OHCL]';//complete 102523
+        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[OHCO]';//complete 102523
+        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[PA]';//complete 102523
+        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[WI]';//complete 102523
+        // String endpoint = urlEnd + '?type=DOMAIN&argument=ATT%20Mobility%20|%20ATTM%20[MI]';//complete 102523
+        // String endpoint = urlEnd + '?type=DOMAIN&argument=ATT%20Mobility%20|%20ATTM%20[OH]';//complete 102523
+        // String endpoint = urlEnd + '?type=DOMAIN&argument=ATT%20Mobility%20|%20ATTM%20[PA]';//complete 102523
+        // String endpoint = urlEnd + '?type=DOMAIN&argument=ATT%20Wireline%20|%20ATTW%20[MI]';//complete 102523
+        String endpoint = urlEnd + '?type=DOMAIN&argument=ATT%20Wireline%20|%20ATTW%20[OH]';//complete 102523
 
         HttpRequest request = new HttpRequest(  );
         System.debug('endpoint' + endpoint);
@@ -859,163 +757,14 @@ public class VisionMetrixCallOut {
         request.setHeader('X-ocularip-token', headerToken);
         request.setHeader('X-ocularip-company', 'Everstream');
         HttpResponse response = new Http(  ).send(request);
+
         Map<String, Object> results = ( Map<String, Object> )JSON.deserializeUntyped(response.getBody());
         String success = results.get('success').toString();
-        // System.debug('success: ' + success);
+        VisionMetrixHelperMethod.handleCircuits(response);
         if ( success == 'false' ) {
             throw new System.QueryException( 'Callout failed with error: ' + results.get('error').toString() );
         }
-        String circuits = results.get('circuits').toString();
-        System.debug('circuits: ' + circuits);
-        String str = '\\';
-        // System.debug('blob: '+blobBodyString.remove(str));
-        // System.debug('String: '+stringBody.remove(str));
-        String editedBody = circuits.remove(str);
-        editedBody = editedBody.remove('"circuits":[');
-        editedBody = editedBody.remove('(');
-        editedBody = editedBody.remove(')');
-        editedBody = editedBody.remove('{');
-        editedBody = editedBody.remove('}');
-        editedBody = editedBody.remove(']');
-        System.debug('editedBody: '+editedBody.deleteWhitespace().trim());
-
-        List<String> circuitKVPs = editedBody.split( ',' );
-        // System.debug('circuitKVPs: ' + circuitKVPs);
-        Map<String, String> circuitMap = new Map<String, String>();
-        VisionMetrix_Circuit__c newCircuit = new VisionMetrix_Circuit__c();
-
-        if ( circuitKVPs.size() > 1 ) {
-
-            for ( String kvp : circuitKVPs ) {
-                String paa_name='';
-                // System.debug(kvp);
-                if(kvp.contains('ethernet_profile_description')){
-                    kvp = kvp.remove('=paa_name');
-                    paa_name = kvp;
-                    // System.debug('paa_name: ' + paa_name);
-                }
-                List<String> kvpList = kvp.split('=');
-                if(kvpList.size() > 1){
-                    kvpList[0] = kvpList[0].trim().deleteWhitespace();
-                    kvpList[1] = kvpList[1].trim().deleteWhitespace();
-                    // kvpList[0] is the key, kvpList[1] is the value add to map
-                    System.debug('Label: ' + kvpList[0] + ' - Value:' + kvpList[1]);
-                    circuitMap.put(kvpList[0], kvpList[1]);
-                }
-            }
-        
-        System.debug(circuitMap.get('ethernet_profile_description'));
-
-        // eventMap has the key value pairs for the event the key matches the field name in the VisionMetrix_Circuit__c object
-            if ( circuitMap.size() > 1 ) {
-                //^ circuit_name
-                if ( circuitMap.get('circuit_alias') != null && circuitMap != null ) {
-                    newCircuit.Circuit_Alias__c = circuitMap.get('circuit_alias').trim().deleteWhitespace();
-                }
-                //^ secondary_name
-                if ( circuitMap.get('secondary_name') != null && circuitMap != null ) {
-                    newCircuit.Secondary_Name__c = circuitMap.get('secondary_name').trim().deleteWhitespace();
-                }
-                //^ Start Time
-                if ( circuitMap.get('start_time') == null || circuitMap.get('start_time') == '' ) {
-                    newCircuit.Start_Time__c = null;
-                } else {
-                    newCircuit.Start_Time__c = Datetime.newInstance(Long.valueOf(circuitMap.get('start_time').trim().deleteWhitespace()) * 1000);
-                }
-                //^ circuit_image
-                if ( circuitMap.get('circuit_image') != null && circuitMap != null ) {
-                    newCircuit.Circuit_Image__c = circuitMap.get('circuit_image').trim().deleteWhitespace();
-                }
-                //^ description
-                if ( circuitMap.get('description') != null && circuitMap != null ) {
-                    newCircuit.Circuit_Description__c = circuitMap.get('description').trim().deleteWhitespace();
-                }
-                //^ status
-                if ( circuitMap.get('status') != null && circuitMap != null ) {
-                    newCircuit.Circuit_Status__c = circuitMap.get('status').trim().deleteWhitespace();
-                }
-                //^ bandwidth
-                if ( circuitMap.get('bandwidth') != null && circuitMap != null ) {
-                    newCircuit.Bandwidth__c = circuitMap.get('bandwidth').trim().deleteWhitespace();
-                }
-                //^ max_ordering_bandwidth
-                if ( circuitMap.get('max_ordering_bandwidth') != null && circuitMap != null ) {
-                    newCircuit.Max_Ordering_Bandwidth__c = circuitMap.get('max_ordering_bandwidth').trim().deleteWhitespace();
-                    //TODO: Add logic to get the related service order agreement from the secondary circuit name
-                }
-                //^ eir
-                if ( circuitMap.get('eir') != null && circuitMap != null ) {
-                    newCircuit.Circuit_EIR__c = circuitMap.get('eir').trim().deleteWhitespace();                  
-                }                
-                //^granularity
-                if ( circuitMap.get('granularity') != null && circuitMap != null ) {
-                    newCircuit.Circuit_Granularity__c = circuitMap.get('granularity').trim().deleteWhitespace();                    
-                }
-                //^ mrc
-                if ( circuitMap.get('mrc') != null && circuitMap != null ) {
-                    newCircuit.Circuit_MRC__c = circuitMap.get('mrc').trim().deleteWhitespace();                    
-                }
-                //^ event_notifications_enabled
-                if ( circuitMap.get('event_notifications_enabled') != null && circuitMap != null ) {
-                    newCircuit.Custom_Notifications_Enabled__c = circuitMap.get('event_notifications_enabled').trim().deleteWhitespace();
-                } 
-                //^ derive_1_way_data_enabled
-                if ( circuitMap.get('derive_1_way_data_enabled') != null && circuitMap != null ) {
-                    newCircuit.One_Way_Data_Enabled__c = circuitMap.get('derive_1_way_data_enabled').trim().deleteWhitespace();
-                } 
-                //^ system_a_name
-                if ( circuitMap.get('system_a_name') != null && circuitMap != null ) {
-                    newCircuit.System_A_Name__c = circuitMap.get('system_a_name').trim().deleteWhitespace();
-                } 
-                //^ system_a_alias
-                if ( circuitMap.get('system_a_alias') != null && circuitMap != null ) {
-                    newCircuit.System_A_Alias__c = circuitMap.get('system_a_alias').trim().deleteWhitespace();
-                } 
-                //^ system_a_ip_address
-                if ( circuitMap.get('system_a_ip_address') != null && circuitMap != null ) {
-                    newCircuit.System_A_IPAddress__c = circuitMap.get('system_a_ip_address').trim().deleteWhitespace();
-                } 
-                //^ system_a_manufacturer
-                if ( circuitMap.get('system_a_manufacturer') != null && circuitMap != null ) {
-                    newCircuit.System_A_Manufacturer__c = circuitMap.get('system_a_manufacturer').trim().deleteWhitespace();
-                } 
-                //^ system_a_model
-                if ( circuitMap.get('system_a_model') != null && circuitMap != null ) {
-                    newCircuit.System_A_Model__c = circuitMap.get('system_a_model').trim().deleteWhitespace();
-                } 
-                //^ system_z_name
-                if ( circuitMap.get('system_z_name') != null && circuitMap != null ) {
-                    newCircuit.System_Z_Name__c = circuitMap.get('system_z_name').trim().deleteWhitespace();
-                } 
-                //^ system_z_alias
-                if ( circuitMap.get('system_z_alias') != null && circuitMap != null ) {
-                    newCircuit.System_Z_Alias__c = circuitMap.get('system_z_alias').trim().deleteWhitespace();
-                } 
-                //^ system_z_ip_address
-                if ( circuitMap.get('system_z_ip_address') != null && circuitMap != null ) {
-                    newCircuit.System_Z_IPAddress__c = circuitMap.get('system_z_ip_address').trim().deleteWhitespace();
-                } 
-                //^ system_z_manufacturer
-                if ( circuitMap.get('system_z_manufacturer') != null && circuitMap != null ) {
-                    newCircuit.System_Z_Manufacturer__c = circuitMap.get('system_z_manufacturer').trim().deleteWhitespace();
-                } 
-                //^ system_z_model
-                if ( circuitMap.get('system_z_model') != null && circuitMap != null ) {
-                    newCircuit.System_Z_Model__c = circuitMap.get('system_z_model').trim().deleteWhitespace();
-                } 
-                //^ ethernet_profile_description
-                if ( circuitMap.get('ethernet_profile_description') != null && circuitMap != null ) {
-                    newCircuit.Ethernet_Profile_Desc__c = circuitMap.get('ethernet_profile_description').trim().deleteWhitespace();
-                }
-
-                //& this will be what make support tickets out of the events
-                // handleEvent(newCircuit);
-                insert newCircuit;
-            }
-            
-        } else {
-            System.debug('No new circuits found');
-        }
     }
+
     /**************************************************************************************************** */
 }
