@@ -5,7 +5,7 @@
  * @group             : Enterprise Technology
  * @Created on        : 7-11-2023
  * @last modified by  : vlettau@everstream.net
- * @last modified on  : 10-11-2023
+ * @last modified on  : 10-27-2023
  **/
 public class VisionMetrixCallOut {
     /**
@@ -611,34 +611,7 @@ public class VisionMetrixCallOut {
         }
     }
 
-    /***************************************************************************************************************************************** */
-    /**
-     * vmEventToAlert()
-     *
-     * method to handle the event and create a nms alert in Salesforce
-     *
-     * @param       newEvent            VisionMetrix_Event__c               the event to be handled
-     *
-     * @uses        visionMetrixLogin() Function                            to get the token for the header
-     */
-    public static void vmEventToAlert(VisionMetrix_Event__c newEvent) {
-        System.debug('vmEventToAlert(): ' + newEvent);
-        if ( newEvent != null ) {
-            //~ these events should already be filtered for severity
-            if ( newEvent.Severity__c == 'Major' && newEvent.Severity__c == 'Critical' ) {
-                NMS_Alert__c alert = new NMS_Alert__c();
-                alert.Identifier__c = newEvent.Event_Name__c + ' | VisionMetrix - Event | ' + newEvent.Start_Time__c;
-                alert.Message__c = newEvent.Event_Name__c + ' | ' + newEvent.Severity__c;
-                alert.Service_ID__c = newEvent.Secondary_Circuit_Name__c;
-                alert.AlertType__c = 'VisionMetrix';
-                alert.Source__c = 'VisionMetrix';
-                System.debug('Alert: ' + alert);
-                // insert alert;
-            }
-        }
-    }
-
-    /**************************************************************************************************************************************** */
+    
     /**
      * Method to retrieve a filtered list of events from VisionMetrix
      *
