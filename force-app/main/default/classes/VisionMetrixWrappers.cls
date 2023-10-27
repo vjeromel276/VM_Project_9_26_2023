@@ -187,7 +187,7 @@ public with sharing class VisionMetrixWrappers{
         public String category;
     }
     public class EventsList{
-        public List<Event> event;
+        public List<VisionMetrixWrappers.Event> events;
     }
 
     public class CircuitList{

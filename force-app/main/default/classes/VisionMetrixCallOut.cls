@@ -599,21 +599,21 @@ public class VisionMetrixCallOut {
         Map<String, Object> results = ( Map<String, Object> )JSON.deserializeUntyped(response.getBody());
         String success = results.get('success').toString();
         String events = results.get('events').toString();
-        VisionMetrixHelperMethod.handleCircuits(response);
         if ( success == 'false' ) {
             throw new System.QueryException( 'Callout failed with error: ' + results.get('error').toString() );
         }
         else if ( success == 'true' && events != null ) {
-
+            System.debug('Success Response Events: ');
             VisionMetrixHelperMethod.handleLatestEvents(response);
-        }else{
+        }
+        else {
             throw new System.QueryException( 'Callout succeded no Events retunred' );
         }
     }
 
     /***************************************************************************************************************************************** */
     /**
-     * handleEvent()
+     * vmEventToAlert()
      *
      * method to handle the event and create a nms alert in Salesforce
      *
@@ -622,6 +622,7 @@ public class VisionMetrixCallOut {
      * @uses        visionMetrixLogin() Function                            to get the token for the header
      */
     public static void vmEventToAlert(VisionMetrix_Event__c newEvent) {
+        System.debug('vmEventToAlert(): ' + newEvent);
         if ( newEvent != null ) {
             //~ these events should already be filtered for severity
             if ( newEvent.Severity__c == 'Major' && newEvent.Severity__c == 'Critical' ) {
@@ -631,7 +632,8 @@ public class VisionMetrixCallOut {
                 alert.Service_ID__c = newEvent.Secondary_Circuit_Name__c;
                 alert.AlertType__c = 'VisionMetrix';
                 alert.Source__c = 'VisionMetrix';
-                insert alert;
+                System.debug('Alert: ' + alert);
+                // insert alert;
             }
         }
     }

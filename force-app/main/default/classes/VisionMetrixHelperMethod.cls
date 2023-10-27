@@ -1,7 +1,4 @@
 public with sharing class VisionMetrixHelperMethod {
-	public VisionMetrixHelperMethod(){
-		
-	}
 	public static void handleCircuits(HttpResponse res) {
 		System.debug('Response: ' + res.getStatusCode());
 
@@ -71,63 +68,16 @@ public with sharing class VisionMetrixHelperMethod {
 	}
 
 	public static void handleLatestEvents(HttpResponse res) {
-		System.debug('Response: ' + res.getStatusCode());
-
-		if ( res.getStatusCode() == 200 && res.getBody() != null ) {
-
-			String responseBody = res.getBody();
-			VisionMetrixWrappers.EventsList eventsList = ( VisionMetrixWrappers.EventsList )JSON.deserialize(responseBody, VisionMetrixWrappers.EventsList.class);
-			List<VisionMetrix_Event__c> events = new List<VisionMetrix_Event__c>();
-			// System.debug('Event List: ' + eventList);
-			// log each event to console
-			if ( eventsList != null ) {
-				for ( VisionMetrixWrappers.Event event : eventsList.event ) {
-					System.debug('Event: ' + event);
-
-					if ( event.severity == 'Major' && event.severity == 'Critical' ) {
-
-						// assigfn values from the wrapper class to the vision metrix event object fields
-						VisionMetrix_Event__c vm_event = new VisionMetrix_Event__c();
-						vm_event.Event_Id_In_VisionMetrix__c = event.id;
-						// vm_event.Start_Time__c =event.start_time;
-						if ( event.start_time == null ) {
-							vm_event.Start_Time__c = null;
-							// System.debug('Start Time should be null and is....... ' + vm_event.get('start_time'));
-						}
-						else {
-							String sdt = event.start_time;
-							Long sldt = Long.valueOf(sdt) * 1000;
-							vm_event.Start_Time__c = Datetime.newInstance(sldt);
-							// System.debug('Start Time is: ' + vm_event.get('start_time'));
-						}
-						// vm_event.End_Time__c = event.end_time;
-						if ( event.start_time == null ) {
-							vm_event.Start_Time__c = null;
-							// System.debug('Start Time should be null and is....... ' + vm_event.get('start_time'));
-						}
-						else {
-							String sdt = event.start_time;
-							Long sldt = Long.valueOf(sdt) * 1000;
-							vm_event.Start_Time__c = Datetime.newInstance(sldt);
-							// System.debug('Start Time is: ' + vm_event.get('start_time'));
-						}
-						vm_event.Event_Name__c = event.event_name;
-						vm_event.Node_Name__c = event.node_name;
-						vm_event.Circuit__c = event.circuit_name;
-						vm_event.Secondary_Circuit_Name__c = event.secondary_circuit_name;
-						vm_event.Direction__c = event.direction;
-						vm_event.KPI__c = event.kpi;
-						vm_event.Severity__c = event.severity;
-						vm_event.Category__c = event.category;
-						VisionMetrixCallOut.vmEventToAlert(vm_event);
-						events.add(vm_event);
-					}
-				}
-			}
-		}
-		else {
-
-		}
+		System.debug('Response: ' + res);
+		String responseBody = res.getBody();
+		VisionMetrixWrappers.EventsList eventsList = ( VisionMetrixWrappers.EventsList )JSON.deserialize(responseBody, VisionMetrixWrappers.EventsList.class);
+		List<VisionMetrix_Event__c> events = new List<VisionMetrix_Event__c>();
+		System.debug('Event List: ' + eventsList);
+		// log each event to console
+		for ( VisionMetrixWrappers.Event event : eventsList.events ) {
+			System.debug('Event: ' + event);
+			// assign values from the wrapper class to the vision metrix event object fields
+			VisionMetrix_Event__c vm_event = new VisionMetrix_Event__c(  );
+		}	
 	}
-
 }
