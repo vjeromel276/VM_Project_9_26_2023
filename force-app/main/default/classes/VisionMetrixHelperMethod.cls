@@ -146,9 +146,10 @@ public with sharing class VisionMetrixHelperMethod {
 				vm_event.KPI__c = event.kpi;
 				vm_event.Severity__c = event.severity;
 				vm_event.Category__c = event.category;
+				
 			}
 			events.add(vm_event);
-			VisionMetrixHelperMethod.vmEventToAlert(vm_event);
+			VisionMetrixHelperMethod.vmEventToAlert(events);
 			// insert vm_event;
 			// call queable class to insert circuits
 			if ( events.size() > 0 ) {
@@ -168,28 +169,33 @@ public with sharing class VisionMetrixHelperMethod {
      *
      * @uses        visionMetrixLogin() Function                            to get the token for the header
      */
-    public static void vmEventToAlert(VisionMetrix_Event__c newEvent) {
+    public static void vmEventToAlert(List<VisionMetrix_Event__c> newEvents) {
 		VisionMetrix_Event__c vm_event = new VisionMetrix_Event__c(  );
         System.debug('vmEventToAlert(): ' + newEvent);
         if ( newEvent != null ) {
             //~ these events should already be filtered for severity
             
 			NMS_Alert__c alert = new NMS_Alert__c();
-			alert.Identifier__c = newEvent.Event_Name__c + ' | VisionMetrix - Event | ' + System.today().format();
+            
+            //CHANGE BELOW EVENT NAME IN THE IDENTIFIER WITH THE ID FOR THE EVENT
+			alert.Identifier__c = newEvent.Event_Id_In_VisionMetrix__c + ' | VisionMetrix - Event | ' + System.today().format();
 			alert.Message__c = newEvent.Event_Name__c + ' | ' + newEvent.Severity__c;
 			alert.Service_ID__c = newEvent.Secondary_Circuit_Name__c;
-			alert.AlertType__c = 'VisionMetrix';
+			alert.AlertType__c = newEvent.Event_Name__c;
 			alert.Source__c = 'VisionMetrix';
             
             /* FILL IN THE BELOW
             alert.IP_Address__c = IP ADDRESS;
             alert.Device_ID__c = NODE;
+			alert.Closed_Date__c END TIME;
 			
             */
             
 			System.debug('Alert: ' + alert);
 			insert alert;
             
+            
+            //create a payload record with the full content of the api call for that event
         }
     }
 
