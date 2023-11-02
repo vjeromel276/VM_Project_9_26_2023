@@ -172,7 +172,7 @@ public with sharing class VisionMetrixHelperMethod {
     public static void vmEventToAlert(List<VisionMetrix_Event__c> newEvents) {
 		VisionMetrix_Event__c vm_event = new VisionMetrix_Event__c(  );
         System.debug('vmEventToAlert(): ' + newEvent);
-        if ( newEvent != null ) {
+        if ( newEvents != null ) {
             //~ these events should already be filtered for severity
             
 			NMS_Alert__c alert = new NMS_Alert__c();
@@ -185,11 +185,12 @@ public with sharing class VisionMetrixHelperMethod {
 			alert.Source__c = 'VisionMetrix';
             
             /* FILL IN THE BELOW
-            alert.IP_Address__c = IP ADDRESS;
-            alert.Device_ID__c = NODE;
-			alert.Closed_Date__c END TIME;
-			
+            alert.IP_Address__c = IP ADDRESS;			
             */
+			alert.Device_ID__c = newEvent.Node_Name__c;
+			alert.Closed_Date__c = newEvent.End_Time__c;
+			
+			//CHANGE BELOW TO THE SEVERITY OF THE EVENT
             
 			System.debug('Alert: ' + alert);
 			insert alert;
