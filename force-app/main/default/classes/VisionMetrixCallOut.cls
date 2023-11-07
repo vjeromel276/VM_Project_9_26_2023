@@ -245,7 +245,7 @@ public class VisionMetrixCallOut {
                 for ( Case child : childCases ) {
                     String circuitString = '';
 
-                    Set<VisionMetrix_Circuit__c> circuitList = [SELECT Id, Service_Order_Agreement__c, Circuit_Alias__c
+                    List<VisionMetrix_Circuit__c> circuitList = [SELECT Id, Service_Order_Agreement__c, Circuit_Alias__c
                                                                     FROM VisionMetrix_Circuit__c 
                                                                     WHERE Service_Order_Agreement__c =: child.Related_Service_Order__c];
 
