@@ -253,14 +253,11 @@ public class VisionMetrixCallOut {
                     
 
                     for(VisionMetrix_Circuit__c circuit : circuitList) {
-                        circuitString += circuit.Circuit_Alias__c + ', ';
+                        // circuitString += circuit.Circuit_Alias__c + ', ';
+                        circuitSet.add(circuit.Circuit_Alias__c);
                     }
 
                     if ( child != null ) {
-
-                        String str = child.Service_ID__c;
-                        str = str.trim();
-                        System.debug('Service Id: ' + str);                       
 
                         //********Required Fields *********//
                         //^~ Ticket Id - Salesforce Ticket Case Number and todays date in the format of mm/dd/yyyy
@@ -272,6 +269,18 @@ public class VisionMetrixCallOut {
                         System.debug('Ticket Type: ' + ticketData.ticket_type);                   
 
                         //^~ Circuit List - List of Circuits to be excluded
+                        System.debug('Circuits: ' + circuitSet);
+                        System.debug('Circuits: ' + circuitSet.size());
+                        Integer circuitSetSize = circuitSet.size();
+                        for(String circuit : circuitSet) {
+                            if(circuitSetSize > 1) {
+                                circuitString += circuit + ', ';
+                                circuitSetSize--;
+                            }
+                            else {
+                                circuitString += circuit;
+                            }
+                        }
                         if ( circuitString.length() >0 ) {
                             ticketData.circuits = circuitString;
                         }
