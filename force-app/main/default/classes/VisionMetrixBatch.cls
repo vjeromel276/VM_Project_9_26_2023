@@ -23,9 +23,15 @@ global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulab
         loginToken = VisionMetrixCallOut.visionMetrixLogin();
         // Query for Customer Communication Cases with Record Type "Customer Communication" and type "Maintenance"
         // need to make this the place where assign the parent ticket data to the individual vm tickets
+
+        //! this is for testing only looking for VisionMetrix_Parent_Case__c = true still want to limit by account id
         return Database.getQueryLocator([SELECT Id, AccountId, ParentId, RecordTypeId, Case_Record_Type__c, VisionMetrix_Parent_Case__c, NotificationType__c, Description, Subject, NOC_Ticket_Assigment__c, Maintenance_Start__c, Maintenance_End__c
                                          FROM Case
-                                         WHERE Case_Record_Type__c = 'Maintenance' AND NotificationType__c = 'Maintenance' AND VisionMetrix_Parent_Case__c = true AND AccountId IN ('0010B00001skFrkQAE', '0013g00000Tfxq2AAB', '001U000001jMJS6IAO', '0013g00000TfxtOAAR', '0010B00001p6Z3VQAU', '001U000001jMJVdIAO') AND ParentId = null]);
+                                         WHERE Case_Record_Type__c = 'Maintenance' AND VisionMetrix_Parent_Case__c = true AND ParentId = null]);
+
+        // return Database.getQueryLocator([SELECT Id, AccountId, ParentId, RecordTypeId, Case_Record_Type__c, VisionMetrix_Parent_Case__c, NotificationType__c, Description, Subject, NOC_Ticket_Assigment__c, Maintenance_Start__c, Maintenance_End__c
+        //                                  FROM Case
+        //                                  WHERE Case_Record_Type__c = 'Maintenance' AND NotificationType__c = 'Maintenance' AND VisionMetrix_Parent_Case__c = true AND AccountId IN ('0010B00001skFrkQAE', '0013g00000Tfxq2AAB', '001U000001jMJS6IAO', '0013g00000TfxtOAAR', '0010B00001p6Z3VQAU', '001U000001jMJVdIAO') AND ParentId = null]);
     }
 
     global void execute(Database.BatchableContext context, List<Case> scope){
