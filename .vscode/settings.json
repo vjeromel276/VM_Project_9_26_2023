@@ -20,5 +20,6 @@
   "notebook.formatOnSave.enabled": true,
   "aurahelper.documentation.useStandardJavaComments": true,
   "aurahelper.apexFormat.query.maxProjectionFieldPerLine": 4,
-  "apexdox.docblock.alignItems": true
+  "apexdox.docblock.alignItems": true,
+  "salesforcedx-vscode-apex.java.home": "C:\\Program Files\\AdoptOpenJDK\\jre-11.0.11.9-hotspot"
 }

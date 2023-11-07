@@ -220,45 +220,105 @@ public class VisionMetrixCallOut {
      *
      * @uses        AddBulkVMTickets    VisionMetrixWrapper     to create the bulk ticket wrapper
      */
-    public static String genParentPayload(List<Case> tickets) {
+    public static String genParentPayload(List<String> ticketIds) {
         // bulk Parent ticket wrapper
         VisionMetrixWrappers.AddBulkVMTickets bulkticketData = new VisionMetrixWrappers.AddBulkVMTickets();
         // ticket list wrapper to hold the list of Parent tickets
         List<VisionMetrixWrappers.AddTicket> ticketList = new List<VisionMetrixWrappers.AddTicket>();
         // for each parent ticekt id in the list of ticket ids
-        for ( Case ticket : tickets ) {
-            // initalize variables to hold the circuit ids
-            List<String> circuitIds = new List<String>();
-            String circuitIdsToPass = '';
+        for ( String ticketId : ticketIds ) {
             // individual Parent ticket wrapper
-            VisionMetrixWrappers.AddTicket ticketData = new VisionMetrixWrappers.AddTicket();
-            //********Required Fields *********//
-            //^~ Ticket Id - Salesforce Ticket Case Number
-            ticketData.ticket_id = ticket.Id;
-            System.debug('Ticket Number: ' + ticket.Id);
+            VisionMetrixWrappers.AddTicket ticketData = new VisionMetrixWrappers.AddTicket();            
 
-            //^~ Ticket Type - Ticket Type defaults to 'Exclusion Period'
-            ticketData.ticket_type = 'Exclusion Period';
-            System.debug('Ticket Type: ' + ticketData.ticket_type);
-
-            List<Case> childCases = [SELECT Id, ParentId, Related_Service_Order__r.Id, Related_Service_Order__r.OSS_Service_ID__c, 
+            List<Case> childCases = [SELECT Id, ParentId, Related_Service_Order__r.Id, Service_ID__c, CaseNumber,
                                             Related_Service_Order__c, Description, Subject, NOC_Ticket_Assigment__c, 
                                             Maintenance_Start__c, Maintenance_End__c
                                      FROM Case
-                                     WHERE ParentId = :ticket.Id];
+                                     WHERE ParentId = :ticketId];
 
-            System.debug('child case array: ' + childCases + ' for ticket: ' + ticket);
+            
+
+            System.debug('child case array: ' + childCases + ' for ticket: ' + ticketId);
 
             if ( childCases != null ) {
                 // make sure the parent has a child
                 for ( Case child : childCases ) {
-                    if ( child != null ) {
-                        System.debug('Child Case: ' + child);
-                        //switch to reg servie id
-                        String circuit = child.Related_Service_Order__r.OSS_Service_ID__c;
-                        System.debug('Circuit Id: ' + circuit);
-                        circuitIds.add(circuit) ;
+                    String circuitString = '';
 
+                    Set<VisionMetrix_Circuit__c> circuitList = [SELECT Id, Service_Order_Agreement__c, Circuit_Alias__c
+                                                                    FROM VisionMetrix_Circuit__c 
+                                                                    WHERE Service_Order_Agreement__c =: child.Related_Service_Order__c];
+
+                    Set<String> circuitSet = new Set<String>();
+                    
+
+                    for(VisionMetrix_Circuit__c circuit : circuitList) {
+                        circuitString += circuit.Circuit_Alias__c + ', ';
+                    }
+
+                    if ( child != null ) {
+
+                        String str = child.Service_ID__c;
+                        str = str.trim();
+                        System.debug('Service Id: ' + str);                       
+
+                        //********Required Fields *********//
+                        //^~ Ticket Id - Salesforce Ticket Case Number and todays date in the format of mm/dd/yyyy
+                        ticketData.ticket_id = child.CaseNumber + '-' + String.valueOf(Date.today().day()) + '/' + String.valueOf(Date.today().month()) + '/' + String.valueOf(Date.today().year()) ;
+                        System.debug('Ticket Number: ' + ticketData.ticket_id);
+
+                        //^~ Ticket Type - Ticket Type defaults to 'Exclusion Period'
+                        ticketData.ticket_type = 'Exclusion Period';
+                        System.debug('Ticket Type: ' + ticketData.ticket_type);                   
+
+                        //^~ Circuit List - List of Circuits to be excluded
+                        if ( circuitString.length() >0 ) {
+                            ticketData.circuits = circuitString;
+                        }
+                        System.debug('Circuits: ' + ticketData.circuits);
+
+                        //^~ Open Status - Exclusion Period Open Status defaults to 'Closed'
+                        ticketData.open_status = 'Closed';
+                        System.debug('Open Status: ' + ticketData.open_status);
+
+                        //^~ Severity - Exclusion Period Severity defaults to 'Low'
+                        ticketData.severity = 'Low';
+                        System.debug('Severity: ' + ticketData.severity);
+
+                        //^~ Start Time - Maintenance Start Time
+                        ticketData.start_time = Integer.valueOf(child.Maintenance_Start__c.getTime() / 1000);
+                        System.debug('Maintenance Start: ' + ticketData.start_time);
+
+                        //^~ End Time - Maintenance End Time
+                        ticketData.end_time = Integer.valueOf(child.Maintenance_End__c.getTime() / 1000);
+                        System.debug('Maintenance End: ' + ticketData.end_time);
+
+                        //********Optional Fields*********//
+                        //^~ Category - Default to Maintenance until the 1 to 1 mapping is complete
+                        ticketData.category = 'Maintenance';
+                        System.debug('Category: ' + ticketData.category);
+                        //^~ Internal Notes - SF Generated Ticket
+                        System.debug('Internal Notes: "SF GENERATED VM TICKET');
+                        //^~ Exclusion Type - Exclusion Period Exclusion Type defaults to 'Smart'
+                        ticketData.exclusion_type = 'Smart';
+                        System.debug('Exclusion Type: ' + ticketData.exclusion_type);
+                        //^~ Exclude From Reporting - Exclusion Period Exclude From Reporting defaults to 'No' should be 'Yes' for exclusions
+                        ticketData.exclude_from_reporting = 'Yes';
+                        System.debug('Exclude From Reporting: ' + ticketData.exclude_from_reporting);
+                        //^~ Exclude From Monitoring Reporting - Exclusion Period Excluded From Monitoring defaults to 'No' should be 'Yes' for exclusions
+                        ticketData.exclusde_from_mttr_reporting = 'Yes';
+                        System.debug('Exclude From Monitoring Reporting: ' + ticketData.exclusde_from_mttr_reporting);
+                        //^~ Description
+                        ticketData.description = child.Description;
+                        System.debug('Description: ' + ticketData.description);
+                        //^~ Subject
+                        ticketData.subject = child.Subject;
+                        System.debug('Subject: ' + ticketData.subject);
+                        //^~ Support Agent
+                        ticketData.support_agent = child.NOC_Ticket_Assigment__c;
+                        System.debug('Support Agent: ' + ticketData.support_agent);
+                        //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+                        ticketList.add(ticketData);
                     }
                     else {
                         //^ If the child is null throw an error
@@ -270,60 +330,9 @@ public class VisionMetrixCallOut {
             }
             else {
                 //^ No child cases found throw an error
-                System.debug('No Children found on ticket: ' + ticket.Id);
-                throw new System.QueryException( 'No Nodes found with the ticket number or ticket is not of correct type: ' + ticket.Id );
+                System.debug('No Children found on ticket: ' + ticketId);
+                throw new System.QueryException( 'No Nodes found with the ticket number or ticket is not of correct type: ' + ticketId );
             }
-
-            circuitIdsToPass = String.join(circuitIds, ',');
-            System.debug('Circuit Id List: ' + circuitIds);
-            System.debug('Circuit Id joinrd string: ' + circuitIdsToPass);
-
-            //^~ Circuit List - List of Circuits to be excluded
-            ticketData.circuits = circuitIdsToPass;
-            System.debug('Circuits: ' + ticketData.circuits);
-
-            //^~ Open Status - Exclusion Period Open Status defaults to 'Closed'
-            ticketData.open_status = 'Closed';
-            System.debug('Open Status: ' + ticketData.open_status);
-
-            //^~ Severity - Exclusion Period Severity defaults to 'Low'
-            ticketData.severity = 'Low';
-            System.debug('Severity: ' + ticketData.severity);
-
-            //^~ Start Time - Maintenance Start Time
-            ticketData.start_time = Integer.valueOf(ticket.Maintenance_Start__c.getTime() / 1000);
-            System.debug('Maintenance Start: ' + ticketData.start_time);
-
-            //^~ End Time - Maintenance End Time
-            ticketData.end_time = Integer.valueOf(ticket.Maintenance_End__c.getTime() / 1000);
-            System.debug('Maintenance End: ' + ticketData.end_time);
-
-            //********Optional Fields*********//
-            //^~ Category - Default to Maintenance until the 1 to 1 mapping is complete
-            System.debug('Category: ');
-            //^~ Internal Notes - SF Generated Ticket
-            System.debug('Internal Notes: "SF GENERATED VM TICKET');
-            //^~ Exclusion Type - Exclusion Period Exclusion Type defaults to 'Smart'
-            ticketData.exclusion_type = 'Smart';
-            System.debug('Exclusion Type: ' + ticketData.exclusion_type);
-            //^~ Exclude From Reporting - Exclusion Period Exclude From Reporting defaults to 'No' should be 'Yes' for exclusions
-            ticketData.exclude_from_reporting = 'Yes';
-            System.debug('Exclude From Reporting: ' + ticketData.exclude_from_reporting);
-            //^~ Exclude From Monitoring Reporting - Exclusion Period Excluded From Monitoring defaults to 'No' should be 'Yes' for exclusions
-            ticketData.exclusde_from_mttr_reporting = 'Yes';
-            System.debug('Exclude From Monitoring Reporting: ' + ticketData.exclusde_from_mttr_reporting);
-            //^~ Description
-            ticketData.description = ticket.Description;
-            System.debug('Description: ' + ticketData.description);
-            //^~ Subject
-            ticketData.subject = ticket.Subject;
-            System.debug('Subject: ' + ticketData.subject);
-            //^~ Support Agent
-            ticketData.support_agent = ticket.NOC_Ticket_Assigment__c;
-            System.debug('Support Agent: ' + ticketData.support_agent);
-
-            //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-            ticketList.add(ticketData);
 
             System.debug('Ticket List: ' + ticketList);
             bulkticketData.tickets = ticketList;
@@ -362,7 +371,7 @@ public class VisionMetrixCallOut {
      * @uses        visionMetrixLogin()                 to get the token for the header
      * @uses        genParentPayload()                  to generate the payload for the callout
      */
-    public static void addBulkVMTicket(List<Case> tickets, String token) {
+    public static void addBulkVMTicket(List<String> ticketIds, String token) {
 
         System.debug('+++++++++++++++++++Start of addBulkVMTicket Method+++++++++++++++++++++++++++++++++++++++++++++++++++');
         Boolean isExclusion = true;
@@ -372,7 +381,7 @@ public class VisionMetrixCallOut {
         HttpRequest request = new HttpRequest(  );
         String ticketPayload;
 
-        ticketPayload = genParentPayload(tickets);
+        ticketPayload = genParentPayload(ticketIds);
 
         request.setEndpoint('https://rest-api2.visionmetrix.net/1.1/tickets/addBulk/');
         request.setMethod('POST');
