@@ -146,7 +146,7 @@ public class VisionMetrixCallOut {
             Integer circuitSetSize = circuitSet.size();
             for ( String circuit : circuitSet ) {
                 if ( circuitSetSize > 1 ) {
-                    circuitString += circuit + ', ';
+                    circuitString += circuit + '& ';
                     circuitSetSize--;
                 }
                 else {
@@ -255,7 +255,7 @@ public class VisionMetrixCallOut {
 
                     //********Required Fields *********//
                     //^~ Ticket Id - Salesforce Ticket Case Number and todays date in the format of mm/dd/yyyy
-                    ticketData.ticket_id = child.CaseNumber + '-' + String.valueOf(Date.today().day()) + '/' + String.valueOf(Date.today().month()) + '/' + String.valueOf(Date.today().year());
+                    ticketData.ticket_id = child.CaseNumber + '--' + String.valueOf(Date.today().day()) + '/' + String.valueOf(Date.today().month()) + '/' + String.valueOf(Date.today().year());
                     // System.debug('Ticket Number: ' + ticketData.ticket_id);
 
                     //^~ Ticket Type - Ticket Type defaults to 'Exclusion Period'
@@ -268,7 +268,7 @@ public class VisionMetrixCallOut {
                     Integer circuitSetSize = circuitSet.size();
                     for ( String circuit : circuitSet ) {
                         if ( circuitSetSize > 1 ) {
-                            circuitString += circuit + ', ';
+                            circuitString += circuit + '& ';
                             circuitSetSize--;
                         }
                         else {
@@ -390,6 +390,7 @@ public class VisionMetrixCallOut {
         HttpResponse response = http.send(request);
         // If the request is successful, parse the JSON response.
         handleResponse(response);
+        VisionMetrixCallOutHelper.logAPICallout( String.valueOf(request.getEndpoint()), String.valueOf(request.getBody()), String.valueOf(JSON.deserializeUntyped(response.getBody())));
         System.debug('+++++++++++++++++++End of addBulkVMTicket Method+++++++++++++++++++++++++++++++++++++++++++++++++++');
     }
 
@@ -464,7 +465,7 @@ public class VisionMetrixCallOut {
         HttpResponse response = http.send(request);
         // If the request is successful, parse the JSON response.
         handleResponse(response);
-        VisionMetrixCallOutHelper.logAPICallout( 'https://rest-api2.visionmetrix.net/1.1/tickets/add/', String.valueOf(request.getBody()), String.valueOf(JSON.deserializeUntyped(response.getBody())));
+        VisionMetrixCallOutHelper.logAPICallout( String.valueOf(request.getEndpoint()), String.valueOf(request.getBody()), String.valueOf(JSON.deserializeUntyped(response.getBody())));
     }
 
     /**************************************************************************************************************************************** */
