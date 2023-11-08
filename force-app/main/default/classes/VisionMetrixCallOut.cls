@@ -5,7 +5,7 @@
  * @group             : Enterprise Technology
  * @Created on        : 7-11-2023
  * @last modified by  : vlettau@everstream.net
- * @last modified on  : 10-27-2023
+ * @last modified on  : 11-08-2023
  **/
 public class VisionMetrixCallOut {
     /**
@@ -336,21 +336,21 @@ public class VisionMetrixCallOut {
         }
 
         //******* Return the payload *******
-        for ( VisionMetrixWrappers.AddTicket t : bulkticketData.tickets ) {
-            System.debug('Ticket Id: ' + t.ticket_id);
-            System.debug('Ticket Type: ' + t.ticket_type);
-            System.debug('Circuits: ' + t.circuits);
-            System.debug('Open Status: ' + t.open_status);
-            System.debug('Severity: ' + t.severity);
-            System.debug('Maintenance Start: ' + t.start_time);
-            System.debug('Maintenance End: ' + t.end_time);
-            System.debug('Exclusion Type: ' + t.exclusion_type);
-            System.debug('Exclude From Reporting: ' + t.exclude_from_reporting);
-            System.debug('Exclude From Monitoring Reporting: ' + t.exclusde_from_mttr_reporting);
-            System.debug('Description: ' + t.description);
-            System.debug('Subject: ' + t.subject);
-            System.debug('Support Agent: ' + t.support_agent);
-        }
+        // for ( VisionMetrixWrappers.AddTicket t : bulkticketData.tickets ) {
+        //     System.debug('Ticket Id: ' + t.ticket_id);
+        //     System.debug('Ticket Type: ' + t.ticket_type);
+        //     System.debug('Circuits: ' + t.circuits);
+        //     System.debug('Open Status: ' + t.open_status);
+        //     System.debug('Severity: ' + t.severity);
+        //     System.debug('Maintenance Start: ' + t.start_time);
+        //     System.debug('Maintenance End: ' + t.end_time);
+        //     System.debug('Exclusion Type: ' + t.exclusion_type);
+        //     System.debug('Exclude From Reporting: ' + t.exclude_from_reporting);
+        //     System.debug('Exclude From Monitoring Reporting: ' + t.exclusde_from_mttr_reporting);
+        //     System.debug('Description: ' + t.description);
+        //     System.debug('Subject: ' + t.subject);
+        //     System.debug('Support Agent: ' + t.support_agent);
+        // }
         return JSON.serialize(bulkticketData);
     }
 
