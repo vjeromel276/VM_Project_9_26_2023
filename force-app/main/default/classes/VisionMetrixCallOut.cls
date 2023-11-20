@@ -214,12 +214,13 @@ public class VisionMetrixCallOut {
      *
      * Method to generate the payload for the Parent ticket call outs
      *
-     * @param       tickets             List<Case>              the list of VisionMetrix ticket numbers
+     * @param       tickets             List<Case>              the list of SF Support Ticket numbers
      * @return                          String                  the payload for the callout
      *
      * @uses        AddBulkVMTickets    VisionMetrixWrapper     to create the bulk ticket wrapper
      */
-    public static String genParentPayload(List<Case> parentTickets) {
+    public static String genParentPayload(List<Case> parentTickets) {+
+
         // bulk Parent ticket wrapper
         VisionMetrixWrappers.AddBulkVMTickets bulkticketData = new VisionMetrixWrappers.AddBulkVMTickets();
         // ticket list wrapper to hold the list of Parent tickets
@@ -255,7 +256,7 @@ public class VisionMetrixCallOut {
 
                     //********Required Fields *********//
                     //^~ Ticket Id - Salesforce Ticket Case Number and todays date in the format of mm/dd/yyyy
-                    ticketData.ticket_id = child.CaseNumber + '--' + String.valueOf(Date.today().day()) + '/' + String.valueOf(Date.today().month()) + '/' + String.valueOf(Date.today().year());
+                    ticketData.ticket_id = child.CaseNumber + '-'+ /** Account.Name +' ' +'Maintenance' */ + ' | ' + String.valueOf(Date.today().year()) + '/' + String.valueOf(Date.today().month()) + '/' + String.valueOf(Date.today().day());
                     // System.debug('Ticket Number: ' + ticketData.ticket_id);
 
                     //^~ Ticket Type - Ticket Type defaults to 'Exclusion Period'
@@ -329,9 +330,15 @@ public class VisionMetrixCallOut {
                     // throw new System.QueryException('No Nodes found with the ticket number or ticket is not of correct type: ' + ticketId);
                 }
             }
-
+            // update Support Ticket with the VisionMetrix Ticket Number
+            // ticket.VisionMetrix_Ticket_Number__c = ticketData.ticket_id;
+            // update Service Affecting Cust List with a list of service Ids
+            // ticket.Service_Affecting_Cust_List__c = ticketData.circuits;
+            // update ticket;
+            // add the ticket to the list of tickets
             ticketList.add(ticketData);
             System.debug('Ticket List: ' + ticketList);
+            // add the list of tickets to the bulk ticket wrapper
             bulkticketData.tickets = ticketList;
         }
 
@@ -359,7 +366,7 @@ public class VisionMetrixCallOut {
      * addBulkVMTicket()
      *
      * Method to add a new VisionMetrix ticket
-     *
+     *@SOQL SELECT Id, AccountId, ParentId, RecordTypeId, Case_Record_Type__c, VisionMetrix_Parent_Case__c, NotificationType__c, Description, Subject, NOC_Ticket_Assigment__c, Maintenance_Start__c, Maintenance_End__c FROM Case WHERE Case_Record_Type__c = 'Maintenance' AND VisionMetrix_Parent_Case__c = true AND ParentId = null
      * @param       tickets             List<Case>      the list of VisionMetrix ticket numbers
      * @param       token               String          the token for the header
      *
