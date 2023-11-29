@@ -37,14 +37,15 @@ global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulab
     global void execute(Database.BatchableContext context, List<Case> scope){
         System.debug('scope: ' + scope.size() + ' records.');
         List<Case> parentCases = new List<Case>();
+        HttpResponse res = new HttpResponse();    
 
         if (Test.isRunningTest() || scope != NULL && scope.size() > 0){
             recordsParsed = scope.size();
             // Collect parent case IDs that meet the criteria
             for (Case c : scope){
                 System.debug('Added Case Id to list: ' + c);
-                c.VisionMETRIX_Ticket_Created_Date__c = DateTime.now();
-                c.VisionMETRIX_Ticket_Number__c = c.CaseNumber + '-' + c.VisionMETRIX_Ticket_Created_Date__c.format('MM/dd/yyyy HH:mm:ss');
+                // c.VisionMETRIX_Ticket_Created_Date__c = DateTime.now();
+                // c.VisionMETRIX_Ticket_Number__c = c.CaseNumber + '-' + c.VisionMETRIX_Ticket_Created_Date__c.format('MM/dd/yyyy');
                 parentCases.add(c);
             }
 
@@ -55,7 +56,19 @@ global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulab
                 //     VisionMetrixCallOut.addVMTicket(parentId, true);
                 // }
                 recordsUpdated = parentCases.size();
-                VisionMetrixCallOut.addBulkVMTicket(parentCases, loginToken);
+                res = VisionMetrixCallOut.addBulkVMTicket(parentCases, loginToken);
+                // if response is successful, update the parent case with the VisionMetrix ticket number
+                if (res != NULL && res.getStatusCode() == 200){
+                    System.debug('Response: ' + res.getBody());
+                    for (Case c : scope){
+                        c.VisionMETRIX_Ticket_Created_Date__c = DateTime.now();
+                        c.VisionMETRIX_Ticket_Number__c = c.CaseNumber + '-' + c.VisionMETRIX_Ticket_Created_Date__c.format('MM/dd/yyyy');                        
+                    }
+                    update scope;
+                } else {
+                    System.debug('Response: ' + res.getBody());
+                }                    
+
             }
         }
     }

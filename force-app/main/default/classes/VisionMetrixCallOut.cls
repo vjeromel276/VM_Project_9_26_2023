@@ -316,7 +316,7 @@ public class VisionMetrixCallOut {
                     ticketData.internal_notes = 'SF GENERATED VM TICKET';
                     // System.debug('Description: ' + ticketData.description);
                     //^~ Description
-                    ticketData.description = 'SF GENERATED VM TICKET';
+                    ticketData.description = parent.Description;
                     // System.debug('Description: ' + ticketData.description);
                     //^~ Subject
                     ticketData.subject = parent.Subject;
@@ -376,7 +376,7 @@ public class VisionMetrixCallOut {
      * @uses        visionMetrixLogin()                 to get the token for the header
      * @uses        genParentPayload()                  to generate the payload for the callout
      */
-    public static void addBulkVMTicket(List<Case> tickets, String token) {
+    public static HttpResponse addBulkVMTicket(List<Case> tickets, String token) {
 
         System.debug('+++++++++++++++++++Start of addBulkVMTicket Method+++++++++++++++++++++++++++++++++++++++++++++++++++');
         Boolean isExclusion = true;
@@ -401,10 +401,14 @@ public class VisionMetrixCallOut {
         }
         request.setBody(ticketPayload);
         HttpResponse response = http.send(request);
-        // If the request is successful, parse the JSON response.
+        // If the request is successful, return an object
         handleResponse(response);
+        // if response is successful
+
+
         VisionMetrixCallOutHelper.logAPICallout( String.valueOf(request.getEndpoint()), String.valueOf(request.getBody()), String.valueOf(JSON.deserializeUntyped(response.getBody())));
         System.debug('+++++++++++++++++++End of addBulkVMTicket Method+++++++++++++++++++++++++++++++++++++++++++++++++++');
+        return response;
     }
 
     /**************************************************************************************************************************************** */
