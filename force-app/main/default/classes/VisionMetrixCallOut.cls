@@ -231,7 +231,7 @@ public class VisionMetrixCallOut {
             VisionMetrixWrappers.AddTicket ticketData = new VisionMetrixWrappers.AddTicket();
 
             List<Case> parentCases = [SELECT Id, ParentId, Related_Service_Order__r.Id, Service_ID__c, Account_Name_Text__c,
-                                            CaseNumber, Related_Service_Order__c, Description, Subject, 
+                                            CaseNumber, Related_Service_Order__c, Related_Service_Order_Text__c, Description, Subject, 
                                             NOC_Ticket_Assigment__c, Maintenance_Start__c, Maintenance_End__c
                                      FROM Case
                                      WHERE ParentId = :ticket.Id];
@@ -240,7 +240,7 @@ public class VisionMetrixCallOut {
             Set<String> circuitSet = new Set<String>();
             // make sure the parent has a child
             for ( Case parent : parentCases ) {
-                System.debug('parent case: ' + parent);
+                System.debug('parent casenumber: ' + parent.CaseNumber+ ' parent id ' + parent.ParentId);
                 String circuitString = '';
 
                 List<VisionMetrix_Circuit__c> circuitList = [SELECT Id, Service_Order_Agreement__c, Circuit_Alias__c
@@ -252,7 +252,7 @@ public class VisionMetrixCallOut {
                     circuitSet.add(( circuit.Circuit_Alias__c ).trim().deleteWhitespace());
                 }
 
-                if ( parent != null ) {
+                // if ( parent != null ) {
 
                     //********Required Fields *********//
                     //^~ Ticket Id - Salesforce Ticket Case Number and todays date in the format of mm/dd/yyyy
@@ -326,12 +326,12 @@ public class VisionMetrixCallOut {
                     // System.debug('Support Agent: ' + ticketData.support_agent);
                     //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
                     // ticketList.add(ticketData);
-                }
-                else {
-                    //^ If the child is null throw an error
-                    System.debug('Child was null: ');
-                    // throw new System.QueryException('No Nodes found with the ticket number or ticket is not of correct type: ' + ticketId);
-                }
+                // }
+                // else {
+                //     //^ If the child is null throw an error
+                //     System.debug('Child was null: ');
+                //     // throw new System.QueryException('No Nodes found with the ticket number or ticket is not of correct type: ' + ticketId);
+                // }
             }
             // update Support Ticket with the VisionMetrix Ticket Number
             // ticket.VisionMetrix_Ticket_Number__c = ticketData.ticket_id;
