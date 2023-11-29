@@ -25,7 +25,7 @@ global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulab
         // need to make this the place where assign the parent ticket data to the individual vm tickets
 
         //! this is for testing only looking for VisionMetrix_Parent_Case__c = true still want to limit by account id
-        return Database.getQueryLocator([SELECT Id, AccountId, ParentId, RecordTypeId, Case_Record_Type__c, VisionMetrix_Parent_Case__c, NotificationType__c, Description, Subject, NOC_Ticket_Assigment__c, Maintenance_Start__c, Maintenance_End__c
+        return Database.getQueryLocator([SELECT Id,CaseNumber, Account_Name_Text__c, AccountId, ParentId, RecordTypeId, Case_Record_Type__c, VisionMETRIX_Ticket_Created_Date__c,VisionMETRIX_Ticket_Number__c, VisionMetrix_Parent_Case__c, NotificationType__c, Description, Subject, NOC_Ticket_Assigment__c, Maintenance_Start__c, Maintenance_End__c
                                          FROM Case
                                          WHERE Case_Record_Type__c = 'Maintenance' AND VisionMetrix_Parent_Case__c = true AND ParentId = null]);
 
@@ -43,6 +43,8 @@ global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulab
             // Collect parent case IDs that meet the criteria
             for (Case c : scope){
                 System.debug('Added Case Id to list: ' + c);
+                c.VisionMETRIX_Ticket_Created_Date__c = DateTime.now();
+                c.VisionMETRIX_Ticket_Number__c = c.CaseNumber + '-' + c.VisionMETRIX_Ticket_Created_Date__c.format('MM/dd/yyyy HH:mm:ss');
                 parentCases.add(c);
             }
 
@@ -74,7 +76,7 @@ global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulab
         }
 
         AsyncApexJob job = Database.query(soql);
-
+        
         //Only send the email if there is a problem.
         if (Test.isRunningTest() || job != NULL && job.NumberOfErrors != NULL && job.NumberOfErrors > 0){
             EmailUtils em = new EmailUtils();

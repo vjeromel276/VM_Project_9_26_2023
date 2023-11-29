@@ -230,7 +230,7 @@ public class VisionMetrixCallOut {
             // individual Parent ticket wrapper
             VisionMetrixWrappers.AddTicket ticketData = new VisionMetrixWrappers.AddTicket();
 
-            List<Case> childCases = [SELECT Id, ParentId, Related_Service_Order__r.Id, Service_ID__c, 
+            List<Case> childCases = [SELECT Id, ParentId, Related_Service_Order__r.Id, Service_ID__c, Account_Name_Text__c,
                                             CaseNumber, Related_Service_Order__c, Description, Subject, 
                                             NOC_Ticket_Assigment__c, Maintenance_Start__c, Maintenance_End__c
                                      FROM Case
@@ -256,7 +256,8 @@ public class VisionMetrixCallOut {
 
                     //********Required Fields *********//
                     //^~ Ticket Id - Salesforce Ticket Case Number and todays date in the format of mm/dd/yyyy
-                    ticketData.ticket_id = child.CaseNumber + '-'+ /** Account.Name +' ' +'Maintenance' */ + ' | ' + String.valueOf(Date.today().year()) + '/' + String.valueOf(Date.today().month()) + '/' + String.valueOf(Date.today().day());
+                    ticketData.ticket_id = child.CaseNumber + ' | ' + child.Account_Name_Text__c + ' Maintenance | Start Date - '+ child.Maintenance_Start__c.format('MM/dd/yyyy');
+                    // ticketData.ticket_id = child.CaseNumber + ' | ' + child.Account_Name_Text__c + ' Maintenance | Start Date - '+ String.valueOf(Date.today().year()) + '/' + String.valueOf(Date.today().month()) + '/' + String.valueOf(Date.today().day());
                     // System.debug('Ticket Number: ' + ticketData.ticket_id);
 
                     //^~ Ticket Type - Ticket Type defaults to 'Exclusion Period'
@@ -313,7 +314,7 @@ public class VisionMetrixCallOut {
                     ticketData.exclusde_from_mttr_reporting = 'Yes';
                     // System.debug('Exclude From Monitoring Reporting: ' + ticketData.exclusde_from_mttr_reporting);
                     //^~ Description
-                    ticketData.description = child.Description;
+                    ticketData.description = 'SF GENERATED VM TICKET';
                     // System.debug('Description: ' + ticketData.description);
                     //^~ Subject
                     ticketData.subject = child.Subject;
@@ -393,6 +394,9 @@ public class VisionMetrixCallOut {
         request.setHeader('Content-Type', 'application/json');
         request.setHeader('Content-Length', String.valueOf(ticketPayload.length()));
         System.debug('Ticket Payload: ' + ticketPayload);
+        for(String s: ticketPayload.split(',')){
+            System.debug(s);
+        }
         request.setBody(ticketPayload);
         HttpResponse response = http.send(request);
         // If the request is successful, parse the JSON response.
