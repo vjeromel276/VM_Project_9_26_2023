@@ -217,7 +217,7 @@ public class VisionMetrixCallOut {
      * @param       tickets             List<Case>              the list of SF Support Ticket numbers
      * @return                          String                  the payload for the callout
      *
-     * @uses        AddBulkVMTickets    VisionMetrixWrapper     to create the bulk ticket wrapper
+     * @see        AddBulkVMTickets    VisionMetrixWrapper     to create the bulk ticket wrapper
      */
     public static String genParentPayload(List<Case> parentTickets) {
 
@@ -230,34 +230,33 @@ public class VisionMetrixCallOut {
             // individual Parent ticket wrapper
             VisionMetrixWrappers.AddTicket ticketData = new VisionMetrixWrappers.AddTicket();
 
-            List<Case> childCases = [SELECT Id, ParentId, Related_Service_Order__r.Id, Service_ID__c, Account_Name_Text__c,
+            List<Case> parentCases = [SELECT Id, ParentId, Related_Service_Order__r.Id, Service_ID__c, Account_Name_Text__c,
                                             CaseNumber, Related_Service_Order__c, Description, Subject, 
                                             NOC_Ticket_Assigment__c, Maintenance_Start__c, Maintenance_End__c
                                      FROM Case
                                      WHERE ParentId = :ticket.Id];
 
-            // System.debug('child case array: ' + childCases + ' for ticket: ' + ticket.Id);
+            // System.debug('child case array: ' + parentCases + ' for ticket: ' + ticket.Id);
             Set<String> circuitSet = new Set<String>();
             // make sure the parent has a child
-            for ( Case child : childCases ) {
-                System.debug('child case: ' + child);
+            for ( Case parent : parentCases ) {
+                System.debug('parent case: ' + parent);
                 String circuitString = '';
 
                 List<VisionMetrix_Circuit__c> circuitList = [SELECT Id, Service_Order_Agreement__c, Circuit_Alias__c
                                                              FROM VisionMetrix_Circuit__c
-                                                             WHERE Service_Order_Agreement__c = :child.Related_Service_Order__c];
+                                                             WHERE Service_Order_Agreement__c = :parent.Related_Service_Order__c];
 
                 for ( VisionMetrix_Circuit__c circuit : circuitList ) {
                     // circuitString += circuit.Circuit_Alias__c + ', ';
                     circuitSet.add(( circuit.Circuit_Alias__c ).trim().deleteWhitespace());
                 }
 
-                if ( child != null ) {
+                if ( parent != null ) {
 
                     //********Required Fields *********//
                     //^~ Ticket Id - Salesforce Ticket Case Number and todays date in the format of mm/dd/yyyy
-                    ticketData.ticket_id = child.CaseNumber + ' | ' + child.Account_Name_Text__c + ' Maintenance | Start Date - '+ child.Maintenance_Start__c.format('MM/dd/yyyy');
-                    // ticketData.ticket_id = child.CaseNumber + ' | ' + child.Account_Name_Text__c + ' Maintenance | Start Date - '+ String.valueOf(Date.today().year()) + '/' + String.valueOf(Date.today().month()) + '/' + String.valueOf(Date.today().day());
+                    ticketData.ticket_id = ticket.CaseNumber + ' | ' + parent.Account_Name_Text__c + ' Maintenance | Start Date - '+ parent.Maintenance_Start__c.format('MM/dd/yyyy');
                     // System.debug('Ticket Number: ' + ticketData.ticket_id);
 
                     //^~ Ticket Type - Ticket Type defaults to 'Exclusion Period'
@@ -291,11 +290,11 @@ public class VisionMetrixCallOut {
                     // System.debug('Severity: ' + ticketData.severity);
 
                     //^~ Start Time - Maintenance Start Time
-                    ticketData.start_time = Integer.valueOf(child.Maintenance_Start__c.getTime() / 1000);
+                    ticketData.start_time = Integer.valueOf(parent.Maintenance_Start__c.getTime() / 1000);
                     // System.debug('Maintenance Start: ' + ticketData.start_time);
 
                     //^~ End Time - Maintenance End Time
-                    ticketData.end_time = Integer.valueOf(child.Maintenance_End__c.getTime() / 1000);
+                    ticketData.end_time = Integer.valueOf(parent.Maintenance_End__c.getTime() / 1000);
                     // System.debug('Maintenance End: ' + ticketData.end_time);
 
                     //********Optional Fields*********//
@@ -313,14 +312,17 @@ public class VisionMetrixCallOut {
                     //^~ Exclude From Monitoring Reporting - Exclusion Period Excluded From Monitoring defaults to 'No' should be 'Yes' for exclusions
                     ticketData.exclusde_from_mttr_reporting = 'Yes';
                     // System.debug('Exclude From Monitoring Reporting: ' + ticketData.exclusde_from_mttr_reporting);
+                    //^~ Internal Notes
+                    ticketData.internal_notes = 'SF GENERATED VM TICKET';
+                    // System.debug('Description: ' + ticketData.description);
                     //^~ Description
                     ticketData.description = 'SF GENERATED VM TICKET';
                     // System.debug('Description: ' + ticketData.description);
                     //^~ Subject
-                    ticketData.subject = child.Subject;
+                    ticketData.subject = parent.Subject;
                     // System.debug('Subject: ' + ticketData.subject);
                     //^~ Support Agent
-                    ticketData.support_agent = child.NOC_Ticket_Assigment__c;
+                    ticketData.support_agent = parent.NOC_Ticket_Assigment__c;
                     // System.debug('Support Agent: ' + ticketData.support_agent);
                     //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
                     // ticketList.add(ticketData);
