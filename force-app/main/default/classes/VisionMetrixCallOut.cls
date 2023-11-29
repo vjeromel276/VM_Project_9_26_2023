@@ -219,7 +219,7 @@ public class VisionMetrixCallOut {
      *
      * @uses        AddBulkVMTickets    VisionMetrixWrapper     to create the bulk ticket wrapper
      */
-    public static String genParentPayload(List<Case> parentTickets) {+
+    public static String genParentPayload(List<Case> parentTickets) {
 
         // bulk Parent ticket wrapper
         VisionMetrixWrappers.AddBulkVMTickets bulkticketData = new VisionMetrixWrappers.AddBulkVMTickets();
