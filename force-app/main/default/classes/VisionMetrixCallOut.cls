@@ -18,9 +18,7 @@ public class VisionMetrixCallOut {
      * @uses        InitLogin           VisionMetrixWrapper     to create the login wrapper
      */
     private static String genAuthPayload() {
-        if(isTest) {
-            return '{"username":"everstreampcol1","password":"Everstream1"}';
-        }
+        
         VisionMetrixWrappers.InitLogin login = new VisionMetrixWrappers.InitLogin();
         // System.debug(login);
         return JSON.serialize(login);
