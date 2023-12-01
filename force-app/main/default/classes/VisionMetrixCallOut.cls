@@ -772,6 +772,8 @@ public class VisionMetrixCallOut {
         queryList.add(urlEnd + '?type=DOMAIN&argument=ATT%20Wireline%20|%20ATTW%20[MI]');
         queryList.add(urlEnd + '?type=DOMAIN&argument=ATT%20Wireline%20|%20ATTW%20[OH]');
 
+        List<HttpResponse> responseList = new List<HttpResponse>();
+
         for ( String query : queryList ) {
             System.debug('endpoint' + query.trim().deleteWhitespace());
             HttpRequest request = new HttpRequest(  );
@@ -782,9 +784,12 @@ public class VisionMetrixCallOut {
             request.setHeader('X-ocularip-token', headerToken);
             request.setHeader('X-ocularip-company', 'Everstream');
             HttpResponse response = new Http(  ).send(request);
-            System.debug('response' + response);
-            VisionMetrixHelperMethod.handleCircuits(response);
+            // System.debug('response' + response);
+            // VisionMetrixHelperMethod.handleCircuits(response);
+            responseList.add(response);
+            
         }
+        System.debug('responseList' + responseList);
     }
 
     /**************************************************************************************************** */
