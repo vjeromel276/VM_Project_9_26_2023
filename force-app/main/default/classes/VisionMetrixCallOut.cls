@@ -737,39 +737,58 @@ public class VisionMetrixCallOut {
         List<VisionMetrix_Circuit__c> circuitList = new List<VisionMetrix_Circuit__c>();
         String headerToken = visionMetrixLogin();
         String urlEnd = 'https://rest-api2.visionmetrix.net/1.1/circuits/query/';
-        // String endpoint = urlEnd + '?type=DOMAIN&argument=EV%20Backbone%20|%20';//!incomplete - may noty need
-        // String endpoint = urlEnd + '?type=DOMAIN&argument=Verizon%20|%20VZW%20[MI]';// complete 102523
-        // String endpoint = urlEnd + '?type=DOMAIN&argument=Verizon%20|%20VZW%20[OH]';// complete 102523
-        // String endpoint = urlEnd + '?type=DOMAIN&argument=Consumers%20|%20CMS%20[MI]';// complete 102523
-        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[IL]';//complete 102523
-        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[IN]';//complete 102523
-        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[MI]';//complete 102523
-        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[MO]';//complete 102523
-        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[OHCL]';//complete 102523
-        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[OHCO]';//complete 102523
-        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[PA]';//complete 102523
-        // String endpoint = urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[WI]';//complete 102523
-        // String endpoint = urlEnd + '?type=DOMAIN&argument=ATT%20Mobility%20|%20ATTM%20[MI]';//complete 102523
-        // String endpoint = urlEnd + '?type=DOMAIN&argument=ATT%20Mobility%20|%20ATTM%20[OH]';//complete 102523
-        // String endpoint = urlEnd + '?type=DOMAIN&argument=ATT%20Mobility%20|%20ATTM%20[PA]';//complete 102523
-        // String endpoint = urlEnd + '?type=DOMAIN&argument=ATT%20Wireline%20|%20ATTW%20[MI]';//complete 102523
-        String endpoint = urlEnd + '?type=DOMAIN&argument=ATT%20Wireline%20|%20ATTW%20[OH]';//complete 102523
+        List<String> queryList = new List<String>();
+        queryList.add(urlEnd + '?type=DOMAIN&argument=EV%20Backbone%20|%20');// complete - may not need
+        queryList.add(urlEnd + '?type=DOMAIN&argument=Verizon%20|%20VZW%20[MI]');// complete 102523
+        queryList.add(urlEnd + '?type=DOMAIN&argument=Verizon%20|%20VZW%20[OH]');// complete 102523
+        queryList.add(urlEnd + '?type=DOMAIN&argument=Consumers%20|%20CMS%20[MI]');// complete 102523
+        queryList.add(urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[IL]');//complete 102523
+        queryList.add(urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[IN]');//complete 102523
+        queryList.add(urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[MI]');//complete 102523
+        queryList.add(urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[MO]');//complete 102523
+        queryList.add(urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[OHCL]');//complete 102523
+        queryList.add(urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[OHCO]');//complete 102523
+        queryList.add(urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[PA]');//complete 102523
+        queryList.add(urlEnd + '?type=DOMAIN&argument=T-Mobile%20|%20TMO%20[WI]');//complete 102523
+        queryList.add(urlEnd + '?type=DOMAIN&argument=ATT%20Mobility%20|%20ATTM%20[MI]');//complete 102523
+        queryList.add(urlEnd + '?type=DOMAIN&argument=ATT%20Mobility%20|%20ATTM%20[OH]');//complete 102523
+        queryList.add(urlEnd + '?type=DOMAIN&argument=ATT%20Mobility%20|%20ATTM%20[PA]');//complete 102523
+        queryList.add(urlEnd + '?type=DOMAIN&argument=ATT%20Wireline%20|%20ATTW%20[MI]');//complete 102523
+        queryList.add(urlEnd + '?type=DOMAIN&argument=ATT%20Wireline%20|%20ATTW%20[OH]');//complete 102523
 
-        HttpRequest request = new HttpRequest(  );
-        System.debug('endpoint' + endpoint);
-        request.setEndpoint(endpoint.trim());
-        request.setMethod('GET');
-        request.setHeader('Content-Type', 'application/json,utf-8');
-        request.setHeader('X-ocularip-username', 'everstreampcol1');
-        request.setHeader('X-ocularip-token', headerToken);
-        request.setHeader('X-ocularip-company', 'Everstream');
-        HttpResponse response = new Http(  ).send(request);
+        List<HttpResponse> responseList = new List<HttpResponse>();
+        
+        for ( String query : queryList ) {
+            HttpRequest request = new HttpRequest(  );
+            request.setEndpoint(query);
+            System.debug('endpoint' + query.trim().deleteWhitespace());
+            request.setMethod('GET');
+            request.setHeader('Content-Type', 'application/json');
+            request.setHeader('X-ocularip-username', 'everstreampcol1');
+            request.setHeader('X-ocularip-token', headerToken);
+            request.setHeader('X-ocularip-company', 'Everstream');
+            HttpResponse response = new Http(  ).send(request);
+            System.debug('response' + response);
+            responseList.add(response);
+        }
 
-        Map<String, Object> results = ( Map<String, Object> )JSON.deserializeUntyped(response.getBody());
-        String success = results.get('success').toString();
-        VisionMetrixHelperMethod.handleCircuits(response);
-        if ( success == 'false' ) {
-            throw new System.QueryException( 'Callout failed with error: ' + results.get('error').toString() );
+        for ( HttpResponse response : responseList ) {
+            Map<String, Object> results = ( Map<String, Object> )JSON.deserializeUntyped(response.getBody());
+            System.debug(results);
+            //String success = results.get('success').toString();
+            // String circuits = results.get('circuits').toString();
+            // if ( success == 'false' ) {
+            //     // throw new System.QueryException( 'Callout failed with error: ' + results.get('error').toString() );
+            //     System.debug('Callout failed with error: ' + results.get('error').toString());
+            // }
+            // else if ( success == 'true' && circuits != null ) {
+            //     System.debug('Success Response Circuits: ');
+            //     // VisionMetrixHelperMethod.handleCircuits(response);
+            //     System.debug('Circuits: ' + circuits + '\n');
+            // }
+            // else {
+            //     throw new System.QueryException( 'Callout succeded no Circuits retunred' );
+            // }
         }
     }
 
