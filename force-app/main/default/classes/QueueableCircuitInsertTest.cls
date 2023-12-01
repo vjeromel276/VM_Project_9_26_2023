@@ -12,7 +12,7 @@ public with sharing class QueueableCircuitInsertTest {
     @isTest static void testCircuitInsert() {
         // Step 1: Set up test data
         List<VisionMetrix_Circuit__c> testCircuits = new List<VisionMetrix_Circuit__c>();
-        // Assuming VisionMetrix_Circuit__c has a field 'Name' for simplicity. Replace with actual fields.
+        // Assuming VisionMetrix_Circuit__c has a field 'Circuit_Alias__c' for simplicity. Replace with actual fields.
         for (Integer i = 0; i < 210; i++) { // Creating more than 200 records to test chunking
             testCircuits.add(new VisionMetrix_Circuit__c(Circuit_Alias__c = 'Test Circuit ' + i));
         }

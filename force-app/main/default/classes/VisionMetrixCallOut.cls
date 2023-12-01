@@ -743,6 +743,7 @@ public class VisionMetrixCallOut {
      * @uses        handleResponse()                to handle the response from the callout
      *
      */
+    @invocableMethod(label='Insert Circuits' description='pulls all circuits from VisionMetrix and inserts them into Salesforce')
     public static void pullAllCircuits() {
         List<VisionMetrix_Circuit__c> circuitList = new List<VisionMetrix_Circuit__c>();
         String headerToken = visionMetrixLogin();
