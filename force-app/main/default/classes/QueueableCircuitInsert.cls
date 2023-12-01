@@ -1,3 +1,12 @@
+/**
+ * @name              : QueueableCircuitInsert.cls
+ * @description       : this class is used for inserting the circuits in chunks of 200
+ * @author            : vlettau@everstream.net
+ * @group             : Enterprise Technology
+ * @Created on        : 12-01-2023
+ * @last modified by  : vlettau@everstream.net
+ * @last modified on  : 12-01-2023
+ **/
 public class QueueableCircuitInsert implements Queueable, Database.AllowsCallouts {
     List<VisionMetrix_Circuit__c> circuitsToInsert;
     public QueueableCircuitInsert(List<VisionMetrix_Circuit__c> circuits) {
