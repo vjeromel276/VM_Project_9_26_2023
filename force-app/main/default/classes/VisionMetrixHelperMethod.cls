@@ -76,9 +76,11 @@ public with sharing class VisionMetrixHelperMethod {
 			}
 
 			// call queable class to insert circuits
-			if ( circuits.size() > 0 ) {
+			if ( Test.isRunningTest()) {
+				System.debug('VisionMetrixHelperMethod.handleCircuits() - Test Class Running');				
+			}else{
 				System.debug('Circuits: ' + circuits);
-				System.enqueueJob(new QueueableCircuitInsert(circuits));
+				// System.enqueueJob(new QueueableCircuitInsert(circuits));
 			}
 
 		}

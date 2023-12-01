@@ -1,4 +1,4 @@
-public with sharing class VisionMetrixCircuitWrapper {
+public class VisionMetrixCircuitWrapper {
     
     public String circuit_alias;
     public String secondary_name;

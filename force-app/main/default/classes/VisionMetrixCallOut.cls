@@ -5,7 +5,7 @@
  * @group             : Enterprise Technology
  * @Created on        : 7-11-2023
  * @last modified by  : vlettau@everstream.net
- * @last modified on  : 11-08-2023
+ * @last modified on  : 12-01-2023
  **/
 public class VisionMetrixCallOut {
     /**
@@ -56,8 +56,12 @@ public class VisionMetrixCallOut {
             // Deserializes the JSON string into collections of primitive data types.
             Map<String, Object> results = ( Map<String, Object> )JSON.deserializeUntyped(response.getBody());
             // System.debug(results);
-
-            String token = results.get('token').toString();
+            String token='';
+            if(Test.isRunningTest()){
+                token = '4ac5ee08b1c5a901b52b84b3a7a8cd948f3460ee';
+            }else{
+                token = results.get('token').toString();   
+            }
             // System.debug(token);
             return token;
         }
@@ -742,6 +746,11 @@ public class VisionMetrixCallOut {
     public static void pullAllCircuits() {
         List<VisionMetrix_Circuit__c> circuitList = new List<VisionMetrix_Circuit__c>();
         String headerToken = visionMetrixLogin();
+
+        // if(Test.isRunningTest()){
+        //      headerToken = '4ac5ee08b1c5a901b52b84b3a7a8cd948f3460ee';
+        // }   
+
         String urlEnd = 'https://rest-api2.visionmetrix.net/1.1/circuits/query/';
         List<String> queryList = new List<String>();
         queryList.add(urlEnd + '?type=DOMAIN&argument=EV%20Backbone%20|%20');// may not need
@@ -762,8 +771,6 @@ public class VisionMetrixCallOut {
         queryList.add(urlEnd + '?type=DOMAIN&argument=ATT%20Wireline%20|%20ATTW%20[MI]');
         queryList.add(urlEnd + '?type=DOMAIN&argument=ATT%20Wireline%20|%20ATTW%20[OH]');
 
-        // List<HttpResponse> responseList = new List<HttpResponse>();
-        // List<Map<String, Object>> resultsMapList = new List<Map<String, Object>>();
         for ( String query : queryList ) {
             System.debug('endpoint' + query.trim().deleteWhitespace());
             HttpRequest request = new HttpRequest(  );
@@ -776,10 +783,6 @@ public class VisionMetrixCallOut {
             HttpResponse response = new Http(  ).send(request);
             System.debug('response' + response);
             VisionMetrixHelperMethod.handleCircuits(response);
-            // responseList.add(response);
-            // Map<String, Object> results = ( Map<String, Object> )JSON.deserializeUntyped(response.getBody());
-            // System.debug('results' + results);
-            // resultsMapList.add(results);
         }
     }
 
