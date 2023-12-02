@@ -35,6 +35,10 @@ public class VisionMetrixCallOut {
      * @uses        genAuthPayload()    Function        to generate the payload for the callout
      */
     public static String visionMetrixLogin() {
+        if(Test.isRunningTest()){
+            String token = '4ac5ee08b1c5a901b52b84b3a7a8cd948f3460ee';
+            return token;
+        }
 
         Http http = new Http(  );
         HttpRequest request = new HttpRequest(  );
@@ -89,33 +93,33 @@ public class VisionMetrixCallOut {
      * @param       response            HttpResponse    the response from the call out
      * @return                          List<Object>    the list of values from the response
      */
-    // public static List<Object> handleResponse(HttpResponse response) {
-    //     // If the request is successful, parse the JSON response.
-    //     if ( response.getStatusCode() == 200 ) {
-    //         // Deserializes the JSON string into collections of primitive data types.
-    //         Map<String, Object> results = ( Map<String, Object> )JSON.deserializeUntyped(response.getBody());
-    //         for ( String key : results.keySet() ) {
-    //             System.debug(key + ' : ' + results.get(key));
-    //         }
-    //         System.debug(results);
-    //         return results.values();
-    //     }
-    //     else {
-    //         System.debug('***********************************************RESPONSE***********************************************');
-    //         Object[] keys = response.getHeaderKeys();
-    //         Map<String, String> headers = new Map<String, String>();
-    //         String outputLine='';
-    //         List<String> outputList = new List<String>();
-    //         for ( Object key : keys ) {
-    //             outputLine = key + ' : ' + response.getHeader(key.toString()) + '\n';
-    //             outputList.add(outputLine);
-    //             System.debug(key + ' : ' + response.getHeader(key.toString()));
-    //         }
-    //         System.debug(response.getBody().remove('\\'));
-    //         System.debug('******************************************END RESPONSE***********************************************');
-    //         return outputList;
-    //     }
-    // }
+    public static List<Object> handleResponse(HttpResponse response) {
+        // If the request is successful, parse the JSON response.
+        if ( response.getStatusCode() == 200 ) {
+            // Deserializes the JSON string into collections of primitive data types.
+            Map<String, Object> results = ( Map<String, Object> )JSON.deserializeUntyped(response.getBody());
+            for ( String key : results.keySet() ) {
+                System.debug(key + ' : ' + results.get(key));
+            }
+            System.debug(results);
+            return results.values();
+        }
+        else {
+            System.debug('***********************************************RESPONSE***********************************************');
+            Object[] keys = response.getHeaderKeys();
+            Map<String, String> headers = new Map<String, String>();
+            String outputLine='';
+            List<String> outputList = new List<String>();
+            for ( Object key : keys ) {
+                outputLine = key + ' : ' + response.getHeader(key.toString()) + '\n';
+                outputList.add(outputLine);
+                System.debug(key + ' : ' + response.getHeader(key.toString()));
+            }
+            System.debug(response.getBody().remove('\\'));
+            System.debug('******************************************END RESPONSE***********************************************');
+            return outputList;
+        }
+    }
 
     /**************************************************************************************************************************************** */
 
@@ -231,156 +235,156 @@ public class VisionMetrixCallOut {
      *
      * @see        AddBulkVMTickets    VisionMetrixWrapper     to create the bulk ticket wrapper
      */
-    // public static String genParentPayload(List<Case> parentTickets) {
+    public static String genParentPayload(List<Case> parentTickets) {
 
         // bulk Parent ticket wrapper
-        // VisionMetrixWrappers.AddBulkVMTickets bulkticketData = new VisionMetrixWrappers.AddBulkVMTickets();
-        // // ticket list wrapper to hold the list of Parent tickets
-        // List<VisionMetrixWrappers.AddTicket> ticketList = new List<VisionMetrixWrappers.AddTicket>();
+        VisionMetrixWrappers.AddBulkVMTickets bulkticketData = new VisionMetrixWrappers.AddBulkVMTickets();
+        // ticket list wrapper to hold the list of Parent tickets
+        List<VisionMetrixWrappers.AddTicket> ticketList = new List<VisionMetrixWrappers.AddTicket>();
         // for each parent ticekt id in the list of ticket ids
-        // for ( Case ticket : parentTickets ) {
-        //     // individual Parent ticket wrapper
-        //     VisionMetrixWrappers.AddTicket ticketData = new VisionMetrixWrappers.AddTicket();
+        for ( Case ticket : parentTickets ) {
+            // individual Parent ticket wrapper
+            VisionMetrixWrappers.AddTicket ticketData = new VisionMetrixWrappers.AddTicket();
 
-        //     List<Case> parentCases = [SELECT Id, ParentId, Related_Service_Order__r.Id, Service_ID__c, Account_Name_Text__c,
-        //                                     CaseNumber, Related_Service_Order__c, Related_Service_Order_Text__c, Description, Subject, 
-        //                                     NOC_Ticket_Assigment__c, Maintenance_Start__c, Maintenance_End__c
-        //                              FROM Case
-        //                              WHERE ParentId = :ticket.Id];
+            List<Case> parentCases = [SELECT Id, ParentId, Related_Service_Order__r.Id, Service_ID__c, Account_Name_Text__c,
+                                            CaseNumber, Related_Service_Order__c, Related_Service_Order_Text__c, Description, Subject, 
+                                            NOC_Ticket_Assigment__c, Maintenance_Start__c, Maintenance_End__c
+                                     FROM Case
+                                     WHERE ParentId = :ticket.Id];
 
-            // System.debug('child case array: ' + parentCases + ' for ticket: ' + ticket.Id);
-            // Set<String> circuitSet = new Set<String>();
+            System.debug('child case array: ' + parentCases + ' for ticket: ' + ticket.Id);
+            Set<String> circuitSet = new Set<String>();
             
             // make sure the parent has a child
-            // for ( Case parent : parentCases ) {
-            //     System.debug('parent casenumber: ' + parent.CaseNumber+ ' parent id ' + parent.Related_Service_Order_Text__c);                
+            for ( Case parent : parentCases ) {
+                System.debug('parent casenumber: ' + parent.CaseNumber+ ' parent id ' + parent.Related_Service_Order_Text__c);                
 
-            //     List<VisionMetrix_Circuit__c> circuitList = [SELECT Id, Service_Order_Agreement__c, Circuit_Alias__c
-            //                                                  FROM VisionMetrix_Circuit__c
-            //                                                  WHERE Service_Order_Agreement__c = :parent.Related_Service_Order__c];
+                List<VisionMetrix_Circuit__c> circuitList = [SELECT Id, Service_Order_Agreement__c, Circuit_Alias__c
+                                                             FROM VisionMetrix_Circuit__c
+                                                             WHERE Service_Order_Agreement__c = :parent.Related_Service_Order__c];
 
-            //     System.debug('circuit list: ' + circuitList);
-            //     String circuitString = '';
-            //     for ( VisionMetrix_Circuit__c circuit : circuitList ) {
-            //         // circuitString += circuit.Circuit_Alias__c + ', ';
-            //         circuitSet.add(( circuit.Circuit_Alias__c ).trim().deleteWhitespace()+'&');
-            //     }
+                System.debug('circuit list: ' + circuitList);
+                String circuitString = '';
+                for ( VisionMetrix_Circuit__c circuit : circuitList ) {
+                    // circuitString += circuit.Circuit_Alias__c + ', ';
+                    circuitSet.add(( circuit.Circuit_Alias__c ).trim().deleteWhitespace()+'&');
+                }
 
-            //     if ( parent != null ) {
+                if ( parent != null ) {
 
-            //         //********Required Fields *********//
-            //         //^~ Ticket Id - Salesforce Ticket Case Number and todays date in the format of mm/dd/yyyy
-            //         ticketData.ticket_id = ticket.CaseNumber + ' | ' + parent.Account_Name_Text__c + ' Maintenance | Start Date - '+ parent.Maintenance_Start__c.format('MM/dd/yyyy');
-            //         // System.debug('Ticket Number: ' + ticketData.ticket_id);
+                    //********Required Fields *********//
+                    //^~ Ticket Id - Salesforce Ticket Case Number and todays date in the format of mm/dd/yyyy
+                    ticketData.ticket_id = ticket.CaseNumber + ' | ' + parent.Account_Name_Text__c + ' Maintenance | Start Date - '+ parent.Maintenance_Start__c.format('MM/dd/yyyy');
+                    // System.debug('Ticket Number: ' + ticketData.ticket_id);
 
-            //         //^~ Ticket Type - Ticket Type defaults to 'Exclusion Period'
-            //         ticketData.ticket_type = 'Exclusion Period';
-            //         // System.debug('Ticket Type: ' + ticketData.ticket_type);
+                    //^~ Ticket Type - Ticket Type defaults to 'Exclusion Period'
+                    ticketData.ticket_type = 'Exclusion Period';
+                    // System.debug('Ticket Type: ' + ticketData.ticket_type);
 
-            //         //^~ Circuit List - List of Circuits to be excluded
-            //         // System.debug('Circuits: ' + circuitSet);
-            //         // System.debug('Circuits: ' + circuitSet.size());
-            //         Integer circuitSetSize = circuitSet.size();
-            //         for ( String circuit : circuitSet ) {
-            //             if ( circuitSetSize > 1 ) {
-            //                 // circuitString += circuit + '& ';
-            //                 circuitString += circuit;
-            //                 circuitSetSize--;
-            //             }
-            //             else {
-            //                 circuitString += circuit;
-            //             }
-            //         }
-            //         if ( circuitString.length() > 0 ) {
-            //             if(circuitString.endsWith('&')) {
-            //                 circuitString = circuitString.removeEnd('&');
-            //             }
-            //             ticketData.circuits = ( circuitString ).trim().deleteWhitespace();
-            //         }
-            //         // System.debug('Circuits: ' + ticketData.circuits);
+                    //^~ Circuit List - List of Circuits to be excluded
+                    // System.debug('Circuits: ' + circuitSet);
+                    // System.debug('Circuits: ' + circuitSet.size());
+                    Integer circuitSetSize = circuitSet.size();
+                    for ( String circuit : circuitSet ) {
+                        if ( circuitSetSize > 1 ) {
+                            // circuitString += circuit + '& ';
+                            circuitString += circuit;
+                            circuitSetSize--;
+                        }
+                        else {
+                            circuitString += circuit;
+                        }
+                    }
+                    if ( circuitString.length() > 0 ) {
+                        if(circuitString.endsWith('&')) {
+                            circuitString = circuitString.removeEnd('&');
+                        }
+                        ticketData.circuits = ( circuitString ).trim().deleteWhitespace();
+                    }
+                    // System.debug('Circuits: ' + ticketData.circuits);
 
-            //         //^~ Open Status - Exclusion Period Open Status defaults to 'Closed'
-            //         ticketData.open_status = 'Closed';
-            //         // System.debug('Open Status: ' + ticketData.open_status);
+                    //^~ Open Status - Exclusion Period Open Status defaults to 'Closed'
+                    ticketData.open_status = 'Closed';
+                    // System.debug('Open Status: ' + ticketData.open_status);
 
-            //         //^~ Severity - Exclusion Period Severity defaults to 'Low'
-            //         ticketData.severity = 'Low';
-            //         // System.debug('Severity: ' + ticketData.severity);
+                    //^~ Severity - Exclusion Period Severity defaults to 'Low'
+                    ticketData.severity = 'Low';
+                    // System.debug('Severity: ' + ticketData.severity);
 
-            //         //^~ Start Time - Maintenance Start Time
-            //         ticketData.start_time = Integer.valueOf(parent.Maintenance_Start__c.getTime() / 1000);
-            //         // System.debug('Maintenance Start: ' + ticketData.start_time);
+                    //^~ Start Time - Maintenance Start Time
+                    ticketData.start_time = Integer.valueOf(parent.Maintenance_Start__c.getTime() / 1000);
+                    // System.debug('Maintenance Start: ' + ticketData.start_time);
 
-            //         //^~ End Time - Maintenance End Time
-            //         ticketData.end_time = Integer.valueOf(parent.Maintenance_End__c.getTime() / 1000);
-            //         // System.debug('Maintenance End: ' + ticketData.end_time);
+                    //^~ End Time - Maintenance End Time
+                    ticketData.end_time = Integer.valueOf(parent.Maintenance_End__c.getTime() / 1000);
+                    // System.debug('Maintenance End: ' + ticketData.end_time);
 
-            //         //********Optional Fields*********//
-            //         //^~ Category - Default to Maintenance until the 1 to 1 mapping is complete
-            //         ticketData.category = 'Maintenance';
-            //         // System.debug('Category: ' + ticketData.category);
-            //         //^~ Internal Notes - SF Generated Ticket
-            //         // System.debug('Internal Notes: "SF GENERATED VM TICKET');
-            //         //^~ Exclusion Type - Exclusion Period Exclusion Type defaults to 'Smart'
-            //         ticketData.exclusion_type = 'Smart';
-            //         // System.debug('Exclusion Type: ' + ticketData.exclusion_type);
-            //         //^~ Exclude From Reporting - Exclusion Period Exclude From Reporting defaults to 'No' should be 'Yes' for exclusions
-            //         ticketData.exclude_from_reporting = 'Yes';
-            //         // System.debug('Exclude From Reporting: ' + ticketData.exclude_from_reporting);
-            //         //^~ Exclude From Monitoring Reporting - Exclusion Period Excluded From Monitoring defaults to 'No' should be 'Yes' for exclusions
-            //         ticketData.exclusde_from_mttr_reporting = 'Yes';
-            //         // System.debug('Exclude From Monitoring Reporting: ' + ticketData.exclusde_from_mttr_reporting);
-            //         //^~ Internal Notes
-            //         ticketData.internal_notes = 'SF GENERATED VM TICKET';
-            //         // System.debug('Description: ' + ticketData.description);
-            //         //^~ Description
-            //         ticketData.description = parent.Description;
-            //         // System.debug('Description: ' + ticketData.description);
-            //         //^~ Subject
-            //         ticketData.subject = parent.Subject;
-            //         // System.debug('Subject: ' + ticketData.subject);
-            //         //^~ Support Agent
-            //         ticketData.support_agent = parent.NOC_Ticket_Assigment__c;
-            //         // System.debug('Support Agent: ' + ticketData.support_agent);
-            //         //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-            //         // ticketList.add(ticketData);
-            //     }
-            //     else {
-            //         //^ If the child is null throw an error
-            //         System.debug('Child was null: ');
-            //         // throw new System.QueryException('No Nodes found with the ticket number or ticket is not of correct type: ' + ticketId);
-            //     }
-            // }
-        //     // update Support Ticket with the VisionMetrix Ticket Number
-        //     // ticket.VisionMetrix_Ticket_Number__c = ticketData.ticket_id;
-        //     // update Service Affecting Cust List with a list of service Ids
-        //     // ticket.Service_Affecting_Cust_List__c = ticketData.circuits;
-        //     // update ticket;
-        //     // add the ticket to the list of tickets
-        //     ticketList.add(ticketData);
-        //     System.debug('Ticket List: ' + ticketList);
-        //     // add the list of tickets to the bulk ticket wrapper
-        //     bulkticketData.tickets = ticketList;
+                    //********Optional Fields*********//
+                    //^~ Category - Default to Maintenance until the 1 to 1 mapping is complete
+                    ticketData.category = 'Maintenance';
+                    // System.debug('Category: ' + ticketData.category);
+                    //^~ Internal Notes - SF Generated Ticket
+                    // System.debug('Internal Notes: "SF GENERATED VM TICKET');
+                    //^~ Exclusion Type - Exclusion Period Exclusion Type defaults to 'Smart'
+                    ticketData.exclusion_type = 'Smart';
+                    // System.debug('Exclusion Type: ' + ticketData.exclusion_type);
+                    //^~ Exclude From Reporting - Exclusion Period Exclude From Reporting defaults to 'No' should be 'Yes' for exclusions
+                    ticketData.exclude_from_reporting = 'Yes';
+                    // System.debug('Exclude From Reporting: ' + ticketData.exclude_from_reporting);
+                    //^~ Exclude From Monitoring Reporting - Exclusion Period Excluded From Monitoring defaults to 'No' should be 'Yes' for exclusions
+                    ticketData.exclusde_from_mttr_reporting = 'Yes';
+                    // System.debug('Exclude From Monitoring Reporting: ' + ticketData.exclusde_from_mttr_reporting);
+                    //^~ Internal Notes
+                    ticketData.internal_notes = 'SF GENERATED VM TICKET';
+                    // System.debug('Description: ' + ticketData.description);
+                    //^~ Description
+                    ticketData.description = parent.Description;
+                    // System.debug('Description: ' + ticketData.description);
+                    //^~ Subject
+                    ticketData.subject = parent.Subject;
+                    // System.debug('Subject: ' + ticketData.subject);
+                    //^~ Support Agent
+                    ticketData.support_agent = parent.NOC_Ticket_Assigment__c;
+                    // System.debug('Support Agent: ' + ticketData.support_agent);
+                    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+                    // ticketList.add(ticketData);
+                }
+                else {
+                    //^ If the child is null throw an error
+                    System.debug('Child was null: ');
+                    // throw new System.QueryException('No Nodes found with the ticket number or ticket is not of correct type: ' + ticketId);
+                }
+            }
+            // update Support Ticket with the VisionMetrix Ticket Number
+            // ticket.VisionMetrix_Ticket_Number__c = ticketData.ticket_id;
+            // update Service Affecting Cust List with a list of service Ids
+            // ticket.Service_Affecting_Cust_List__c = ticketData.circuits;
+            // update ticket;
+            // add the ticket to the list of tickets
+            ticketList.add(ticketData);
+            System.debug('Ticket List: ' + ticketList);
+            // add the list of tickets to the bulk ticket wrapper
+            bulkticketData.tickets = ticketList;
+        }
+
+        // ******* Return the payload *******
+        // for ( VisionMetrixWrappers.AddTicket t : bulkticketData.tickets ) {
+        //     System.debug('Ticket Id: ' + t.ticket_id);
+        //     System.debug('Ticket Type: ' + t.ticket_type);
+        //     System.debug('Circuits: ' + t.circuits);
+        //     System.debug('Open Status: ' + t.open_status);
+        //     System.debug('Severity: ' + t.severity);
+        //     System.debug('Maintenance Start: ' + t.start_time);
+        //     System.debug('Maintenance End: ' + t.end_time);
+        //     System.debug('Exclusion Type: ' + t.exclusion_type);
+        //     System.debug('Exclude From Reporting: ' + t.exclude_from_reporting);
+        //     System.debug('Exclude From Monitoring Reporting: ' + t.exclusde_from_mttr_reporting);
+        //     System.debug('Description: ' + t.description);
+        //     System.debug('Subject: ' + t.subject);
+        //     System.debug('Support Agent: ' + t.support_agent);
         // }
-
-        //******* Return the payload *******
-    //     // for ( VisionMetrixWrappers.AddTicket t : bulkticketData.tickets ) {
-    //     //     System.debug('Ticket Id: ' + t.ticket_id);
-    //     //     System.debug('Ticket Type: ' + t.ticket_type);
-    //     //     System.debug('Circuits: ' + t.circuits);
-    //     //     System.debug('Open Status: ' + t.open_status);
-    //     //     System.debug('Severity: ' + t.severity);
-    //     //     System.debug('Maintenance Start: ' + t.start_time);
-    //     //     System.debug('Maintenance End: ' + t.end_time);
-    //     //     System.debug('Exclusion Type: ' + t.exclusion_type);
-    //     //     System.debug('Exclude From Reporting: ' + t.exclude_from_reporting);
-    //     //     System.debug('Exclude From Monitoring Reporting: ' + t.exclusde_from_mttr_reporting);
-    //     //     System.debug('Description: ' + t.description);
-    //     //     System.debug('Subject: ' + t.subject);
-    //     //     System.debug('Support Agent: ' + t.support_agent);
-    //     // }
-    //      return JSON.serialize(bulkticketData);
-    // }
+         return JSON.serialize(bulkticketData);
+    }
 
     /**************************************************************************************************************************************** */
     
@@ -395,40 +399,40 @@ public class VisionMetrixCallOut {
      * @uses        visionMetrixLogin()                 to get the token for the header
      * @uses        genParentPayload()                  to generate the payload for the callout
      */
-    // public static HttpResponse addBulkVMTicket(List<Case> tickets, String token) {
+    public static HttpResponse addBulkVMTicket(List<Case> tickets, String token) {
 
-    //     System.debug('+++++++++++++++++++Start of addBulkVMTicket Method+++++++++++++++++++++++++++++++++++++++++++++++++++');
-    //     Boolean isExclusion = true;
-    //     String headerToken = visionMetrixLogin();
-    //     // String headerToken = token;
-    //     Http http = new Http(  );
-    //     HttpRequest request = new HttpRequest(  );
-    //     String ticketPayload;
+        System.debug('+++++++++++++++++++Start of addBulkVMTicket Method+++++++++++++++++++++++++++++++++++++++++++++++++++');
+        Boolean isExclusion = true;
+        String headerToken = visionMetrixLogin();
+        Http http = new Http(  );
+        HttpRequest request = new HttpRequest(  );
+        String ticketPayload;
 
-    //     ticketPayload = genParentPayload(tickets);
+        ticketPayload = genParentPayload(tickets);
 
-    //     request.setEndpoint('https://rest-api2.visionmetrix.net/1.1/tickets/addBulk/');
-    //     request.setMethod('POST');
-    //     request.setHeader('X-ocularip-username', 'everstreampcol1');
-    //     request.setHeader('X-ocularip-token', headerToken);
-    //     request.setHeader('X-ocularip-company', 'Everstream');
-    //     request.setHeader('Content-Type', 'application/json');
-    //     request.setHeader('Content-Length', String.valueOf(ticketPayload.length()));
-    //     System.debug('Ticket Payload: ' + ticketPayload);
-    //     for(String s: ticketPayload.split(',')){
-    //         System.debug(s);
-    //     }
-    //     request.setBody(ticketPayload);
-    //     HttpResponse response = http.send(request);
-    //     // If the request is successful, return an object
-    //     handleResponse(response);
-    //     // if response is successful
+        
+        request.setEndpoint('https://rest-api2.visionmetrix.net/1.1/tickets/addBulk/');
+        request.setMethod('POST');
+        request.setHeader('X-ocularip-username', 'everstreampcol1');
+        request.setHeader('X-ocularip-token', headerToken);
+        request.setHeader('X-ocularip-company', 'Everstream');
+        request.setHeader('Content-Type', 'application/json');
+        request.setHeader('Content-Length', String.valueOf(ticketPayload.length()));
+        System.debug('Ticket Payload: ' + ticketPayload);
+        for(String s: ticketPayload.split(',')){
+            System.debug(s);
+        }
+        request.setBody(ticketPayload);
+        HttpResponse response = http.send(request);
+        // If the request is successful, return an object
+        handleResponse(response);
+        // if response is successful
 
 
-    //     VisionMetrixCallOutHelper.logAPICallout( String.valueOf(request.getEndpoint()), String.valueOf(request.getBody()), String.valueOf(JSON.deserializeUntyped(response.getBody())));
-    //     System.debug('+++++++++++++++++++End of addBulkVMTicket Method+++++++++++++++++++++++++++++++++++++++++++++++++++');
-    //     return response;
-    // }
+        VisionMetrixCallOutHelper.logAPICallout( String.valueOf(request.getEndpoint()), String.valueOf(request.getBody()), String.valueOf(JSON.deserializeUntyped(response.getBody())));
+        System.debug('+++++++++++++++++++End of addBulkVMTicket Method+++++++++++++++++++++++++++++++++++++++++++++++++++');
+        return response;
+    }
 
     /**************************************************************************************************************************************** */
     /**

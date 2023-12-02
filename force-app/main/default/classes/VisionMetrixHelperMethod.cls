@@ -80,7 +80,7 @@ public with sharing class VisionMetrixHelperMethod {
 				System.debug('VisionMetrixHelperMethod.handleCircuits() - Test Class Running');				
 			}else{
 				System.debug('Circuits: ' + circuits);
-				System.enqueueJob(new QueueableCircuitInsert(circuits));
+				// System.enqueueJob(new QueueableCircuitInsert(circuits));
 			}
 
 		}
