@@ -2,7 +2,7 @@ global class BatchVisionMetrixCircuitCallout implements Database.Batchable<sObje
     global Integer recordsParsed = 0;
     global Integer recordsUpdated = 0;
     global Boolean ExecuteNextJob = false;
-    global static Integer BatchSize = 200;
+    global static Integer BatchSize = 1000;
     global BatchVisionMetrixCircuitCallout() {
         // Constructor
     }
@@ -20,7 +20,9 @@ global class BatchVisionMetrixCircuitCallout implements Database.Batchable<sObje
         // Example: Insert or update records
         // Ensure to handle exceptions and respect governor limits
         try {
-            insert scope;
+            System.debug('Circuits: ' + scope.size());
+            System.enqueueJob(new QueueableCircuitInsert(scope));
+            // insert scope;
         } catch (Exception e) {
             // Handle exceptions appropriately
             System.debug('Error during batch processing: ' + e.getMessage());
@@ -28,7 +30,7 @@ global class BatchVisionMetrixCircuitCallout implements Database.Batchable<sObje
     }
 
     global void execute(SchedulableContext SC){
-        Database.executeBatch(new VisionMetrixBatch(), BatchSize);
+        Database.executeBatch(new BatchVisionMetrixCircuitCallout(), BatchSize);
     }
 
     global void finish(Database.BatchableContext BC){
