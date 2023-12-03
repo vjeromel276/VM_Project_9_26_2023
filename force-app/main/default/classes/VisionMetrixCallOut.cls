@@ -748,17 +748,12 @@ public class VisionMetrixCallOut {
      *
      */
     @invocableMethod(label='Insert Circuits' description='pulls all circuits from VisionMetrix and inserts them into Salesforce')
-    public static void pullAllCircuits() {
-        List<VisionMetrix_Circuit__c> circuitList = new List<VisionMetrix_Circuit__c>();
-        String headerToken = visionMetrixLogin();
-
-        // if(Test.isRunningTest()){
-        //      headerToken = '4ac5ee08b1c5a901b52b84b3a7a8cd948f3460ee';
-        // }   
+    public static List<VisionMetrix_Circuit__c> pullAllCircuits() {
+        String headerToken = visionMetrixLogin();  
 
         String urlEnd = 'https://rest-api2.visionmetrix.net/1.1/circuits/query/';
         List<String> queryList = new List<String>();
-        queryList.add(urlEnd + '?type=DOMAIN&argument=EV%20Backbone%20|%20');// may not need
+        // queryList.add(urlEnd + '?type=DOMAIN&argument=EV%20Backbone%20|%20');// may not need
         queryList.add(urlEnd + '?type=DOMAIN&argument=Verizon%20|%20VZW%20[MI]');
         queryList.add(urlEnd + '?type=DOMAIN&argument=Verizon%20|%20VZW%20[OH]');
         queryList.add(urlEnd + '?type=DOMAIN&argument=Consumers%20|%20CMS%20[MI]');
@@ -777,7 +772,7 @@ public class VisionMetrixCallOut {
         queryList.add(urlEnd + '?type=DOMAIN&argument=ATT%20Wireline%20|%20ATTW%20[OH]');
 
         List<HttpResponse> responseList = new List<HttpResponse>();
-
+        List<VisionMetrix_Circuit__c> circuitList = new List<VisionMetrix_Circuit__c>();
         for ( String query : queryList ) {
             System.debug('endpoint' + query.trim().deleteWhitespace());
             HttpRequest request = new HttpRequest(  );
@@ -788,12 +783,18 @@ public class VisionMetrixCallOut {
             request.setHeader('X-ocularip-token', headerToken);
             request.setHeader('X-ocularip-company', 'Everstream');
             HttpResponse response = new Http(  ).send(request);
-            // System.debug('response' + response);
-            // VisionMetrixHelperMethod.handleCircuits(response);
             responseList.add(response);
             
         }
         System.debug('responseList' + responseList);
+        
+        circuitList= VisionMetrixHelperMethod.handleCircuits(responseList);
+        // if(circuitList.size() > 0){
+		// 	System.debug('Circuits: ' + circuitList);
+		// 	System.enqueueJob(new QueueableCircuitInsert(circuitList));
+		// }
+        return circuitList;
+        
     }
 
     /**************************************************************************************************** */

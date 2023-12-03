@@ -19,74 +19,77 @@ public with sharing class VisionMetrixHelperMethod {
 	 * @uses		QueueableCircuitInsert(<List<VisionMetrix_Circuit__c>>)		
 	 * 										to insert the circuit records in Salesforce taking the circuits as a parameter
 	 */
-	public static void handleCircuits(HttpResponse res) {
-		System.debug('Response: ' + res.getStatusCode());
+	public static List<VisionMetrix_Circuit__c> handleCircuits(List<HttpResponse> responses) {
+		
+		List<VisionMetrix_Circuit__c> circuits = new List<VisionMetrix_Circuit__c>();
 
-		if ( res.getStatusCode() == 200 ) {
-			String responseBody = res.getBody();
-			VisionMetrixWrappers.CircuitList circuitList = ( VisionMetrixWrappers.CircuitList )JSON.deserialize(responseBody, VisionMetrixWrappers.CircuitList.class);
-			List<VisionMetrix_Circuit__c> circuits = new List<VisionMetrix_Circuit__c>();
+		for ( HttpResponse res : responses ) {
+			System.debug('Response: ' + res);
+			if ( res.getStatusCode() == 200 ) {
+				String responseBody = res.getBody();
+				VisionMetrixWrappers.CircuitList circuitList = ( VisionMetrixWrappers.CircuitList )JSON.deserialize(responseBody, VisionMetrixWrappers.CircuitList.class);
+				
+				// System.debug('Circuit List: ' + circuitList);
+				// log each circuit to console
+				for ( VisionMetrixCircuitWrapper circuit : circuitList.circuits ) {
+					System.debug('Circuit: ' + circuit);
+					// assigfn values from the wrapper class to the vision metrix circuit object fields
+					VisionMetrix_Circuit__c vm_circuit = new VisionMetrix_Circuit__c(  );
+					vm_circuit.Bandwidth__c = circuit.bandwidth;
+					vm_circuit.Circuit_Alias__c = circuit.circuit_alias;
+					vm_circuit.Circuit_Description__c = circuit.description;
+					vm_circuit.Circuit_EIR__c = circuit.eir;
+					vm_circuit.Circuit_Granularity__c = circuit.granularity;
+					vm_circuit.Circuit_Image__c = circuit.circuit_image;
+					vm_circuit.Circuit_MRC__c = circuit.mrc;
+					vm_circuit.Circuit_Status__c = circuit.status;
+					vm_circuit.Custom_Notifications_Enabled__c = circuit.custom_notifications_enabled;
+					vm_circuit.One_Way_Data_Enabled__c = circuit.derive_1_way_data_enabled;
+					if(circuit.ethernet_profile_description != null){
+						vm_circuit.Ethernet_Profile_Desc__c = circuit.ethernet_profile_description.paa_name;
+					}
+					else{
+						vm_circuit.Ethernet_Profile_Desc__c = '';
+					}
+					
+					vm_circuit.Event_Notifications_Enabled__c = circuit.event_notifications_enabled;
+					vm_circuit.Max_Ordering_Bandwidth__c = circuit.max_ordering_bandwidth;
+					vm_circuit.Secondary_Name__c = circuit.secondary_name;
+					// vm_circuit.Start_Time__c = circuit.start_time;
 
-			// System.debug('Circuit List: ' + circuitList);
-			// log each circuit to console
-			for ( VisionMetrixCircuitWrapper circuit : circuitList.circuits ) {
-				System.debug('Circuit: ' + circuit);
-				// assigfn values from the wrapper class to the vision metrix circuit object fields
-				VisionMetrix_Circuit__c vm_circuit = new VisionMetrix_Circuit__c(  );
-				vm_circuit.Bandwidth__c = circuit.bandwidth;
-				vm_circuit.Circuit_Alias__c = circuit.circuit_alias;
-				vm_circuit.Circuit_Description__c = circuit.description;
-				vm_circuit.Circuit_EIR__c = circuit.eir;
-				vm_circuit.Circuit_Granularity__c = circuit.granularity;
-				vm_circuit.Circuit_Image__c = circuit.circuit_image;
-				vm_circuit.Circuit_MRC__c = circuit.mrc;
-				vm_circuit.Circuit_Status__c = circuit.status;
-				vm_circuit.Custom_Notifications_Enabled__c = circuit.custom_notifications_enabled;
-				vm_circuit.One_Way_Data_Enabled__c = circuit.derive_1_way_data_enabled;
-				vm_circuit.Ethernet_Profile_Desc__c = circuit.ethernet_profile_description.paa_name;
-				vm_circuit.Event_Notifications_Enabled__c = circuit.event_notifications_enabled;
-				vm_circuit.Max_Ordering_Bandwidth__c = circuit.max_ordering_bandwidth;
-				vm_circuit.Secondary_Name__c = circuit.secondary_name;
-				// vm_circuit.Start_Time__c = circuit.start_time;
+					if ( circuit.start_time == null ) {
+						vm_circuit.Start_Time__c = null;
+						// System.debug('Start Time should be null and is....... ' + vm_circuit.get('start_time'));
+					}
+					else {
+						String sdt = circuit.start_time;
+						Long sldt = Long.valueOf(sdt) * 1000;
+						vm_circuit.Start_Time__c = Datetime.newInstance(sldt);
+						// System.debug('Start Time is: ' + vm_circuit.get('start_time'));
+					}
 
-				if ( circuit.start_time == null ) {
-					vm_circuit.Start_Time__c = null;
-					// System.debug('Start Time should be null and is....... ' + vm_circuit.get('start_time'));
+					vm_circuit.System_A_Alias__c = circuit.system_a_alias;
+					vm_circuit.System_A_IPAddress__c = circuit.system_a_ip_address;
+					vm_circuit.System_A_Manufacturer__c = circuit.system_a_manufacturer;
+					vm_circuit.System_A_Model__c = circuit.system_a_model;
+					vm_circuit.System_A_Name__c = circuit.system_a_name;
+					vm_circuit.System_Z_Alias__c = circuit.system_z_alias;
+					vm_circuit.System_Z_IPAddress__c = circuit.system_z_ip_address;
+					vm_circuit.System_Z_Manufacturer__c = circuit.system_z_manufacturer;
+					vm_circuit.System_Z_Model__c = circuit.system_z_model;
+					vm_circuit.System_Z_Name__c = circuit.system_z_name;
+					System.debug('Circuit: ' + vm_circuit);
+					circuits.add(vm_circuit);
+					// insert vm_circuit;
 				}
-				else {
-					String sdt = circuit.start_time;
-					Long sldt = Long.valueOf(sdt) * 1000;
-					vm_circuit.Start_Time__c = Datetime.newInstance(sldt);
-					// System.debug('Start Time is: ' + vm_circuit.get('start_time'));
-				}
-
-				vm_circuit.System_A_Alias__c = circuit.system_a_alias;
-				vm_circuit.System_A_IPAddress__c = circuit.system_a_ip_address;
-				vm_circuit.System_A_Manufacturer__c = circuit.system_a_manufacturer;
-				vm_circuit.System_A_Model__c = circuit.system_a_model;
-				vm_circuit.System_A_Name__c = circuit.system_a_name;
-				vm_circuit.System_Z_Alias__c = circuit.system_z_alias;
-				vm_circuit.System_Z_IPAddress__c = circuit.system_z_ip_address;
-				vm_circuit.System_Z_Manufacturer__c = circuit.system_z_manufacturer;
-				vm_circuit.System_Z_Model__c = circuit.system_z_model;
-				vm_circuit.System_Z_Name__c = circuit.system_z_name;
-				System.debug('Circuit: ' + vm_circuit);
-				circuits.add(vm_circuit);
-				// insert vm_circuit;
 			}
-
-			// call queable class to insert circuits
-			if ( Test.isRunningTest()) {
-				System.debug('VisionMetrixHelperMethod.handleCircuits() - Test Class Running');				
-			}else{
-				System.debug('Circuits: ' + circuits);
-				// System.enqueueJob(new QueueableCircuitInsert(circuits));
+			else {
+				System.debug('Error: ' + res.getStatus());
 			}
+		}
 
-		}
-		else {
-			System.debug('Error: ' + res.getStatus());
-		}
+		return circuits;
+
 	}
 	/***************************************************************************************************************************************** */
 	/**
