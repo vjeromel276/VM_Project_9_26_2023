@@ -12,7 +12,7 @@ public with sharing class VisionMetrixHelperMethod {
     /**
 	 * handleCircuits()
 	 *
-	 * method to call the vm api and get the latest events in an http response
+	 * method to call the vm api and get the latest circuits in an http response
 	 *
 	 * @param       res            		HttpResponse					the http response from the vm api
 	 *

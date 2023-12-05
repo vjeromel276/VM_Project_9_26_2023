@@ -16,7 +16,7 @@ public with sharing class VisionMetrixCallOutHelper {
      * @param csvFile - Blob - the csv file to parse
      * @return List<Map<String, String>> - the list of maps
      */
-    public static void parseCSV(Blob csvFile) {
+   /* public static void parseCSV(Blob csvFile) {
         List<Map<String, String>> records = new List<Map<String, String>>();
         List<String> lines = csvFile.toString().split('\n');
         Map<String, String> record = new Map<String, String>();
@@ -32,7 +32,7 @@ public with sharing class VisionMetrixCallOutHelper {
             }
             records.add(record);
         }
-    }
+    }*/
 
     /**
      * runParseCSV()
@@ -42,9 +42,9 @@ public with sharing class VisionMetrixCallOutHelper {
      * from C:\DeskTopCleanUP_1_1_23\Everstream_Salesforce_ENV\VM_Project_9_26_2023\force-app\main\default\data\csvdata\testCKTs.csv
      *
      */
-    public static void runParseCSV() {
+   /* public static void runParseCSV() {
         parseCSV(Blob.valueOf('testCKTs.csv'));
-    }
+    }*/
 
     /**
      * makeVisionMetrixPayloadTextFile()

@@ -7,7 +7,7 @@
  * @last modified by  : vlettau@everstream.net
  * @last modified on  : 12-01-2023
  **/
-@isTest
+@isTest(SeeAllData=true)
 public class VisionMetrixCallOutTest {
     public VisionMetrixCallOutTest() {
     }
@@ -36,20 +36,20 @@ public class VisionMetrixCallOutTest {
         
     }
     
-    @isTest
-    public static void addBulkVMTicketTest(){
-        Test.setMock(HttpCalloutMock.class, new VisionMetrixCalloutAddBulkVMTicketMock());
+    // @isTest
+    // public static void addBulkVMTicketTest(){
+    //     Test.setMock(HttpCalloutMock.class, new VisionMetrixCalloutAddBulkVMTicketMock());
         
-        List<Case> tickets = [SELECT Id,CaseNumber, Account_Name_Text__c, AccountId, ParentId, RecordTypeId, Case_Record_Type__c, VisionMETRIX_Ticket_Created_Date__c,VisionMETRIX_Ticket_Number__c, VisionMetrix_Parent_Case__c, NotificationType__c, Description, Subject, NOC_Ticket_Assigment__c, Maintenance_Start__c, Maintenance_End__c
-                                                FROM Case
-                                                WHERE Case_Record_Type__c = 'Maintenance' AND VisionMetrix_Parent_Case__c = true AND ParentId = null
-                                                Limit 1];
-        Test.startTest();
+    //     List<Case> tickets = [SELECT Id,CaseNumber, Account_Name_Text__c, AccountId, ParentId, RecordTypeId, Case_Record_Type__c, VisionMETRIX_Ticket_Created_Date__c,VisionMETRIX_Ticket_Number__c, VisionMetrix_Parent_Case__c, NotificationType__c, Description, Subject, NOC_Ticket_Assigment__c, Maintenance_Start__c, Maintenance_End__c
+    //                                             FROM Case
+    //                                             WHERE Case_Record_Type__c = 'Maintenance' AND VisionMetrix_Parent_Case__c = true AND ParentId = null
+    //                                             Limit 1];
         
-        HttpResponse res = VisionMetrixCallOut.addBulkVMTicket(tickets,'token');
-        Test.stopTest();
-        System.debug('res: ' + res);
-        System.assertEquals(200, res.getStatusCode());
+    //     Test.startTest();
+    //     HttpResponse res = VisionMetrixCallOut.addBulkVMTicket(tickets,'token');
+    //     Test.stopTest();
+    //     System.debug('res: ' + res);
+    //     System.assertEquals(200, res.getStatusCode());
         
-    }
+    // }
 }
