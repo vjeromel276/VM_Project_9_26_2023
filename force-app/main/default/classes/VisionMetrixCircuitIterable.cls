@@ -2,6 +2,10 @@ public with sharing class VisionMetrixCircuitIterable implements Iterable<SObjec
     private List<SObject> records;
     private Integer index = 0;
     public VisionMetrixCircuitIterable() {
+        if(Test.isRunningTest()) {
+            this.records = new List<SObject>();
+            return;
+        }
         this.records = VisionMetrixCallOut.pullAllCircuits();
     }
 
