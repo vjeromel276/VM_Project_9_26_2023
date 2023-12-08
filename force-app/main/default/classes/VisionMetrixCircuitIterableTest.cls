@@ -5,7 +5,7 @@ public class VisionMetrixCircuitIterableTest {
 
     @IsTest
     public static void testCircuitIterable() {
-        Test.setMock(HttpCalloutMock.class, new VisionMetrixCalloutPullCircuitMock());
+        Test.setMock(HttpCalloutMock.class, new VisionMetrixCalloutPullCircuitMock2());
 
         List<HttpResponse> responses = new List<HttpResponse>();
        

@@ -14,7 +14,7 @@ public class BatchVisionMetrixCircuitCalloutTEST {
     }
     @isTest
     public static void circuitsTest(){
-        Test.setMock(HttpCalloutMock.class, new VisionMetrixCalloutPullCircuitMock());
+        Test.setMock(HttpCalloutMock.class, new VisionMetrixCalloutPullCircuitMock2());
         Test.startTest();
         HttpResponse res = new HttpResponse();
         
