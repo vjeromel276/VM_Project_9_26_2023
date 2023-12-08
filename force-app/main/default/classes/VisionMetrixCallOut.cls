@@ -793,8 +793,9 @@ public class VisionMetrixCallOut {
 		// 	System.debug('Circuits: ' + circuitList);
 		// 	System.enqueueJob(new QueueableCircuitInsert(circuitList));
 		// }
+        circuitList = VisionMetrixCircuitChecker.getCircuitSet(circuitList);
         return circuitList;
-        
+        // return circuitList=VisionMetrixCircuitChecker.getCircuitSet( VisionMetrixHelperMethod.handleCircuits(responseList));
     }
 
     /**************************************************************************************************** */
