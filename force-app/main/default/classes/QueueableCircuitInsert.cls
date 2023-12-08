@@ -24,14 +24,16 @@ public class QueueableCircuitInsert implements Queueable, Database.AllowsCallout
 
             // If the chunk is full, insert it and clear it
             if (chunk.size() == chunkSize) {
-                insert chunk;
+                upsert chunk Circuit_Alias__c;
+                // insert chunk;
                 chunk.clear();
             }
         }
 
         // Insert any remaining records
         if (!chunk.isEmpty()) {
-            insert chunk;
+            upsert chunk Circuit_Alias__c;
+            // insert chunk;
         }
     } 
 }
