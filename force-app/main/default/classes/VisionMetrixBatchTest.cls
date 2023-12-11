@@ -1,12 +1,3 @@
-/**
- * @name              : VisionMetrixBatchTest.cls
- * @description       : this class is used for testing VisionMetrixBatch class
- * @author            : vlettau@everstream.net
- * @group             : Enterprise Technology
- * @Created on        : 12-01-2023
- * @last modified by  : vlettau@everstream.net
- * @last modified on  : 12-01-2023
- **/
 @isTest(SeeAllData=true)
 public with sharing class VisionMetrixBatchTest {
     
