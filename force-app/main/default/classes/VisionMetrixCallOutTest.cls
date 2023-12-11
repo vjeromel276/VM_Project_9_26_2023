@@ -28,7 +28,7 @@ public class VisionMetrixCallOutTest {
 
     @isTest
     public static void pullAllCircuitsTest(){
-        Test.setMock(HttpCalloutMock.class, new VisionMetrixCalloutPullCircuitMock2());
+        Test.setMock(HttpCalloutMock.class, new VisionMetrixCalloutPullCircuitMock());
         Test.startTest();
         
         VisionMetrixCallOut.pullAllCircuits();
