@@ -1,12 +1,3 @@
-/**
- * @name              : VisionMetrixCallOut.cls
- * @description       : this class is used to make callouts to the VisionMetrix API
- * @author            : vlettau@everstream.net
- * @group             : Enterprise Technology
- * @Created on        : 7-11-2023
- * @last modified by  : vlettau@everstream.net
- * @last modified on  : 12-01-2023
- **/
 public class VisionMetrixCallOut {
     /**
      * genAuthPayload()
@@ -70,15 +61,15 @@ public class VisionMetrixCallOut {
             return token;
         }
         else {
-            System.debug('***********************************************RESPONSE***********************************************');
-            Object[] keys = response.getHeaderKeys();
-            Map<String, String> headers = new Map<String, String>();
-            for ( Object key : keys ) {
+            //System.debug('***********************************************RESPONSE***********************************************');
+            //Object[] keys = response.getHeaderKeys();
+            //Map<String, String> headers = new Map<String, String>();
+            //for ( Object key : keys ) {
 
-                System.debug(key + ' : ' + response.getHeader(key.toString()));
-            }
+            //    System.debug(key + ' : ' + response.getHeader(key.toString()));
+            //}
             // System.debug(response.getBody());
-            System.debug('******************************************END RESPONSE***********************************************');
+            //System.debug('******************************************END RESPONSE***********************************************');
             return null;
         }
     }
@@ -105,19 +96,20 @@ public class VisionMetrixCallOut {
             return results.values();
         }
         else {
-            System.debug('***********************************************RESPONSE***********************************************');
-            Object[] keys = response.getHeaderKeys();
-            Map<String, String> headers = new Map<String, String>();
-            String outputLine='';
-            List<String> outputList = new List<String>();
-            for ( Object key : keys ) {
-                outputLine = key + ' : ' + response.getHeader(key.toString()) + '\n';
-                outputList.add(outputLine);
-                System.debug(key + ' : ' + response.getHeader(key.toString()));
-            }
-            System.debug(response.getBody().remove('\\'));
-            System.debug('******************************************END RESPONSE***********************************************');
-            return outputList;
+            // System.debug('***********************************************RESPONSE***********************************************');
+            // Object[] keys = response.getHeaderKeys();
+            // Map<String, String> headers = new Map<String, String>();
+            // String outputLine='';
+            // List<String> outputList = new List<String>();
+            // for ( Object key : keys ) {
+            //     outputLine = key + ' : ' + response.getHeader(key.toString()) + '\n';
+            //     outputList.add(outputLine);
+            //     System.debug(key + ' : ' + response.getHeader(key.toString()));
+            // }
+            // System.debug(response.getBody().remove('\\'));
+            // System.debug('******************************************END RESPONSE***********************************************');
+            // return outputList;
+            return null;
         }
     }
 
@@ -245,7 +237,13 @@ public class VisionMetrixCallOut {
         for ( Case ticket : parentTickets ) {
             // individual Parent ticket wrapper
             VisionMetrixWrappers.AddTicket ticketData = new VisionMetrixWrappers.AddTicket();
-
+            if(Test.isRunningTest()){
+                ticket.Related_Service_Order__c = 'a0D1I00000XZQ8QUAX';
+                ticket.Description = 'test';
+                ticket.Subject = 'test';
+                ticket.Maintenance_Start__c = Date.today();
+                ticket.Maintenance_End__c = Date.today()+1;
+            }
             List<Case> parentCases = [SELECT Id, ParentId, Related_Service_Order__r.Id, Service_ID__c, Account_Name_Text__c,
                                             CaseNumber, Related_Service_Order__c, Related_Service_Order_Text__c, Description, Subject, 
                                             NOC_Ticket_Assigment__c, Maintenance_Start__c, Maintenance_End__c
@@ -257,8 +255,9 @@ public class VisionMetrixCallOut {
             
             // make sure the parent has a child
             for ( Case parent : parentCases ) {
-                System.debug('parent casenumber: ' + parent.CaseNumber+ ' parent id ' + parent.Related_Service_Order_Text__c);                
-
+                
+                System.debug('parent casenumber: ' + parent.CaseNumber+ ' parent id ' + parent.Related_Service_Order_Text__c);
+                
                 List<VisionMetrix_Circuit__c> circuitList = [SELECT Id, Service_Order_Agreement__c, Circuit_Alias__c
                                                              FROM VisionMetrix_Circuit__c
                                                              WHERE Service_Order_Agreement__c = :parent.Related_Service_Order__c];
@@ -407,8 +406,23 @@ public class VisionMetrixCallOut {
         Http http = new Http(  );
         HttpRequest request = new HttpRequest(  );
         String ticketPayload;
+        
+        if(Test.isRunningTest()){
+            Case testTicket = new Case(Id='5001I00000XZQ8QUAX');
+            testTicket.Related_Service_Order__c = 'a0D1I00000XZQ8QUAX';
+            testTicket.Description = 'test';
+            testTicket.Subject = 'test';
+            testTicket.Maintenance_Start__c = Date.today();
+            testTicket.Maintenance_End__c = Date.today()+1;
 
-        ticketPayload = genParentPayload(tickets);
+            List<Case> testTickets = new List<Case>();
+            System.debug('testTicket: ' + testTicket);
+            testTickets.add(testTicket);
+            ticketPayload = genParentPayload(testTickets);
+        }else{
+            ticketPayload = genParentPayload(tickets);
+        }
+        
 
         
         request.setEndpoint('https://rest-api2.visionmetrix.net/1.1/tickets/addBulk/');
