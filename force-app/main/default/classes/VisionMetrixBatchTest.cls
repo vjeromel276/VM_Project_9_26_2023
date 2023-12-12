@@ -1,52 +1,35 @@
-@isTest(SeeAllData=true)
+@isTest
 public with sharing class VisionMetrixBatchTest {
-    
-    // Helper method to create test data
-    private static List<Case> createTestCases() {
-        List<Case> cases = new List<Case>();
-        // Add logic to create Case records as per your schema
-        return cases;
-    }
 
-    // Mock class to simulate callout response
-    private class MockVisionMetrixCallout implements HttpCalloutMock {
-        public HTTPResponse respond(HTTPRequest request) {
-            // Create a fake response
-            HttpResponse response = new HttpResponse();
-            response.setStatusCode(200);
-            response.setBody('Mock response');
-            return response;
-        }
-    }
+    // Set up test data
+    @TestSetup
+    public static void setup() {
+        // Create test account
+        Account testAccount = new Account(Name = 'Test Account');
+        insert testAccount;
 
-    @isTest static void testBatchExecution() {
-        // Set up test data
-        List<Case> testCases = createTestCases();
-        insert testCases;
+        // Create visionmetrix parent test case
+        Case parentTestCase = new Case(AccountId = testAccount.Id, Subject = 'Test Case', Description = 'Test Case Description', RecordTypeId='0120B000000AJaoQAG',VisionMetrix_Parent_Case__c = true, ParentId = null, Origin='Reported (Email)', NotificationType__c = 'Maintenance', NOC_Ticket_Assigment__c = 'NOC', Maintenance_Start__c = System.today(), Maintenance_End__c = System.today());
+        insert parentTestCase;
+
+        // Create visionmetrix child test case
+        Case childTestCase = new Case(AccountId = testAccount.Id, Subject = 'Test Case', Description = 'Test Case Description', RecordTypeId='0123g0000008cKUAAY',VisionMetrix_Parent_Case__c = false, ParentId = parentTestCase.Id, Origin='Reported (Email)', NotificationType__c = 'Maintenance', NOC_Ticket_Assigment__c = 'NOC', Maintenance_Start__c = System.today(), Maintenance_End__c = System.today());
+    }
+ 
+    @isTest
+    static void testBatchExecution() {
+        
+		List<Case> tickets = [SELECT Id,CaseNumber, Account_Name_Text__c, AccountId, ParentId, RecordTypeId, Case_Record_Type__c, VisionMETRIX_Ticket_Created_Date__c,VisionMETRIX_Ticket_Number__c, VisionMetrix_Parent_Case__c, NotificationType__c, Description, Subject, NOC_Ticket_Assigment__c, Maintenance_Start__c, Maintenance_End__c
+                              FROM Case
+                              WHERE Case_Record_Type__c = 'Maintenance' AND VisionMetrix_Parent_Case__c = true AND ParentId = null];
 
         // Set up mock callout
-        Test.setMock(HttpCalloutMock.class, new MockVisionMetrixCallout());
+        Test.setMock(HttpCalloutMock.class, new VisionMetrixCalloutMock());
 
         Test.startTest();
         // Execute batch
-        VisionMetrixBatch batch = new VisionMetrixBatch();
-        Database.executeBatch(batch, VisionMetrixBatch.BatchSize);
+        VisionMetrixBatch.start(0);
         Test.stopTest();
     }
 
-    @isTest static void testSchedulableExecution() {
-        // Set up test data
-        List<Case> testCases = createTestCases();
-        insert testCases;
-
-        // Set up mock callout
-        Test.setMock(HttpCalloutMock.class, new MockVisionMetrixCallout());
-
-        Test.startTest();
-        // Schedule the batch and execute
-        String cronExpr = '0 0 12 * * ?'; // daily at noon
-        VisionMetrixBatch batch = new VisionMetrixBatch();
-        System.schedule('Test VisionMetrixBatch', cronExpr, batch);
-        Test.stopTest();
-    }
 }
