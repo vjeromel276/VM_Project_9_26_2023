@@ -8,12 +8,9 @@ public with sharing class VisionMetrixBatchTest {
         Account testAccount = new Account(Name = 'Test Account');
         insert testAccount;
 
-        // Create visionmetrix parent test case
-        Case parentTestCase = new Case(AccountId = testAccount.Id, Subject = 'Test Case', Description = 'Test Case Description', RecordTypeId='0120B000000AJaoQAG',VisionMetrix_Parent_Case__c = true, ParentId = null, Origin='Reported (Email)', NotificationType__c = 'Maintenance', NOC_Ticket_Assigment__c = 'NOC', Maintenance_Start__c = System.today(), Maintenance_End__c = System.today());
-        insert parentTestCase;
-
-        // Create visionmetrix child test case
-        Case childTestCase = new Case(AccountId = testAccount.Id, Subject = 'Test Case', Description = 'Test Case Description', RecordTypeId='0123g0000008cKUAAY',VisionMetrix_Parent_Case__c = false, ParentId = parentTestCase.Id, Origin='Reported (Email)', NotificationType__c = 'Maintenance', NOC_Ticket_Assigment__c = 'NOC', Maintenance_Start__c = System.today(), Maintenance_End__c = System.today());
+        // Create test case
+        Case testCase = new Case(AccountId = '0010B00001skFrkQAE', Subject = 'Test Case', Description = 'Test Case Description', RecordTypeId='0120B000000AJaoQAG',VisionMetrix_Parent_Case__c = true, ParentId = null, Origin='Reported (Email)', NotificationType__c = 'Maintenance', NOC_Ticket_Assigment__c = 'NOC', Maintenance_Start__c = System.today(), Maintenance_End__c = System.today());
+        insert testCase;
     }
  
     @isTest
