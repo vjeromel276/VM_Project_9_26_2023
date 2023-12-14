@@ -96,20 +96,20 @@ public class VisionMetrixCallOut {
             return results.values();
         }
         else {
-            // System.debug('***********************************************RESPONSE***********************************************');
-            // Object[] keys = response.getHeaderKeys();
-            // Map<String, String> headers = new Map<String, String>();
-            // String outputLine='';
-            // List<String> outputList = new List<String>();
-            // for ( Object key : keys ) {
-            //     outputLine = key + ' : ' + response.getHeader(key.toString()) + '\n';
-            //     outputList.add(outputLine);
-            //     System.debug(key + ' : ' + response.getHeader(key.toString()));
-            // }
-            // System.debug(response.getBody().remove('\\'));
-            // System.debug('******************************************END RESPONSE***********************************************');
-            // return outputList;
-            return null;
+            System.debug('***********************************************RESPONSE***********************************************');
+            Object[] keys = response.getHeaderKeys();
+            Map<String, String> headers = new Map<String, String>();
+            String outputLine='';
+            List<String> outputList = new List<String>();
+            for ( Object key : keys ) {
+                outputLine = key + ' : ' + response.getHeader(key.toString()) + '\n';
+                outputList.add(outputLine);
+                System.debug(key + ' : ' + response.getHeader(key.toString()));
+            }
+            System.debug(response.getBody().remove('\\'));
+            System.debug('******************************************END RESPONSE***********************************************');
+            return outputList;
+            // return null;
         }
     }
 
@@ -405,9 +405,9 @@ public class VisionMetrixCallOut {
         String headerToken = visionMetrixLogin();
         Http http = new Http(  );
         HttpRequest request = new HttpRequest(  );
-        String ticketPayload;
+        String ticketPayload = '';
         
-        if(Test.isRunningTest()){
+        if(Test.isRunningTest()==true){
             Case testTicket = new Case(Id='5001I00000XZQ8QUAX');
             testTicket.Related_Service_Order__c = 'a0D1I00000XZQ8QUAX';
             testTicket.Description = 'test';
@@ -434,7 +434,7 @@ public class VisionMetrixCallOut {
         request.setHeader('Content-Length', String.valueOf(ticketPayload.length()));
         System.debug('Ticket Payload: ' + ticketPayload);
         for(String s: ticketPayload.split(',')){
-            System.debug(s);
+            // System.debug(s);
         }
         request.setBody(ticketPayload);
         HttpResponse response = http.send(request);

@@ -1,23 +1,11 @@
-//  * @description       : VisionMetrixBatch
-//  * @author            : vlettau@everstream.net
-//  * @group             :
-//  * @last modified on  : 09-19-2023
-//  * @last modified by  : vlettau@everstream.net
 global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulable, Database.Stateful, Database.AllowsCallouts{
-    //*@AccountId array items
-    // T-mobile 0010B00001skFrkQAE
-    // Att wireline 0013g00000Tfxq2AAB
-    // Att mobility 001U000001jMJS6IAO
-    // Att mobility peg unc 0013g00000TfxtOAAR
-    // Dobson/att mobility 0010B00001p6Z3VQAU
-    // Verizion 001U000001jMJVdIAO
+
     global Integer recordsParsed = 0;
     global Integer recordsUpdated = 0;
     global Boolean ExecuteNextJob = false;
     global static Integer BatchSize = 10;
     String loginToken = '';
-    public VisionMetrixBatch(){
-    }
+
 
     global Database.QueryLocator start(Database.BatchableContext context){
         loginToken = VisionMetrixCallOut.visionMetrixLogin();
@@ -25,13 +13,13 @@ global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulab
         // need to make this the place where assign the parent ticket data to the individual vm tickets
 
         //! this is for testing only looking for VisionMetrix_Parent_Case__c = true still want to limit by account id
-        return Database.getQueryLocator([SELECT Id,CaseNumber, Account_Name_Text__c, AccountId, ParentId, RecordTypeId, Case_Record_Type__c, VisionMETRIX_Ticket_Created_Date__c,VisionMETRIX_Ticket_Number__c, VisionMetrix_Parent_Case__c, NotificationType__c, Description, Subject, NOC_Ticket_Assigment__c, Maintenance_Start__c, Maintenance_End__c
-                                         FROM Case
-                                         WHERE Case_Record_Type__c = 'Maintenance' AND VisionMetrix_Parent_Case__c = true AND ParentId = null]);
-
-        // return Database.getQueryLocator([SELECT Id, AccountId, ParentId, RecordTypeId, Case_Record_Type__c, VisionMetrix_Parent_Case__c, NotificationType__c, Description, Subject, NOC_Ticket_Assigment__c, Maintenance_Start__c, Maintenance_End__c
+        // return Database.getQueryLocator([SELECT Id,CaseNumber, Account_Name_Text__c, AccountId, ParentId, RecordTypeId, Case_Record_Type__c, VisionMETRIX_Ticket_Created_Date__c,VisionMETRIX_Ticket_Number__c, VisionMetrix_Parent_Case__c, NotificationType__c, Description, Subject, NOC_Ticket_Assigment__c, Maintenance_Start__c, Maintenance_End__c
         //                                  FROM Case
-        //                                  WHERE Case_Record_Type__c = 'Maintenance' AND NotificationType__c = 'Maintenance' AND VisionMetrix_Parent_Case__c = true AND AccountId IN ('0010B00001skFrkQAE', '0013g00000Tfxq2AAB', '001U000001jMJS6IAO', '0013g00000TfxtOAAR', '0010B00001p6Z3VQAU', '001U000001jMJVdIAO') AND ParentId = null]);
+        //                                  WHERE Case_Record_Type__c = 'Maintenance' AND VisionMetrix_Parent_Case__c = true AND ParentId = null]);
+
+        return Database.getQueryLocator([SELECT Id, AccountId, ParentId, RecordTypeId, Case_Record_Type__c, VisionMetrix_Parent_Case__c, NotificationType__c, Description, Subject, NOC_Ticket_Assigment__c, Maintenance_Start__c, Maintenance_End__c
+                                         FROM Case
+                                         WHERE Case_Record_Type__c = 'Maintenance' AND NotificationType__c = 'Maintenance' AND VisionMetrix_Parent_Case__c = true AND AccountId IN ('0010B00001skFrkQAE', '0013g00000Tfxq2AAB', '001U000001jMJS6IAO', '0013g00000TfxtOAAR', '0010B00001p6Z3VQAU', '001U000001jMJVdIAO') AND ParentId = null]);
     }
 
     global void execute(Database.BatchableContext context, List<Case> scope){
