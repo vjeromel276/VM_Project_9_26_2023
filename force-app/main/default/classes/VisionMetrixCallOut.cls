@@ -553,7 +553,6 @@ public class VisionMetrixCallOut {
      * @uses        visionMetrixLogin()     Function                    to get the token for the header
      *
      */
-    @future(callout = true)
     public static void getLatestEvents() {
         String headerToken = visionMetrixLogin();
         HttpRequest request = new HttpRequest(  );
