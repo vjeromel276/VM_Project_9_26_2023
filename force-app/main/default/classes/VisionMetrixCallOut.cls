@@ -495,26 +495,26 @@ public class VisionMetrixCallOut {
      * @param ticketId - the VisionMetrix ticket number
      * @uses visionMetrixLogin() to get the token for the header
      */
-    // public static void getVMTicket(String ticketId) {
-    //     String headerToken = visionMetrixLogin();
-    //     String urlEnd = 'tickets/get?ticket_id=' + ticketId;
-    //     String endpoint = 'https://rest-api2.visionmetrix.net/1.1/' + urlEnd;
-    //     Http http = new Http(  );
-    //     HttpRequest request = new HttpRequest(  );
-    //     System.debug(endpoint);
-    //     request.setEndpoint(endpoint.trim());
-    //     request.setMethod('GET');
-    //     request.setHeader('Accept', 'text/json');
-    //     request.setHeader('Content-Type', 'application/json');
-    //     request.setHeader('Content-Lngth', '118');
-    //     request.setHeader('X-ocularip-username', 'everstreampcol1');
-    //     request.setHeader('X-ocularip-token', headerToken);
-    //     request.setHeader('X-ocularip-company', 'Everstream');
-    //     HttpResponse response = http.send(request);
-    //     // If the request is successful, parse the JSON response.
-    //     System.debug(response.getStatus());
-    //     handleResponse(response);
-    // }
+    public static void getVMTicket(String ticketId) {
+        String headerToken = visionMetrixLogin();
+        String urlEnd = 'tickets/get?ticket_id=' + ticketId;
+        String endpoint = 'https://rest-api2.visionmetrix.net/1.1/' + urlEnd;
+        Http http = new Http(  );
+        HttpRequest request = new HttpRequest(  );
+        System.debug(endpoint);
+        request.setEndpoint(endpoint.trim());
+        request.setMethod('GET');
+        request.setHeader('Accept', 'text/json');
+        request.setHeader('Content-Type', 'application/json');
+        request.setHeader('Content-Lngth', '118');
+        request.setHeader('X-ocularip-username', 'everstreampcol1');
+        request.setHeader('X-ocularip-token', headerToken);
+        request.setHeader('X-ocularip-company', 'Everstream');
+        HttpResponse response = http.send(request);
+        // If the request is successful, parse the JSON response.
+        System.debug(response.getStatus());
+        handleResponse(response);
+    }
 
     /**************************************************************************************************************************************** */
     /**
