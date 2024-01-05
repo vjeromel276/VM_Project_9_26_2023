@@ -553,32 +553,32 @@ public class VisionMetrixCallOut {
      * @uses        visionMetrixLogin()     Function                    to get the token for the header
      *
      */
-    // @future(callout = true)
-    // public static void getLatestEvents() {
-    //     String headerToken = visionMetrixLogin();
-    //     HttpRequest request = new HttpRequest(  );
-    //     request.setEndpoint('https://rest-api2.visionmetrix.net/1.1/event/latest/');
-    //     request.setMethod('GET');
-    //     request.setHeader('Content-Type', 'application/json');
-    //     request.setHeader('X-ocularip-username', 'everstreampcol1');
-    //     request.setHeader('X-ocularip-token', headerToken);
-    //     request.setHeader('X-ocularip-company', 'Everstream');
-    //     HttpResponse response = new Http(  ).send(request);
+    @future(callout = true)
+    public static void getLatestEvents() {
+        String headerToken = visionMetrixLogin();
+        HttpRequest request = new HttpRequest(  );
+        request.setEndpoint('https://rest-api2.visionmetrix.net/1.1/event/latest/');
+        request.setMethod('GET');
+        request.setHeader('Content-Type', 'application/json');
+        request.setHeader('X-ocularip-username', 'everstreampcol1');
+        request.setHeader('X-ocularip-token', headerToken);
+        request.setHeader('X-ocularip-company', 'Everstream');
+        HttpResponse response = new Http(  ).send(request);
 
-    //     Map<String, Object> results = ( Map<String, Object> )JSON.deserializeUntyped(response.getBody());
-    //     String success = results.get('success').toString();
-    //     String events = results.get('events').toString();
-    //     if ( success == 'false' ) {
-    //         throw new System.QueryException( 'Callout failed with error: ' + results.get('error').toString() );
-    //     }
-    //     else if ( success == 'true' && events != null ) {
-    //         System.debug('Success Response Events: ');
-    //         VisionMetrixHelperMethod.handleLatestEvents(response);
-    //     }
-    //     else {
-    //         throw new System.QueryException( 'Callout succeded no Events retunred' );
-    //     }
-    // }
+        Map<String, Object> results = ( Map<String, Object> )JSON.deserializeUntyped(response.getBody());
+        String success = results.get('success').toString();
+        String events = results.get('events').toString();
+        if ( success == 'false' ) {
+            throw new System.QueryException( 'Callout failed with error: ' + results.get('error').toString() );
+        }
+        else if ( success == 'true' && events != null ) {
+            System.debug('Success Response Events: ');
+            VisionMetrixHelperMethod.handleLatestEvents(response);
+        }
+        else {
+            throw new System.QueryException( 'Callout succeded no Events retunred' );
+        }
+    }
 
     /**
      * Method to retrieve a filtered list of events from VisionMetrix

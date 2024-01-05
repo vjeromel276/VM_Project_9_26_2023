@@ -173,22 +173,22 @@ public with sharing class VisionMetrixWrappers{
     //     // public String acknowledged_note;
     // }
 
-    // public class Event{
-    //     public String id;
-    //     public String start_time;
-    //     public String end_time;
-    //     public String event_name;
-    //     public String node_name;
-    //     public String circuit_name;
-    //     public String secondary_circuit_name;
-    //     public String direction;
-    //     public String kpi;
-    //     public String severity;
-    //     public String category;
-    // }
-    // public class EventsList{
-    //     public List<VisionMetrixWrappers.Event> events;
-    // }
+    public class Event{
+        public String id;
+        public String start_time;
+        public String end_time;
+        public String event_name;
+        public String node_name;
+        public String circuit_name;
+        public String secondary_circuit_name;
+        public String direction;
+        public String kpi;
+        public String severity;
+        public String category;
+    }
+    public class EventsList{
+        public List<VisionMetrixWrappers.Event> events;
+    }
 
     public class CircuitList{
         public List<VisionMetrixCircuitWrapper> circuits;
