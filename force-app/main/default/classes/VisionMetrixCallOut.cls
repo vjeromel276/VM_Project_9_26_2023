@@ -116,126 +116,126 @@ public class VisionMetrixCallOut {
     /**************************************************************************************************************************************** */
 
     /**
-     * genExclusionPayload()
+     * genTicketPayload()
      *
      * Method to generate the payload for the exclusion call outs
      *
      * @param       ticketId            String          the VisionMetrix ticket number
      * @return                          String          the payload for the callout
      */
-    public static String genExclusionPayload(String ticketId) {
+    // public static String genTicketPayload(String ticketId) {
+    public static String genTicketPayload(Case ticket) {
         VisionMetrixWrappers.AddTicket ticketData = new VisionMetrixWrappers.AddTicket();
-        String circuitString = '';
-        Case ticket = [SELECT Id, ParentId, Related_Service_Order__r.Id, Service_ID__c, Account_Name_Text__c,
-                                            CaseNumber, Related_Service_Order__c, Related_Service_Order_Text__c, Description, Subject, 
-                                            NOC_Ticket_Assigment__c, Maintenance_Start__c, Maintenance_End__c
-                                     FROM Case
-                                     WHERE ParentId = :ticketId LIMIT 1];
 
-            System.debug('child case array: ' + parentCases + ' for ticket: ' + ticketId);
+        // Case ticket = [SELECT Id, ParentId, Related_Service_Order__r.Id, Service_ID__c, Account_Name_Text__c,
+        //                                     CaseNumber, Related_Service_Order__c, Related_Service_Order_Text__c, Description, Subject, 
+        //                                     NOC_Ticket_Assigment__c, Maintenance_Start__c, Maintenance_End__c
+        //                              FROM Case
+        //                              WHERE ParentId = :ticketId LIMIT 1];
+
             Set<String> circuitSet = new Set<String>();
             
             // make sure the parent has a child
-            for ( Case parent : parentCases ) {
+            
                 
-                System.debug('parent casenumber: ' + parent.CaseNumber+ ' parent id ' + parent.Related_Service_Order_Text__c);
+             
                 
-                List<VisionMetrix_Circuit__c> circuitList = [SELECT Id, Service_Order_Agreement__c, Circuit_Alias__c
-                                                             FROM VisionMetrix_Circuit__c
-                                                             WHERE Service_Order_Agreement__c = :parent.Related_Service_Order__c];
+        List<VisionMetrix_Circuit__c> circuitList = [SELECT Id, Service_Order_Agreement__c, Circuit_Alias__c
+                                                        FROM VisionMetrix_Circuit__c
+                                                        WHERE Service_Order_Agreement__c = :ticket.Related_Service_Order__c];
 
-                System.debug('circuit list: ' + circuitList);
-                String circuitString = '';
-                for ( VisionMetrix_Circuit__c circuit : circuitList ) {
-                    // circuitString += circuit.Circuit_Alias__c + ', ';
-                    circuitSet.add(( circuit.Circuit_Alias__c ).trim().deleteWhitespace()+'&');
-                }
+        System.debug('circuit list: ' + circuitList);
+        String circuitString = '';
+        for ( VisionMetrix_Circuit__c circuit : circuitList ) {
+            // circuitString += circuit.Circuit_Alias__c + ', ';
+            circuitSet.add(( circuit.Circuit_Alias__c ).trim().deleteWhitespace()+'&');
+        }
 
-                if ( parent != null ) {
+        if ( ticket != null ) {
 
-                    //********Required Fields *********//
-                    //^~ Ticket Id - Salesforce Ticket Case Number and todays date in the format of mm/dd/yyyy
-                    ticketData.ticket_id = ticket.CaseNumber + ' | ' + parent.Account_Name_Text__c + ' Maintenance | Start Date - '+ parent.Maintenance_Start__c.format('MM/dd/yyyy');
-                    // System.debug('Ticket Number: ' + ticketData.ticket_id);
+            //********Required Fields *********//
+            //^~ Ticket Id - Salesforce Ticket Case Number and todays date in the format of mm/dd/yyyy
+            ticketData.ticket_id = ticket.CaseNumber + ' | ' + ticket.Account_Name_Text__c + ' Maintenance | Start Date - '+ ticket.Maintenance_Start__c.format('MM/dd/yyyy');
+            // System.debug('Ticket Number: ' + ticketData.ticket_id);
 
-                    //^~ Ticket Type - Ticket Type defaults to 'Exclusion Period'
-                    ticketData.ticket_type = 'Exclusion Period';
-                    // System.debug('Ticket Type: ' + ticketData.ticket_type);
+            //^~ Ticket Type - Ticket Type defaults to 'Exclusion Period'
+            ticketData.ticket_type = 'Exclusion Period';
+            // System.debug('Ticket Type: ' + ticketData.ticket_type);
 
-                    //^~ Circuit List - List of Circuits to be excluded
-                    // System.debug('Circuits: ' + circuitSet);
-                    // System.debug('Circuits: ' + circuitSet.size());
-                    Integer circuitSetSize = circuitSet.size();
-                    for ( String circuit : circuitSet ) {
-                        if ( circuitSetSize > 1 ) {
-                            // circuitString += circuit + '& ';
-                            circuitString += circuit;
-                            circuitSetSize--;
-                        }
-                        else {
-                            circuitString += circuit;
-                        }
-                    }
-                    if ( circuitString.length() > 0 ) {
-                        if(circuitString.endsWith('&')) {
-                            circuitString = circuitString.removeEnd('&');
-                        }
-                        ticketData.circuits = ( circuitString ).trim().deleteWhitespace();
-                    }
-                    // System.debug('Circuits: ' + ticketData.circuits);
-
-                    //^~ Open Status - Exclusion Period Open Status defaults to 'Closed'
-                    ticketData.open_status = 'Closed';
-                    // System.debug('Open Status: ' + ticketData.open_status);
-
-                    //^~ Severity - Exclusion Period Severity defaults to 'Low'
-                    ticketData.severity = 'Low';
-                    // System.debug('Severity: ' + ticketData.severity);
-
-                    //^~ Start Time - Maintenance Start Time
-                    ticketData.start_time = Integer.valueOf(parent.Maintenance_Start__c.getTime() / 1000);
-                    // System.debug('Maintenance Start: ' + ticketData.start_time);
-
-                    //^~ End Time - Maintenance End Time
-                    ticketData.end_time = Integer.valueOf(parent.Maintenance_End__c.getTime() / 1000);
-                    // System.debug('Maintenance End: ' + ticketData.end_time);
-
-                    //********Optional Fields*********//
-                    //^~ Category - Default to Maintenance until the 1 to 1 mapping is complete
-                    ticketData.category = 'Maintenance';
-                    // System.debug('Category: ' + ticketData.category);
-                    //^~ Internal Notes - SF Generated Ticket
-                    // System.debug('Internal Notes: "SF GENERATED VM TICKET');
-                    //^~ Exclusion Type - Exclusion Period Exclusion Type defaults to 'Smart'
-                    ticketData.exclusion_type = 'Smart';
-                    // System.debug('Exclusion Type: ' + ticketData.exclusion_type);
-                    //^~ Exclude From Reporting - Exclusion Period Exclude From Reporting defaults to 'No' should be 'Yes' for exclusions
-                    ticketData.exclude_from_reporting = 'Yes';
-                    // System.debug('Exclude From Reporting: ' + ticketData.exclude_from_reporting);
-                    //^~ Exclude From Monitoring Reporting - Exclusion Period Excluded From Monitoring defaults to 'No' should be 'Yes' for exclusions
-                    ticketData.exclusde_from_mttr_reporting = 'Yes';
-                    // System.debug('Exclude From Monitoring Reporting: ' + ticketData.exclusde_from_mttr_reporting);
-                    //^~ Internal Notes
-                    ticketData.internal_notes = 'SF GENERATED VM TICKET';
-                    // System.debug('Description: ' + ticketData.description);
-                    //^~ Description
-                    ticketData.description = parent.Description;
-                    // System.debug('Description: ' + ticketData.description);
-                    //^~ Subject
-                    ticketData.subject = parent.Subject;
-                    // System.debug('Subject: ' + ticketData.subject);
-                    //^~ Support Agent
-                    ticketData.support_agent = parent.NOC_Ticket_Assigment__c;
-                    // System.debug('Support Agent: ' + ticketData.support_agent);
-                    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-                    // ticketList.add(ticketData);
+            //^~ Circuit List - List of Circuits to be excluded
+            // System.debug('Circuits: ' + circuitSet);
+            // System.debug('Circuits: ' + circuitSet.size());
+            Integer circuitSetSize = circuitSet.size();
+            for ( String circuit : circuitSet ) {
+                if ( circuitSetSize > 1 ) {
+                    // circuitString += circuit + '& ';
+                    circuitString += circuit;
+                    circuitSetSize--;
                 }
                 else {
-                    //^ If the child is null throw an error
-                    System.debug('Child was null: ');
-                    // throw new System.QueryException('No Nodes found with the ticket number or ticket is not of correct type: ' + ticketId);
+                    circuitString += circuit;
                 }
             }
+            if ( circuitString.length() > 0 ) {
+                if(circuitString.endsWith('&')) {
+                    circuitString = circuitString.removeEnd('&');
+                }
+                ticketData.circuits = ( circuitString ).trim().deleteWhitespace();
+            }
+            // System.debug('Circuits: ' + ticketData.circuits);
+
+            //^~ Open Status - Exclusion Period Open Status defaults to 'Closed'
+            ticketData.open_status = 'Closed';
+            // System.debug('Open Status: ' + ticketData.open_status);
+
+            //^~ Severity - Exclusion Period Severity defaults to 'Low'
+            ticketData.severity = 'Low';
+            // System.debug('Severity: ' + ticketData.severity);
+
+            //^~ Start Time - Maintenance Start Time
+            ticketData.start_time = Integer.valueOf(ticket.Maintenance_Start__c.getTime() / 1000);
+            // System.debug('Maintenance Start: ' + ticketData.start_time);
+
+            //^~ End Time - Maintenance End Time
+            ticketData.end_time = Integer.valueOf(ticket.Maintenance_End__c.getTime() / 1000);
+            // System.debug('Maintenance End: ' + ticketData.end_time);
+
+            //********Optional Fields*********//
+            //^~ Category - Default to Maintenance until the 1 to 1 mapping is complete
+            ticketData.category = 'Maintenance';
+            // System.debug('Category: ' + ticketData.category);
+            //^~ Internal Notes - SF Generated Ticket
+            // System.debug('Internal Notes: "SF GENERATED VM TICKET');
+            //^~ Exclusion Type - Exclusion Period Exclusion Type defaults to 'Smart'
+            ticketData.exclusion_type = 'Smart';
+            // System.debug('Exclusion Type: ' + ticketData.exclusion_type);
+            //^~ Exclude From Reporting - Exclusion Period Exclude From Reporting defaults to 'No' should be 'Yes' for exclusions
+            ticketData.exclude_from_reporting = 'Yes';
+            // System.debug('Exclude From Reporting: ' + ticketData.exclude_from_reporting);
+            //^~ Exclude From Monitoring Reporting - Exclusion Period Excluded From Monitoring defaults to 'No' should be 'Yes' for exclusions
+            ticketData.exclusde_from_mttr_reporting = 'Yes';
+            // System.debug('Exclude From Monitoring Reporting: ' + ticketData.exclusde_from_mttr_reporting);
+            //^~ Internal Notes
+            ticketData.internal_notes = 'SF GENERATED VM TICKET';
+            // System.debug('Description: ' + ticketData.description);
+            //^~ Description
+            ticketData.description = ticket.Description;
+            // System.debug('Description: ' + ticketData.description);
+            //^~ Subject
+            ticketData.subject = ticket.Subject;
+            // System.debug('Subject: ' + ticketData.subject);
+            //^~ Support Agent
+            ticketData.support_agent = ticket.NOC_Ticket_Assigment__c;
+            // System.debug('Support Agent: ' + ticketData.support_agent);
+            //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+            // ticketList.add(ticketData);
+        }
+        else {
+            //^ If the child is null throw an error
+            System.debug('Child was null: ');
+            // throw new System.QueryException('No Nodes found with the ticket number or ticket is not of correct type: ' + ticketId);
+        }
+            
         return JSON.serialize(ticketData);
     }
 
@@ -481,7 +481,7 @@ public class VisionMetrixCallOut {
      * @param       ticketId            String      the VisionMetrix ticket number
      *
      * @uses        visionMetrixLogin()             to get the token for the header
-     * @uses        genExclusionPayload()           to generate the payload for the callout
+     * @uses        genTicketPayload()           to generate the payload for the callout
      *
      * @return      String                          the payload for the callout
      */
@@ -513,38 +513,32 @@ public class VisionMetrixCallOut {
     /**************************************************************************************************************************************** */
     /**
      * Method to add a new VisionMetrix ticket
-     * @param ticketId - the VisionMetrix ticket number
-     * @param isExclusion - boolean to determine if the ticket is an exclusion or not
+     * @param ticket - the VisionMetrix ticket
      * @uses visionMetrixLogin() to get the token for the header
-     * @uses genExclusionPayload() to generate the payload for the callout
+     * @uses genTicketPayload() to generate the payload for the callout
      */
-    // public static void addVMTicket(Case ticket, Boolean isExclusion) {
-    //     String headerToken = visionMetrixLogin();
-    //     Http http = new Http(  );
-    //     HttpRequest request = new HttpRequest(  );
-    //     String ticketPayload;
-    //     if ( isExclusion ) {
-
-    //         ticketPayload = genExclusionPayload(ticket);
-    //     }
-    //     else {
-    //         ticketPayload = genNonExclusionPayload('ticketId');
-    //     }
-    //     request.setEndpoint('https://rest-api2.visionmetrix.net/1.1/tickets/add/');
-    //     request.setMethod('POST');
-    //     request.setHeader('X-ocularip-username', 'everstreampcol1');
-    //     request.setHeader('X-ocularip-token', headerToken);
-    //     request.setHeader('X-ocularip-company', 'Everstream');
-    //     request.setHeader('Content-Type', 'application/json');
-    //     request.setHeader('Content-Length', String.valueOf(ticketPayload.length()));
-    //     System.debug(ticketPayload);
-    //     request.setBody(ticketPayload);
+    public static void addVMTicket(Case ticket) {
+        String headerToken = visionMetrixLogin();
+        Http http = new Http(  );
+        HttpRequest request = new HttpRequest(  );
+        String ticketPayload;
+        ticketPayload = genTicketPayload(ticket);
+        
+        request.setEndpoint('https://rest-api2.visionmetrix.net/1.1/tickets/add/');
+        request.setMethod('POST');
+        request.setHeader('X-ocularip-username', 'everstreampcol1');
+        request.setHeader('X-ocularip-token', headerToken);
+        request.setHeader('X-ocularip-company', 'Everstream');
+        request.setHeader('Content-Type', 'application/json');
+        request.setHeader('Content-Length', String.valueOf(ticketPayload.length()));
+        System.debug(ticketPayload);
+        request.setBody(ticketPayload);
                 
-    //     HttpResponse response = http.send(request);
-    //     // If the request is successful, parse the JSON response.
-    //     handleResponse(response);
-    //     VisionMetrixCallOutHelper.logAPICallout( String.valueOf(request.getEndpoint()), String.valueOf(request.getBody()), String.valueOf(JSON.deserializeUntyped(response.getBody())));
-    // }
+        HttpResponse response = http.send(request);
+        // If the request is successful, parse the JSON response.
+        handleResponse(response);
+        VisionMetrixCallOutHelper.logAPICallout( String.valueOf(request.getEndpoint()), String.valueOf(request.getBody()), String.valueOf(JSON.deserializeUntyped(response.getBody())));
+    }
 
     /**************************************************************************************************************************************** */
     /**
@@ -576,16 +570,16 @@ public class VisionMetrixCallOut {
     /**************************************************************************************************************************************** */
     /**
      * Method to edit an existing VisionMetrix ticket
-     * @param ticketId - the VisionMetrix ticket number
+     * @param ticket - the VisionMetrix ticket number
      * @param selectedNodes - the circuit alias to be added to the ticket
      * @uses visionMetrixLogin() to get the token for the header
-     * @uses genExclusionPayload() to generate the payload for the callout
+     * @uses genTicketPayload() to generate the payload for the callout
      */
     public static void editVMTicket(Case ticket) {
         String headerToken = visionMetrixLogin();
         Http http = new Http(  );
         HttpRequest request = new HttpRequest(  );
-        String ticketPayload = genExclusionPayload(ticket);
+        String ticketPayload = genTicketPayload(ticket);
         request.setEndpoint('https://rest-api2.visionmetrix.net/1.1/tickets/edit/');
         request.setMethod('POST');
         request.setHeader('X-ocularip-username', 'everstreampcol1');
