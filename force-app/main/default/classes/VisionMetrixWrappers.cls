@@ -106,11 +106,36 @@ public with sharing class VisionMetrixWrappers{
     }
     
     //edit vm tickets request wrapper
-    // public class EditCircuitInVisionMetrix{
-    //     public String old_circuit_alias;//required
-    //     public String new_circuit_alias;//required
-    //     // public String match;
-    // }
+    public class Circuit{
+        public String circuit_alias;//required
+        public String secondary_name;
+        public Integer start_time;
+        public String circuit_image;
+        public String description;
+        public String status;
+        public String bandwidth;
+        public String max_ordering_bandwidth;
+        public String eir;
+        public String granularity;
+        public String mrc;
+        public String event_notifications_enabled;
+        public String event_notifications_enabled_time;
+        public String custom_notifications_enabled;
+        public String system_a_name;
+        public String system_a_alias;
+        public String system_a_ip_address;
+        public String system_a_manufacturer;
+        public String system_a_model;
+        public String system_z_name;
+        public String system_z_alias;
+        public String system_z_ip_address;
+        public String system_z_manufacturer;
+        public String system_z_model;
+        public String ethernet_profile_description;
+        public String util_profile_a_az_name;
+        public String util_profile_a_za_name;
+        public String util_profile_z_az_name;
+    }
 
     //add circuit to a ticket request wrapper
     // public class AddCircuitToTicket{

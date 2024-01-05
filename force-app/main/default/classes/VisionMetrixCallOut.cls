@@ -611,20 +611,38 @@ public class VisionMetrixCallOut {
      *
      * Method to update the circuit id in VisionMetrix
      *
-     * @param       oldId               String                  old circuit id
-     * @param       newId               String                  the new circuit id
-     *
-     * @uses        circuitIdChange     VisionMetrixWrappers    the wrapper class to hold the old and new circuit ids
+     * @param       circuit               VisionMetrix_Circuit__c                  old circuit id
      *
      * @return                          String                   the payload for the callout
      */
-    // public static String genEditCircuitPayload(String oldId, String newId) {
-    //     VisionMetrixWrappers.EditCircuitInVisionMetrix circuitIdChange = new VisionMetrixWrappers.EditCircuitInVisionMetrix();
-    //     circuitIdChange.old_circuit_alias = oldId;
-    //     circuitIdChange.new_circuit_alias = newId;
-    //     System.debug('Circuit Id Change Payload: ' + circuitIdChange);
-    //     return JSON.serialize(circuitIdChange);
-    // }
+    public static String genEditCircuitPayload(VisionMetrix_Circuit__c circuit) {
+        VisionMetrixWrappers.Circuit circuitWrapper = new VisionMetrixWrappers.Circuit();
+        circuitWrapper.circuit_alias = circuit.Circuit_Alias__c;
+        circuitWrapper.secondary_name = circuit.Secondary_Name__c;
+        circuitWrapper.start_time = Integer.valueOf(circuit.Start_Time__c);
+        circuitWrapper.circuit_image = circuit.Circuit_Image__c;
+        circuitWrapper.description = circuit.Circuit_Description__c;
+        circuitWrapper.status = circuit.Circuit_Status__c;
+        circuitWrapper.bandwidth = circuit.Bandwidth__c;
+        circuitWrapper.max_ordering_bandwidth = circuit.Max_Ordering_Bandwidth__c;
+        circuitWrapper.eir = circuit.Circuit_EIR__c;
+        circuitWrapper.granularity = circuit.Circuit_Granularity__c;
+        circuitWrapper.mrc = circuit.Circuit_MRC__c;
+        circuitWrapper.event_notifications_enabled = circuit.Event_Notifications_Enabled__c;
+        circuitWrapper.custom_notifications_enabled = circuit.Custom_Notifications_Enabled__c;
+        circuitWrapper.system_a_alias = circuit.System_A_Alias__c;
+        circuitWrapper.system_a_ip_address = circuit.System_A_IPAddress__c;
+        circuitWrapper.system_a_manufacturer = circuit.System_A_Manufacturer__c;
+        circuitWrapper.system_a_model = circuit.System_A_Model__c;
+        circuitWrapper.system_a_name = circuit.System_A_Name__c;
+        circuitWrapper.system_z_alias = circuit.System_Z_Alias__c;
+        circuitWrapper.system_z_ip_address = circuit.System_Z_IPAddress__c;
+        circuitWrapper.system_z_manufacturer = circuit.System_Z_Manufacturer__c;
+        circuitWrapper.system_z_model = circuit.System_Z_Model__c;
+
+        System.debug('Circuit Id Change Payload: ' + circuitWrapper);
+        return JSON.serialize(circuitWrapper);
+    }
 
     /**************************************************************************************************************************************** */
     /**
@@ -639,25 +657,25 @@ public class VisionMetrixCallOut {
      * @uses        genEditCircuitPayload()         to generate the payload for the callout
      * @uses        handleResponse()                to handle the response from the callout
      */
-    // public static void updateCircuitIdInVM(String oldId, String newId) {
-    //     String headerToken = visionMetrixLogin();
-    //     Http http = new Http(  );
-    //     HttpRequest request = new HttpRequest(  );
-    //     String ticketPayload = genEditCircuitPayload(oldId, newId);
-    //     request.setEndpoint('https://rest-api2.visionmetrix.net/1.1/circuits/edit/');
-    //     request.setMethod('POST');
-    //     request.setHeader('X-ocularip-username', 'everstreampcol1');
-    //     request.setHeader('X-ocularip-token', headerToken);
-    //     request.setHeader('X-ocularip-company', 'Everstream');
-    //     request.setHeader('Content-Type', 'application/json');
-    //     request.setHeader('Content-Length', String.valueOf(ticketPayload.length()));
-    //     request.setHeader('Connection', 'keep-alive');
-    //     request.setHeader('Accept-Encoding', 'gzip, deflate, br');
-    //     request.setBody(ticketPayload);
-    //     HttpResponse response = http.send(request);
-    //     // If the request is successful, parse the JSON response.
-    //     handleResponse(response);
-    // }
+    public static void updateCircuitIdInVM(VisionMetrix_Circuit__c circuit) {
+        String headerToken = visionMetrixLogin();
+        Http http = new Http(  );
+        HttpRequest request = new HttpRequest(  );
+        String ticketPayload = genEditCircuitPayload(circuit);
+        request.setEndpoint('https://rest-api2.visionmetrix.net/1.1/circuits/edit/');
+        request.setMethod('POST');
+        request.setHeader('X-ocularip-username', 'everstreampcol1');
+        request.setHeader('X-ocularip-token', headerToken);
+        request.setHeader('X-ocularip-company', 'Everstream');
+        request.setHeader('Content-Type', 'application/json');
+        request.setHeader('Content-Length', String.valueOf(ticketPayload.length()));
+        request.setHeader('Connection', 'keep-alive');
+        request.setHeader('Accept-Encoding', 'gzip, deflate, br');
+        request.setBody(ticketPayload);
+        HttpResponse response = http.send(request);
+        // If the request is successful, parse the JSON response.
+        handleResponse(response);
+    }
 
     /**************************************************************************************************************************************** */
     /**
