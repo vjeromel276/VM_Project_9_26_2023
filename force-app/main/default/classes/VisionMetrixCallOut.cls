@@ -461,27 +461,6 @@ public class VisionMetrixCallOut {
 
     /**************************************************************************************************************************************** */
     /**
-     * genAddCircuitPayload()
-     *
-     * Method to generate the payload for the addCircuitToTicket call outs
-     *
-     * @param       vmTicketNumber      String      the VisionMetrix ticket number
-     * @param       selectedNodes       String      the circuit alias to be added to the ticket
-     * @return      String                          the payload for the callout
-     * @uses        visionMetrixLogin()             to get the token for the header
-     */
-    // public static String genAddCircuitPayload(String vmTicketNumber, String selectedNodes) {
-    //     VisionMetrixWrappers.AddCircuitToTicket ticketData = new VisionMetrixWrappers.AddCircuitToTicket();
-    //     ticketData.ticket_id = vmTicketNumber;
-    //     ticketData.circuit_alias = selectedNodes;
-    //     System.debug('Ticket Number: ' + ticketData.ticket_id);
-    //     System.debug('Circuit Alias: ' + ticketData.circuit_alias);
-    //     System.debug('Ids added to Exclusion Peiod Ticket: ' + ticketData.ticket_id);
-    //     return JSON.serialize(ticketData);
-    // }
-
-    /**************************************************************************************************************************************** */
-    /**
      * Method to add a new VisionMetrix ticket
      * @param ticket - the VisionMetrix ticket
      * @uses visionMetrixLogin() to get the token for the header
