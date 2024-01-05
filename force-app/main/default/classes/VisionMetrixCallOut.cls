@@ -544,65 +544,6 @@ public class VisionMetrixCallOut {
 
     /**************************************************************************************************************************************** */
     /**
-     * Method to add a circuit to an existing VisionMetrix ticket
-     * @param vmTicketNumber - the VisionMetrix ticket number
-     * @param selectedNodes - the circuit alias to be added to the ticket
-     * @uses genAddCircuitPayload() to generate the payload for the callout
-     */
-    // @AuraEnabled
-    // public static void addCircuitToVMTicket(String vmTicketNumber, String selectedNodes) {
-    //     String headerToken = visionMetrixLogin();
-    //     Http http = new Http(  );
-    //     HttpRequest request = new HttpRequest(  );
-    //     String ticketPayload = genAddCircuitPayload(vmTicketNumber, selectedNodes);
-    //     request.setEndpoint('https://rest-api2.visionmetrix.net/1.1/tickets/addCircuitToTicket/');
-    //     request.setMethod('POST');
-    //     request.setHeader('X-ocularip-username', 'everstreampcol1');
-    //     request.setHeader('X-ocularip-token', headerToken);
-    //     request.setHeader('X-ocularip-company', 'Everstream');
-    //     request.setHeader('Content-Type', 'application/json');
-    //     request.setHeader('Content-Length', String.valueOf(ticketPayload.length()));
-    //     request.setBody(ticketPayload);
-    //     HttpResponse response = http.send(request);
-    //     // If the request is successful, parse the JSON response.
-    //     handleResponse(response);
-    // }
-
-    /**************************************************************************************************************************************** */
-    /**
-     * Method to remove a circuit from an existing VisionMetrix ticket
-     * @param vmTicketNumber - the VisionMetrix ticket number
-     * @param selectedNodes - the circuit alias to be removed from the ticket
-     * @uses genAddCircuitPayload() to generate the payload for the callout
-     */
-    // @AuraEnabled
-    // public static void removeCircuitFromTicket(String vmTicketNumber, String selectedNodes) {
-    //     String headerToken = visionMetrixLogin();
-    //     Http http = new Http(  );
-    //     HttpRequest request = new HttpRequest(  );
-    //     String ticketPayload = genAddCircuitPayload(vmTicketNumber, selectedNodes);
-    //     request.setEndpoint('https://rest-api2.visionmetrix.net/1.1/tickets/removeCircuitFromTicket/');
-    //     request.setMethod('POST');
-    //     request.setHeader('X-ocularip-username', 'everstreampcol1');
-    //     request.setHeader('X-ocularip-token', headerToken);
-    //     request.setHeader('X-ocularip-company', 'Everstream');
-    //     request.setHeader('Content-Type', 'application/json');
-    //     request.setHeader('Content-Length', String.valueOf(ticketPayload.length()));
-    //     request.setBody(ticketPayload);
-    //     HttpResponse response = http.send(request);
-    //     // If the request is successful, parse the JSON response.
-    //     handleResponse(response);
-    // }
-
-    /**************************************************************************************************************************************** */
-    // invocableMethod for getting the latest events from VisionMetrix called from a flow
-    // @invocableMethod(label = 'Get Latest Events')
-    // public static void getLatestEventsInvocable() {
-    //     getLatestEvents();
-    // }
-
-    /**************************************************************************************************************************************** */
-    /**
      * getLatestEvents()
      *
      * Method calls the VisionMetrix API to get the latest events and will create a new ticket in Salesforce or attach the event to an existing ticket
