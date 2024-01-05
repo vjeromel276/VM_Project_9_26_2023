@@ -120,26 +120,13 @@ public class VisionMetrixCallOut {
      *
      * Method to generate the payload for the exclusion call outs
      *
-     * @param       ticketId            String          the VisionMetrix ticket number
+     * @param       ticket            String          the VisionMetrix ticket number
      * @return                          String          the payload for the callout
      */
-    // public static String genTicketPayload(String ticketId) {
     public static String genTicketPayload(Case ticket) {
         VisionMetrixWrappers.AddTicket ticketData = new VisionMetrixWrappers.AddTicket();
+        Set<String> circuitSet = new Set<String>();
 
-        // Case ticket = [SELECT Id, ParentId, Related_Service_Order__r.Id, Service_ID__c, Account_Name_Text__c,
-        //                                     CaseNumber, Related_Service_Order__c, Related_Service_Order_Text__c, Description, Subject, 
-        //                                     NOC_Ticket_Assigment__c, Maintenance_Start__c, Maintenance_End__c
-        //                              FROM Case
-        //                              WHERE ParentId = :ticketId LIMIT 1];
-
-            Set<String> circuitSet = new Set<String>();
-            
-            // make sure the parent has a child
-            
-                
-             
-                
         List<VisionMetrix_Circuit__c> circuitList = [SELECT Id, Service_Order_Agreement__c, Circuit_Alias__c
                                                         FROM VisionMetrix_Circuit__c
                                                         WHERE Service_Order_Agreement__c = :ticket.Related_Service_Order__c];
@@ -419,8 +406,8 @@ public class VisionMetrixCallOut {
      * @param       tickets             List<Case>      the list of VisionMetrix ticket numbers
      * @param       token               String          the token for the header
      *
-     * @uses        visionMetrixLogin()                 to get the token for the header
-     * @uses        genParentPayload()                  to generate the payload for the callout
+     * @see        visionMetrixLogin()                 to get the token for the header
+     * @see        genParentPayload()                  to generate the payload for the callout
      */
     public static HttpResponse addBulkVMTicket(List<Case> tickets, String token) {
 
@@ -471,23 +458,6 @@ public class VisionMetrixCallOut {
         System.debug('+++++++++++++++++++End of addBulkVMTicket Method+++++++++++++++++++++++++++++++++++++++++++++++++++');
         return response;
     }
-
-    /**************************************************************************************************************************************** */
-    /**
-     * genNonExclusionPayload()
-     *
-     * Method to generate the payload for the nonExclusion call outs
-     *
-     * @param       ticketId            String      the VisionMetrix ticket number
-     *
-     * @uses        visionMetrixLogin()             to get the token for the header
-     * @uses        genTicketPayload()           to generate the payload for the callout
-     *
-     * @return      String                          the payload for the callout
-     */
-    // public static String genNonExclusionPayload(String ticketId) {
-    //     return null;
-    // }
 
     /**************************************************************************************************************************************** */
     /**
