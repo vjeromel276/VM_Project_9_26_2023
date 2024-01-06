@@ -542,6 +542,12 @@ public class VisionMetrixCallOut {
         handleResponse(response);
     }
 
+    // invocableMethod for getting the latest events from VisionMetrix called from a flow
+    // @invocableMethod(label = 'Get Latest Events')
+    // public static void getLatestEventsInvocable() {
+    //     getLatestEvents();
+    // }
+
     /**************************************************************************************************************************************** */
     /**
      * getLatestEvents()
@@ -553,6 +559,7 @@ public class VisionMetrixCallOut {
      * @uses        visionMetrixLogin()     Function                    to get the token for the header
      *
      */
+    // @future(callout=true)
     public static void getLatestEvents() {
         String headerToken = visionMetrixLogin();
         HttpRequest request = new HttpRequest(  );
