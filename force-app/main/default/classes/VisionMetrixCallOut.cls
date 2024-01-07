@@ -544,9 +544,9 @@ public class VisionMetrixCallOut {
 
     // invocableMethod for getting the latest events from VisionMetrix called from a flow
     // @invocableMethod(label = 'Get Latest Events')
-    // public static void getLatestEventsInvocable() {
-    //     getLatestEvents();
-    // }
+    public static void getLatestEventsInvocable() {
+        getLatestEvents();
+    }
 
     /**************************************************************************************************************************************** */
     /**
