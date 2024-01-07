@@ -10,7 +10,9 @@ global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulab
     global Database.QueryLocator start(Database.BatchableContext context){
         loginToken = VisionMetrixCallOut.visionMetrixLogin();
 
-        
+        //~piggyback on this batch to call the getLatestEvents method
+        VisionMetrixCallOut.getLatestEvents();
+        VisionMetrixEventController.attachVmEventToCircuit();
         // Query for Customer Communication Cases with Record Type "Customer Communication" and type "Maintenance"
         // need to make this the place where assign the parent ticket data to the individual vm tickets
 
@@ -39,6 +41,7 @@ global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulab
                                      WHERE ParentId = :c.Id];
 
                 for (Case s : serviceAffectedCases){
+                    System.debug('Service Affected Case: ' + s.Service_ID__c);
                     custAffectedList.add(s.Service_ID__c);
                 }
 
@@ -63,7 +66,7 @@ global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulab
                         c.Customer_List__c = custAffectedList.toString();
                         System.debug('custAffectedList: ' + custAffectedList.toString());
                         c.VisionMETRIX_Ticket_Created_Date__c = DateTime.now();
-                        c.VisionMETRIX_Ticket_Number__c = c.CaseNumber + '-' + c.VisionMETRIX_Ticket_Created_Date__c.format('MM/dd/yyyy');                        
+                        c.VisionMETRIX_Ticket_Number__c = c.CaseNumber + '-' + c.VisionMETRIX_Ticket_Created_Date__c.format('MM/dd/yyyy');                       
                     }
                     update scope;
                 } else {
