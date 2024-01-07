@@ -155,12 +155,11 @@ public with sharing class VisionMetrixHelperMethod {
 			// VisionMetrixHelperMethod.vmEventToAlert(events);//*this will be used to create the nms alert
 			// insert event;
 			// call queable class to insert circuits
-			System.debug('Events: ' + events.size());
-			if ( events.size() > 0 ) {
-				System.debug('Events: ' + events);
-				System.enqueueJob(new QueueableEventInsert(events));
-			}
-
+		}
+		System.debug('Events: ' + events.size());
+		if ( events.size() > 0) {
+			System.debug('Events: ' + events);
+			System.enqueueJob(new QueueableEventInsert(events));
 		}
 	}
 
