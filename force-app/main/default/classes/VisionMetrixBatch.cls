@@ -12,7 +12,7 @@ global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulab
 
         //~piggyback on this batch to call the getLatestEvents method
         VisionMetrixCallOut.getLatestEvents();
-        VisionMetrixEventController.attachVmEventToCircuit();
+        //VisionMetrixEventController.attachVmEventToCircuit();
         // Query for Customer Communication Cases with Record Type "Customer Communication" and type "Maintenance"
         // need to make this the place where assign the parent ticket data to the individual vm tickets
 

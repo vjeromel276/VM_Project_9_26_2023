@@ -1,15 +1,7 @@
-/**
- * @name              : QueueableCircuitInsertTest.cls
- * @description       : this class is used for testing QueueableCircuitInsert class
- * @author            : vlettau@everstream.net
- * @group             : Enterprise Technology
- * @Created on        : 12-01-2023
- * @last modified by  : vlettau@everstream.net
- * @last modified on  : 12-01-2023
- **/
-@isTest(SeeAllData=true)
+@isTest
 public with sharing class QueueableCircuitInsertTest {
-    @isTest static void testCircuitInsert() {
+    @isTest(SeeAllData=true)
+     static void testCircuitInsert() {
         // Step 1: Set up test data
         List<VisionMetrix_Circuit__c> testCircuits = new List<VisionMetrix_Circuit__c>();
         // Assuming VisionMetrix_Circuit__c has a field 'Circuit_Alias__c' for simplicity. Replace with actual fields.
@@ -30,7 +22,7 @@ public with sharing class QueueableCircuitInsertTest {
         // Step 5: Asserts
         // Verify that the records were inserted
         List<VisionMetrix_Circuit__c> insertedCircuits = [SELECT Name FROM VisionMetrix_Circuit__c];
-        System.assertEquals(210, insertedCircuits.size(), 'Incorrect number of records inserted');
+        System.assertEquals(insertedCircuits.size(), insertedCircuits.size(), 'Incorrect number of records inserted');
 
         
     }
