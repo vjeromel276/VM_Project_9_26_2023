@@ -56,9 +56,9 @@ global class BatchVisionMetrixCircuitCallout implements Database.Batchable<sObje
     global static void start(Integer minute){
 
         String jobName = 'BatchVisionMetrixCircuitCallout';
-        if (Test.isRunningTest() || minute == NULL){
-            Database.executebatch(new BatchVisionMetrixCircuitCallout(), BatchSize);
-        } else if (Test.isRunningTest() || minute != NULL){
+        if (Test.isRunningTest() ||minute == NULL){
+            Database.executebatch(new BatchVisionMetrixCircuitCallout() );
+        } else if ( minute != NULL){
             jobName = jobName += ' - ' + minute + ' - ' + DateTime.now().format();
             String cron = '0 ' + String.valueOf(minute) + ' * * * ?';
             System.schedule(jobName, cron, new BatchVisionMetrixCircuitCallout());

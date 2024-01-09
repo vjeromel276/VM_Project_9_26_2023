@@ -40,4 +40,14 @@ public class VisionMetrixCallOutTest {
         System.assertEquals(200, res.getStatusCode());
         
     }
+
+    @isTest(SeeAllData=true)
+    public static void getLatestEventsTest(){
+        Test.setMock(HttpCalloutMock.class, new VisionMetrixCalloutGetLatestEventsMock());
+        
+        Test.startTest();
+        VisionMetrixCallOut.getLatestEvents();
+        Test.stopTest();
+        
+    }
 }

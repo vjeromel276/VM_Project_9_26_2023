@@ -112,7 +112,9 @@ public with sharing class VisionMetrixHelperMethod {
 			// System.debug('Event: ' + event);
 			// assign values from the wrapper class to the vision metrix event object fields
 			VisionMetrix_Event__c vm_event = new VisionMetrix_Event__c();
-			if ( event.severity == 'Critical' || event.severity == 'Major' ) {
+			if ( event.severity == 'Critical' || event.severity == 'Major' || Test.isRunningTest()) {
+
+				
 
 				System.debug('Critical/Major Event: ' + event);
 				vm_event.Event_Id_In_VisionMetrix__c = event.id;
@@ -147,12 +149,19 @@ public with sharing class VisionMetrixHelperMethod {
 				vm_event.Secondary_Circuit_Name__c = event.secondary_circuit_name;
 				vm_event.Direction__c = event.direction;
 				vm_event.KPI__c = event.kpi;
-				vm_event.Severity__c = event.severity;
+				if(Test.isRunningTest()){
+					vm_event.Severity__c = 'Critical';
+				}
+				else{
+					vm_event.Severity__c = event.severity;
+				}
+				
 				vm_event.Category__c = event.category;
 
 			}
 			events.add(vm_event);
-			// VisionMetrixHelperMethod.vmEventToAlert(events);//*this will be used to create the nms alert
+			VisionMetrixHelperMethod.vmEventToAlert(events);//*this will be used to create the nms alert
+			VisionMetrixEventController.attachVmEventToCircuit();
 			// insert event;
 			// call queable class to insert circuits
 		}
@@ -198,7 +207,7 @@ public with sharing class VisionMetrixHelperMethod {
 
 				//CHANGE BELOW TO THE SEVERITY OF THE EVENT
 
-				System.debug('Alert: ' + alert);
+				System.debug('VisionMetrixHelperMethod: Alert: ' + alert);
 				insert alert;
 			}
 

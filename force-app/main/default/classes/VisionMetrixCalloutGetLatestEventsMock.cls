@@ -1,0 +1,11 @@
+public with sharing class VisionMetrixCalloutGetLatestEventsMock implements HttpCalloutMock {
+    public static HttpResponse respond(HttpRequest req) {
+        HttpResponse res = new HttpResponse(  );
+        res.setStatusCode(200);
+        res.setHeader('Content-Type', 'text/json');
+        res.setBody('{"success": true,"events": [{"id": "20801576","start_time": "1704775800","end_time": "1704780600","event_name": "Data Upload Issue","node_name": "EV.ACC.TMO-CLYH003A-13500-R21N1","circuit_name": "TMO.OHCL.021.CLYH003A.2705","secondary_circuit_name": "EV-ETHS-ON-13500 a/b","direction": "EV.ACC.TMO-CLYH003A-13500-R21N1 In","kpi": null,"severity": "Info","category": "Data Upload Issue"},{"id": "20801577","start_time": "1704775800","end_time": "1704780600","event_name": "Data Upload Issue","node_name": "EV.ACC.TMO-CLYH003A-13500-R21N1","circuit_name": "TMO.OHCL.021.CLYH003A.0705","secondary_circuit_name": "EV-ETHS-ON-13500 a/b","direction": "EV.ACC.TMO-CLYH003A-13500-R21N1 In","kpi": null,"severity": "Info","category": "Data Upload Issue"},{"id": "20802304","start_time": "1704779460","end_time": "1704780600","event_name": "Data Upload Issue","node_name": "EV.ACC.TMO-CL23566C-13548-R43N1","circuit_name": "TMO.OHCL.043.CL23566C.2551","secondary_circuit_name": "EV-ETHS-ON-13548 a/b","direction": "EV.ACC.TMO-CL23566C-13548-R43N1 In","kpi": null,"severity": "Info","category": "Data Upload Issue"},{"id": "20802305","start_time": "1704779400","end_time": "1704780600","event_name": "Data Upload Issue","node_name": "EV.ACC.TMO-CL33571D-13523-R49N1","circuit_name": "TMO.OHCL.049.CL33571D.2281","secondary_circuit_name": "EV-ETHS-ON-13523 a/b","direction": "EV.ACC.TMO-CL33571D-13523-R49N1 In","kpi": null,"severity": "Info","category": "Data Upload Issue"},{"id": "20802306","start_time": "1704778200","end_time": "1704780600","event_name": "Data Upload Issue","node_name": "TMO.R37N4.CL10045C.44963.OH","circuit_name": "TMO.OHCLE.037.CL10045C.44963.PRI","secondary_circuit_name": "EV-ETHS-ON-44963","direction": "TMO.R37N4.CL10045C.44963.OH In","kpi": null,"severity": "Info","category": "Data Upload Issue"}]}');
+
+        return res;
+    }
+
+}
