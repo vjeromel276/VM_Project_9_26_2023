@@ -189,10 +189,10 @@ public with sharing class VisionMetrixHelperMethod {
 	public static void vmEventToAlert(List<VisionMetrix_Event__c> newEvents) {
 		// VisionMetrixEventController.attachVmEventToCircuit(newEvents);
 		VisionMetrix_Event__c vm_event = new VisionMetrix_Event__c();
-		
+		List<NMS_Alert__c> alerts = new List<NMS_Alert__c>();
 
 		if ( newEvents != null ) {
-			List<NMS_Alert__c> alerts = new List<NMS_Alert__c>();
+			
 			//~ these events should already be filtered for severity
 			for ( VisionMetrix_Event__c newEvent : newEvents ) {
 				
@@ -222,7 +222,7 @@ public with sharing class VisionMetrixHelperMethod {
 			}
 			if ( alerts.size() > 0) {
 			System.debug('Alerts: ' + alerts);
-			// System.enqueueJob(new QueueableAlertInsert(alerts));
+			//System.enqueueJob(new QueueableAlertInsert(alerts));
 			insert alerts;
 			}
 			

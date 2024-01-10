@@ -21,9 +21,9 @@ global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulab
         //                                  FROM Case
         //                                  WHERE Case_Record_Type__c = 'Maintenance' AND VisionMetrix_Parent_Case__c = true AND ParentId = null]);
         //! the below query is what is to be used in production
-        return Database.getQueryLocator([SELECT Id,CaseNumber, Account_Name_Text__c, AccountId, ParentId, RecordTypeId, Case_Record_Type__c, VisionMETRIX_Ticket_Created_Date__c,VisionMETRIX_Ticket_Number__c, VisionMetrix_Parent_Case__c, NotificationType__c, Description, Subject, NOC_Ticket_Assigment__c, Maintenance_Start__c, Maintenance_End__c
+        return Database.getQueryLocator([SELECT Id,CaseNumber, hasVisionMetrixTicket__c, Account_Name_Text__c, AccountId, ParentId, RecordTypeId, Case_Record_Type__c, VisionMETRIX_Ticket_Created_Date__c,VisionMETRIX_Ticket_Number__c, VisionMetrix_Parent_Case__c, NotificationType__c, Description, Subject, NOC_Ticket_Assigment__c, Maintenance_Start__c, Maintenance_End__c
                                          FROM Case
-                                         WHERE Case_Record_Type__c = 'Maintenance' AND VisionMetrix_Parent_Case__c = true AND AccountId IN ('0010B00001skFrkQAE', '0013g00000Tfxq2AAB', '001U000001jMJS6IAO', '0013g00000TfxtOAAR', '0010B00001p6Z3VQAU', '001U000001jMJVdIAO') AND ParentId = null]);
+                                         WHERE hasVisionMetrixTicket__c != true AND Case_Record_Type__c = 'Maintenance' AND VisionMetrix_Parent_Case__c = true AND AccountId IN ('0010B00001skFrkQAE', '0013g00000Tfxq2AAB', '001U000001jMJS6IAO', '0013g00000TfxtOAAR', '0010B00001p6Z3VQAU', '001U000001jMJVdIAO') AND ParentId = null]);
 
         
      }
@@ -47,6 +47,8 @@ global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulab
                 for (Case s : serviceAffectedCases){
                     System.debug('Service Affected Case: ' + s.Service_ID__c);
                     custAffectedList.add(s.Service_ID__c);
+                    // s.Subject = s?.CaseNumber + ' | ' + s?.Account_Name_Text__c + ' Maintenance | Start Date - '+ s?.Maintenance_Start__c;
+                    System.debug('Ticket Subject: ' + s.Subject);
                 }
 
                 System.debug('Added Case Id to list: ' + c);
@@ -70,7 +72,9 @@ global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulab
                         c.Customer_List__c = custAffectedList.toString();
                         System.debug('custAffectedList: ' + custAffectedList.toString());
                         c.VisionMETRIX_Ticket_Created_Date__c = DateTime.now();
-                        c.VisionMETRIX_Ticket_Number__c = c.CaseNumber + '-' + c.VisionMETRIX_Ticket_Created_Date__c.format('MM/dd/yyyy');                       
+                        c.VisionMETRIX_Ticket_Number__c = c.CaseNumber + '-' + c.VisionMETRIX_Ticket_Created_Date__c.format('MM/dd/yyyy');
+                        c.Subject = c?.CaseNumber + ' | ' + c?.Account_Name_Text__c + ' Maintenance | Start Date - '+ c?.Maintenance_Start__c;
+                        C.hasVisionMetrixTicket__c = true;                    
                     }
                     update scope;
                 } else {
@@ -86,7 +90,7 @@ global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulab
     }
 
     global void finish(Database.BatchableContext BC){
-        VisionMetrixEventController.attachVmEventToCircuit();
+        // VisionMetrixEventController.attachVmEventToCircuit();
         System.debug(recordsUpdated + ' records updated.');
 
         String soql = 'SELECT Id, ApexClass.Name, MethodName, JobType, Status, NumberOfErrors, JobItemsProcessed, TotalJobItems, ExtendedStatus, CreatedBy.Email FROM AsyncApexJob ';

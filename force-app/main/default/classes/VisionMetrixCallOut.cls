@@ -290,7 +290,7 @@ public class VisionMetrixCallOut {
 
                     //********Required Fields *********//
                     //^~ Ticket Id - Salesforce Ticket Case Number and todays date in the format of mm/dd/yyyy
-                    ticketData.ticket_id = ticket.CaseNumber + ' | ' + parent.Account_Name_Text__c + ' Maintenance | Start Date - '+ parent.Maintenance_Start__c.format('MM/dd/yyyy');
+                    ticketData.ticket_id = ticket?.CaseNumber + ' | ' + parent?.Account_Name_Text__c + ' Maintenance | Start Date - '+ parent?.Maintenance_Start__c;
                     // System.debug('Ticket Number: ' + ticketData.ticket_id);
 
                     //^~ Ticket Type - Ticket Type defaults to 'Exclusion Period'
@@ -328,7 +328,9 @@ public class VisionMetrixCallOut {
                     // System.debug('Severity: ' + ticketData.severity);
 
                     //^~ Start Time - Maintenance Start Time
-                    ticketData.start_time = Integer.valueOf(parent.Maintenance_Start__c.getTime() / 1000);
+                    System.debug('Maintenance Start: ' + parent?.Maintenance_Start__c);
+                    Datetime start = parent?.Maintenance_Start__c;
+                    ticketData.start_time = Integer.valueOf(start.getTime() / 1000);
                     // System.debug('Maintenance Start: ' + ticketData.start_time);
 
                     //^~ End Time - Maintenance End Time
@@ -357,13 +359,13 @@ public class VisionMetrixCallOut {
                     ticketData.description = parent.Description;
                     // System.debug('Description: ' + ticketData.description);
                     //^~ Subject
-                    ticketData.subject = parent.Subject;
+                    ticketData.subject = ticket?.CaseNumber + ' | ' + parent?.Account_Name_Text__c + ' Maintenance | Start Date - '+ parent?.Maintenance_Start__c;
                     // System.debug('Subject: ' + ticketData.subject);
                     //^~ Support Agent
                     ticketData.support_agent = parent.NOC_Ticket_Assigment__c;
                     // System.debug('Support Agent: ' + ticketData.support_agent);
                     //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-                    // ticketList.add(ticketData);
+                    ticketList.add(ticketData);
                 }
                 else {
                     //^ If the child is null throw an error
@@ -377,7 +379,7 @@ public class VisionMetrixCallOut {
             // ticket.Service_Affecting_Cust_List__c = ticketData.circuits;
             // update ticket;
             // add the ticket to the list of tickets
-            ticketList.add(ticketData);
+            // ticketList.add(ticketData);
             System.debug('Ticket List: ' + ticketList);
             // add the list of tickets to the bulk ticket wrapper
             bulkticketData.tickets = ticketList;
