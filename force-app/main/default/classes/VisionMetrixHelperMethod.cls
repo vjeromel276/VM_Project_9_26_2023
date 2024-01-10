@@ -111,10 +111,10 @@ public with sharing class VisionMetrixHelperMethod {
 		for ( VisionMetrixWrappers.Event event : eventsList.events ) {
 			// System.debug('Event: ' + event);
 			// assign values from the wrapper class to the vision metrix event object fields
-			VisionMetrix_Event__c vm_event = new VisionMetrix_Event__c();
+			
 			if ( event.severity == 'Critical' || event.severity == 'Major' || Test.isRunningTest()) {
-
 				
+				VisionMetrix_Event__c vm_event = new VisionMetrix_Event__c();				
 
 				System.debug('Critical/Major Event: ' + event);
 				vm_event.Event_Id_In_VisionMetrix__c = event.id;
@@ -157,18 +157,22 @@ public with sharing class VisionMetrixHelperMethod {
 				}
 				
 				vm_event.Category__c = event.category;
+				
+				events.add(vm_event);
 
 			}
-			events.add(vm_event);
+			
+			
 			VisionMetrixHelperMethod.vmEventToAlert(events);//*this will be used to create the nms alert
-			VisionMetrixEventController.attachVmEventToCircuit();
+			
 			// insert event;
 			// call queable class to insert circuits
 		}
 		System.debug('Events: ' + events.size());
 		if ( events.size() > 0) {
 			System.debug('Events: ' + events);
-			System.enqueueJob(new QueueableEventInsert(events));
+			// System.enqueueJob(new QueueableEventInsert(events));
+			insert events;
 		}
 	}
 
@@ -183,36 +187,47 @@ public with sharing class VisionMetrixHelperMethod {
 	 * @uses        visionMetrixLogin() Function                            to get the token for the header
 	 */
 	public static void vmEventToAlert(List<VisionMetrix_Event__c> newEvents) {
+		// VisionMetrixEventController.attachVmEventToCircuit(newEvents);
 		VisionMetrix_Event__c vm_event = new VisionMetrix_Event__c();
+		
 
 		if ( newEvents != null ) {
+			List<NMS_Alert__c> alerts = new List<NMS_Alert__c>();
 			//~ these events should already be filtered for severity
 			for ( VisionMetrix_Event__c newEvent : newEvents ) {
-				System.debug('vmEventToAlert(): ' + newEvent);
-				//CHANGE BELOW EVENT NAME IN THE IDENTIFIER WITH THE ID FOR THE EVENT
-				NMS_Alert__c alert = new NMS_Alert__c();
+				
+				if(newEvent.Event_Id_In_VisionMetrix__c != null|| newEvent.Event_Id_In_VisionMetrix__c != '' ){
+					NMS_Alert__c alert = new NMS_Alert__c();
+					System.debug('vmEventToAlert(): ' + newEvent);
+					//CHANGE BELOW EVENT NAME IN THE IDENTIFIER WITH THE ID FOR THE EVENT
+					
 
-				//CHANGE BELOW EVENT NAME IN THE IDENTIFIER WITH THE ID FOR THE EVENT
-				alert.Identifier__c = newEvent.Event_Id_In_VisionMetrix__c + ' | VisionMetrix - Event | ' + System.today().format();
-				alert.Message__c = newEvent.Event_Name__c + ' | ' + newEvent.Severity__c;
-				alert.Service_ID__c = newEvent.Secondary_Circuit_Name__c;
-				alert.AlertType__c = newEvent.Event_Name__c;
-				alert.Source__c = 'VisionMetrix';
+					//CHANGE BELOW EVENT NAME IN THE IDENTIFIER WITH THE ID FOR THE EVENT
+					alert.Identifier__c = newEvent.Event_Id_In_VisionMetrix__c + ' | VisionMetrix - Event | ' + System.today().format();
+					alert.Message__c = newEvent.Event_Name__c + ' | ' + newEvent.Severity__c;
+					alert.Service_ID__c = newEvent.Secondary_Circuit_Name__c;
+					alert.AlertType__c = newEvent.Event_Name__c;
+					alert.Source__c = 'VisionMetrix';
 
-				/* FILL IN THE BELOW
-				 alert.IP_Address__c = IP ADDRESS;
-				 */
-				alert.Device_ID__c = newEvent.Node_Name__c;
-				alert.ClosedDate__c = newEvent.End_Time__c;
+					/* FILL IN THE BELOW
+					alert.IP_Address__c = IP ADDRESS;
+					*/
+					alert.Device_ID__c = newEvent.Node_Name__c;
+					alert.ClosedDate__c = newEvent.End_Time__c;
 
-				//CHANGE BELOW TO THE SEVERITY OF THE EVENT
-
-				System.debug('VisionMetrixHelperMethod: Alert: ' + alert);
-				insert alert;
+					System.debug('VisionMetrixHelperMethod: Alert: ' + alert);
+					alerts.add(alert);
+				}
+				
 			}
-
-			//create a payload record with the full content of the api call for that event
+			if ( alerts.size() > 0) {
+			System.debug('Alerts: ' + alerts);
+			// System.enqueueJob(new QueueableAlertInsert(alerts));
+			insert alerts;
+			}
+			
 		}
+		
 	}
 
 	/**************************************************************************************************************************************** */

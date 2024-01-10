@@ -11,7 +11,7 @@ global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulab
         loginToken = VisionMetrixCallOut.visionMetrixLogin();
 
         //~piggyback on this batch to call the getLatestEvents method
-        // VisionMetrixCallOut.getLatestEvents();
+        VisionMetrixCallOut.getLatestEvents();
         //VisionMetrixEventController.attachVmEventToCircuit();
         // Query for Customer Communication Cases with Record Type "Customer Communication" and type "Maintenance"
         // need to make this the place where assign the parent ticket data to the individual vm tickets
@@ -82,6 +82,7 @@ global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulab
     }
 
     global void finish(Database.BatchableContext BC){
+        VisionMetrixEventController.attachVmEventToCircuit();
         System.debug(recordsUpdated + ' records updated.');
 
         String soql = 'SELECT Id, ApexClass.Name, MethodName, JobType, Status, NumberOfErrors, JobItemsProcessed, TotalJobItems, ExtendedStatus, CreatedBy.Email FROM AsyncApexJob ';

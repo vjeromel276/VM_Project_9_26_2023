@@ -12,6 +12,7 @@ public class QueueableCircuitInsert implements Queueable, Database.AllowsCallout
     public QueueableCircuitInsert(List<VisionMetrix_Circuit__c> circuits) {
         this.circuitsToInsert = circuits;
     }
+    
     public void execute(QueueableContext context) {
         // Determine the chunk size
         Integer chunkSize = 200; // Choose an appropriate size
