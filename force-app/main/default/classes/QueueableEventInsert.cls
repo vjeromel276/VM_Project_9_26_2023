@@ -13,16 +13,16 @@ public class QueueableEventInsert implements Queueable, Database.AllowsCallouts 
         for (VisionMetrix_Event__c record : eventsToInsert) {
             chunk.add(record);
 
-            // If the chunk is full, insert it and clear it
+            // If the chunk is full, upsert it and clear it
             if (chunk.size() == chunkSize) {
-                insert chunk;
+                upsert chunk;
                 chunk.clear();
             }
         }
 
         // Insert any remaining records
         if (!chunk.isEmpty()) {
-            insert chunk;
+            upsert chunk;
         }
     } 
 }

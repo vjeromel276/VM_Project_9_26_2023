@@ -13,6 +13,7 @@ trigger VisionMetrixEventTrigger on VisionMetrix_Event__c (before insert, before
     // }
     if(Trigger.isAfter){
         if(Trigger.isInsert){
+            System.debug('VisionMetrixEventTriggerHandler.onAfterInsert');
             VisionMetrixEventTriggerHandler.onAfterInsert(events);
         }
         // if(Trigger.isUpdate){

@@ -22,6 +22,17 @@ public with sharing class VisionMetrixHelperMethod {
 	public static List<VisionMetrix_Circuit__c> handleCircuits(List<HttpResponse> responses) {
 
 		List<VisionMetrix_Circuit__c> circuits = new List<VisionMetrix_Circuit__c>();
+		List<VisionMetrix_Circuit__c> existingCircuits = [SELECT Id, Circuit_Alias__c, Circuit_Description__c, Circuit_EIR__c, 
+		                                                         Circuit_Granularity__c, Circuit_Image__c, Circuit_MRC__c, Circuit_Status__c, 
+		                                                         Custom_Notifications_Enabled__c, One_Way_Data_Enabled__c, Ethernet_Profile_Desc__c, Event_Notifications_Enabled__c, 
+		                                                         Max_Ordering_Bandwidth__c, Secondary_Name__c, Start_Time__c, System_A_Alias__c, 
+		                                                         System_A_IPAddress__c, System_A_Manufacturer__c, System_A_Model__c, System_A_Name__c, 
+		                                                         System_Z_Alias__c, System_Z_IPAddress__c, System_Z_Manufacturer__c, System_Z_Model__c, 
+		                                                         System_Z_Name__c
+		                                                  FROM VisionMetrix_Circuit__c];
+
+		Set<VisionMetrix_Circuit__c> circuitSet = new Set<VisionMetrix_Circuit__c>(existingCircuits);
+
 
 		for ( HttpResponse res : responses ) {
 			System.debug('Response: ' + res);
@@ -86,6 +97,8 @@ public with sharing class VisionMetrixHelperMethod {
 			else {
 				System.debug('Error: ' + res.getStatus());
 			}
+			circuitSet.addAll(circuits);
+			circuits = new List<VisionMetrix_Circuit__c>(circuitSet);
 		}
 
 		return circuits;
@@ -111,10 +124,10 @@ public with sharing class VisionMetrixHelperMethod {
 		for ( VisionMetrixWrappers.Event event : eventsList.events ) {
 			// System.debug('Event: ' + event);
 			// assign values from the wrapper class to the vision metrix event object fields
-			
-			if ( event.severity == 'Critical' || event.severity == 'Major' || Test.isRunningTest()) {
-				
-				VisionMetrix_Event__c vm_event = new VisionMetrix_Event__c();				
+
+			if ( event.severity == 'Critical' || event.severity == 'Major' || Test.isRunningTest() ) {
+
+				VisionMetrix_Event__c vm_event = new VisionMetrix_Event__c();
 
 				System.debug('Critical/Major Event: ' + event);
 				vm_event.Event_Id_In_VisionMetrix__c = event.id;
@@ -149,27 +162,26 @@ public with sharing class VisionMetrixHelperMethod {
 				vm_event.Secondary_Circuit_Name__c = event.secondary_circuit_name;
 				vm_event.Direction__c = event.direction;
 				vm_event.KPI__c = event.kpi;
-				if(Test.isRunningTest()){
+				if ( Test.isRunningTest() ) {
 					vm_event.Severity__c = 'Critical';
 				}
-				else{
+				else {
 					vm_event.Severity__c = event.severity;
 				}
-				
+
 				vm_event.Category__c = event.category;
-				
+
 				events.add(vm_event);
 
 			}
-			
-			
+
 			VisionMetrixHelperMethod.vmEventToAlert(events);//*this will be used to create the nms alert
-			
+
 			// insert event;
 			// call queable class to insert circuits
 		}
 		System.debug('Events: ' + events.size());
-		if ( events.size() > 0) {
+		if ( events.size() > 0 ) {
 			System.debug('Events: ' + events);
 			// System.enqueueJob(new QueueableEventInsert(events));
 			insert events;
@@ -192,15 +204,14 @@ public with sharing class VisionMetrixHelperMethod {
 		List<NMS_Alert__c> alerts = new List<NMS_Alert__c>();
 
 		if ( newEvents != null ) {
-			
+
 			//~ these events should already be filtered for severity
 			for ( VisionMetrix_Event__c newEvent : newEvents ) {
-				
-				if(newEvent.Event_Id_In_VisionMetrix__c != null|| newEvent.Event_Id_In_VisionMetrix__c != '' ){
+
+				if ( newEvent.Event_Id_In_VisionMetrix__c != null || newEvent.Event_Id_In_VisionMetrix__c != '' ) {
 					NMS_Alert__c alert = new NMS_Alert__c();
 					System.debug('vmEventToAlert(): ' + newEvent);
 					//CHANGE BELOW EVENT NAME IN THE IDENTIFIER WITH THE ID FOR THE EVENT
-					
 
 					//CHANGE BELOW EVENT NAME IN THE IDENTIFIER WITH THE ID FOR THE EVENT
 					alert.Identifier__c = newEvent.Event_Id_In_VisionMetrix__c + ' | VisionMetrix - Event | ' + System.today().format();
@@ -210,26 +221,24 @@ public with sharing class VisionMetrixHelperMethod {
 					alert.Source__c = 'VisionMetrix';
 
 					/* FILL IN THE BELOW
-					alert.IP_Address__c = IP ADDRESS;
-					*/
+					 alert.IP_Address__c = IP ADDRESS;
+					 */
 					alert.Device_ID__c = newEvent.Node_Name__c;
 					alert.ClosedDate__c = newEvent.End_Time__c;
 
 					System.debug('VisionMetrixHelperMethod: Alert: ' + alert);
 					alerts.add(alert);
 				}
-				
+
 			}
-			if ( alerts.size() > 0) {
-			System.debug('Alerts: ' + alerts);
-			//System.enqueueJob(new QueueableAlertInsert(alerts));
-			insert alerts;
+			if ( alerts.size() > 0 ) {
+				System.debug('Alerts: ' + alerts);
+				//System.enqueueJob(new QueueableAlertInsert(alerts));
+				insert alerts;
 			}
-			
+
 		}
-		
 	}
 
 	/**************************************************************************************************************************************** */
-	
 }
