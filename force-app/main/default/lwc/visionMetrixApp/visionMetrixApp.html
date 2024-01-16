@@ -1,20 +1,27 @@
 <template>
-    <div class="app-container">
+    <lightning-card class="app-container">
         <!-- Header -->
         <header class="app-header">
-            <h1>App Header</h1>
+            <h1>VisionMetrix Parent Tickets</h1>
         </header>
 
         <!-- Section 1 -->
-        <div class="app-section">
-            <h2>Section 1</h2>
-            <!-- Add your content for Section 1 here -->
-        </div>
 
-        <!-- Section 2 -->
-        <div class="app-section">
-            <h2>Section 2</h2>
-            <!-- Add your content for Section 2 here -->
-        </div>
-    </div>
+        <template
+            for:each={parentCases}
+            for:item="parentCase"
+        >
+            <lightning-card
+                key={parentCase.Id}
+                class="slds-var-m-around_medium"
+            >
+                <div>
+                    <p>{parentCase.CaseNumber}</p>
+                </div>
+
+            </lightning-card>
+        </template>
+
+
+    </lightning-card>
 </template>

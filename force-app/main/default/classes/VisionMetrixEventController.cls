@@ -9,6 +9,8 @@
  **/
 public with sharing class VisionMetrixEventController{
    
+    
+
     /**
      * where the vm event circuit id is equal to the vm circuit id pass the vm circuit id's sf record id to vm event circuit look up fields
      */
@@ -40,6 +42,5 @@ public with sharing class VisionMetrixEventController{
             eventsToUpdate.add(event);
         }
         update eventsToUpdate;
-        
     }
 }
