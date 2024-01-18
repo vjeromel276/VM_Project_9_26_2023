@@ -234,7 +234,8 @@ public with sharing class VisionMetrixHelperMethod {
 			if ( alerts.size() > 0 ) {
 				System.debug('Alerts: ' + alerts);
 				//System.enqueueJob(new QueueableAlertInsert(alerts));
-				insert alerts;
+				upsert alerts;
+				// upsert alerts Identifier__c;
 			}
 
 		}
