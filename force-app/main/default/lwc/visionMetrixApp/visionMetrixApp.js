@@ -1,6 +1,7 @@
 import { LightningElement, wire, api } from 'lwc';
 import getParentCases from '@salesforce/apex/VisionMetrixAppController.getParentCases';
 import getChildCases from '@salesforce/apex/VisionMetrixAppController.getChildCases';
+import order from '@salesforce/schema/Order';
 
 export default class VisionMetrixApp extends LightningElement {
 

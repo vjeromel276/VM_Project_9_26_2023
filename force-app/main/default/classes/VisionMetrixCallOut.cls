@@ -15,7 +15,6 @@ public class VisionMetrixCallOut {
     }
 
     /**************************************************************************************************************************************** */
-
     /**
      * visionMetrixLogin()
      *
@@ -51,11 +50,12 @@ public class VisionMetrixCallOut {
             // Deserializes the JSON string into collections of primitive data types.
             Map<String, Object> results = ( Map<String, Object> )JSON.deserializeUntyped(response.getBody());
             // System.debug(results);
-            String token='';
-            if(Test.isRunningTest()){
+            String token = '';
+            if ( Test.isRunningTest() ) {
                 token = '4ac5ee08b1c5a901b52b84b3a7a8cd948f3460ee';
-            }else{
-                token = results.get('token').toString();   
+            }
+            else {
+                token = results.get('token').toString();
             }
             // System.debug(token);
             return token;
@@ -75,7 +75,6 @@ public class VisionMetrixCallOut {
     }
 
     /**************************************************************************************************************************************** */
-
     /**
      * handleResponse()
      *
@@ -115,7 +114,6 @@ public class VisionMetrixCallOut {
     }
 
     /**************************************************************************************************************************************** */
-
     /**
      * genParentPayload()
      *
@@ -140,34 +138,35 @@ public class VisionMetrixCallOut {
             System.debug('genParentPayload ticket: ' + ticket);
             // individual Parent ticket wrapper
             VisionMetrixWrappers.AddTicket ticketData = new VisionMetrixWrappers.AddTicket();
-            
-            List<Case> childCases = [SELECT Id, ParentId, Related_Service_Order__r.Id, Service_ID__c, Account_Name_Text__c,
-                                            CaseNumber, Related_Service_Order__c, Related_Service_Order_Text__c, Description, Subject, 
-                                            NOC_Ticket_Assigment__c, Maintenance_Start__c, Maintenance_End__c
+
+            List<Case> childCases = [SELECT Id, ParentId, Related_Service_Order__r.Id, Service_ID__c, 
+                                            Account_Name_Text__c, CaseNumber, Related_Service_Order__c, Related_Service_Order_Text__c, 
+                                            Description, Subject, NOC_Ticket_Assigment__c, Maintenance_Start__c, 
+                                            Maintenance_End__c
                                      FROM Case
                                      WHERE ParentId = :ticket.Id];
 
             System.debug('genParentPayload child case array: ' + childCases + ' for ticket: ' + ticket.Id);
             Set<String> circuitSet = new Set<String>();
-            
+
             for ( Case child : childCases ) {
                 System.debug('genParentPayload child case: ' + child);
-                List<VisionMetrix_Circuit__c> circuitList = [ SELECT Id, Service_Order_Agreement__c, Circuit_Alias__c
-                                    FROM VisionMetrix_Circuit__c
-                                    WHERE Service_Order_Agreement__c = :child.Related_Service_Order__c];
+                List<VisionMetrix_Circuit__c> circuitList = [SELECT Id, Service_Order_Agreement__c, Circuit_Alias__c
+                                                             FROM VisionMetrix_Circuit__c
+                                                             WHERE Service_Order_Agreement__c = :child.Related_Service_Order__c];
 
                 System.debug('genParentPayload circuit list: ' + circuitList);
                 String circuitString = '';
                 for ( VisionMetrix_Circuit__c circuit : circuitList ) {
                     // circuitString += circuit.Circuit_Alias__c + ', ';
-                    circuitSet.add(( circuit.Circuit_Alias__c ).trim().deleteWhitespace()+'&');
+                    circuitSet.add(( circuit.Circuit_Alias__c ).trim().deleteWhitespace() + '&');
                 }
 
                 if ( child != null ) {
 
                     //********Required Fields *********//
                     //^~ Ticket Id - Salesforce Ticket Case Number and todays date in the format of mm/dd/yyyy
-                    ticketData.ticket_id = ticket?.CaseNumber + ' | ' + child?.Account_Name_Text__c + ' Maintenance | Start Date - '+ child?.Maintenance_Start__c;
+                    ticketData.ticket_id = ticket?.CaseNumber + ' | ' + child?.Account_Name_Text__c + ' Maintenance | Start Date - ' + child?.Maintenance_Start__c;
                     // System.debug('Ticket Number: ' + ticketData.ticket_id);
 
                     //^~ Ticket Type - Ticket Type defaults to 'Exclusion Period'
@@ -189,7 +188,7 @@ public class VisionMetrixCallOut {
                         }
                     }
                     if ( circuitString.length() > 0 ) {
-                        if(circuitString.endsWith('&')) {
+                        if ( circuitString.endsWith('&') ) {
                             circuitString = circuitString.removeEnd('&');
                         }
                         ticketData.circuits = ( circuitString ).trim().deleteWhitespace();
@@ -236,14 +235,14 @@ public class VisionMetrixCallOut {
                     ticketData.description = child.Description;
                     // System.debug('Description: ' + ticketData.description);
                     //^~ Subject
-                    ticketData.subject = ticket?.CaseNumber + ' | ' + child?.Account_Name_Text__c + ' Maintenance | Start Date - '+ child?.Maintenance_Start__c;
+                    ticketData.subject = ticket?.CaseNumber + ' | ' + child?.Account_Name_Text__c + ' Maintenance | Start Date - ' + child?.Maintenance_Start__c;
                     // System.debug('Subject: ' + ticketData.subject);
                     //^~ Support Agent
                     ticketData.support_agent = child.NOC_Ticket_Assigment__c;
                     // System.debug('Support Agent: ' + ticketData.support_agent);
                     //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 
-                    ticketList.add(ticketData);
+                    // ticketList.add(ticketData);
                 }
                 else {
                     //^ If the child is null throw an error
@@ -257,12 +256,13 @@ public class VisionMetrixCallOut {
             // ticket.Service_Affecting_Cust_List__c = ticketData.circuits;
             // update ticket;
             // add the ticket to the list of tickets
-            // ticketList.add(ticketData);
+            ticketList.add(ticketData);
             System.debug('Ticket List: ' + ticketList);
             // add the list of tickets to the bulk ticket wrapper
-            bulkticketData.tickets = ticketList;
+            // bulkticketData.tickets = ticketList;
+            System.debug('genParentPayload Bulk Ticket Data: ' + bulkticketData);
         }
-
+        bulkticketData.tickets = ticketList;
         // ******* Return the payload *******
         // for ( VisionMetrixWrappers.AddTicket t : bulkticketData.tickets ) {
         //     System.debug('Ticket Id: ' + t.ticket_id);
@@ -284,7 +284,6 @@ public class VisionMetrixCallOut {
     }
 
     /**************************************************************************************************************************************** */
-    
     /**
      * addBulkVMTicket()
      *
@@ -304,30 +303,31 @@ public class VisionMetrixCallOut {
         Http http = new Http(  );
         HttpRequest request = new HttpRequest(  );
         String ticketPayload = '';
-        
-        if(Test.isRunningTest()){
-            Case testTicket = new Case(Id='5006g000011bzbSAAQ');
+
+        if ( Test.isRunningTest() ) {
+            Case testTicket = new Case(
+                Id = '5006g000011bzbSAAQ'
+            );
             // testTicket.Related_Service_Order__c = 'a0D1I00000XZQ8QUAX';
             // testTicket.Related_Service_Order_Text__c = 'test';
             // testTicket.Description = 'test';
             // testTicket.Subject = 'test';
             // testTicket.Maintenance_Start__c = Date.today();
             // testTicket.Maintenance_End__c = Date.today()+1;
-            
+
             List<Case> testTickets = new List<Case>();
             System.debug('testTicket: ' + testTicket);
             testTickets.add(testTicket);
             ticketPayload = genParentPayload(testTickets);
-        }else{
-            for(Case ticket: tickets){
+        }
+        else {
+            for ( Case ticket : tickets ) {
                 System.debug('addBulkVMTicket ticket: ' + ticket.Id);
             }
-            
+
             ticketPayload = genParentPayload(tickets);
         }
-        
 
-        
         request.setEndpoint('https://rest-api2.visionmetrix.net/1.1/tickets/addBulk/');
         request.setMethod('POST');
         request.setHeader('X-ocularip-username', 'everstreampcol1');
@@ -336,7 +336,7 @@ public class VisionMetrixCallOut {
         request.setHeader('Content-Type', 'application/json');
         request.setHeader('Content-Length', String.valueOf(ticketPayload.length()));
         System.debug('addBulkVMTicket Ticket Payload: ' + ticketPayload);
-        for(String s: ticketPayload.split(',')){
+        for ( String s : ticketPayload.split(',') ) {
             // System.debug(s);
         }
         request.setBody(ticketPayload);
@@ -345,8 +345,7 @@ public class VisionMetrixCallOut {
         handleResponse(response);
         // if response is successful
 
-
-        VisionMetrixCallOutHelper.logAPICallout( String.valueOf(request.getEndpoint()), String.valueOf(request.getBody()), String.valueOf(JSON.deserializeUntyped(response.getBody())));
+        VisionMetrixCallOutHelper.logAPICallout(String.valueOf(request.getEndpoint()), String.valueOf(request.getBody()), String.valueOf(JSON.deserializeUntyped(response.getBody())));
         System.debug('+++++++++++++++++++End of addBulkVMTicket Method+++++++++++++++++++++++++++++++++++++++++++++++++++');
         return response;
     }
@@ -401,7 +400,7 @@ public class VisionMetrixCallOut {
      */
     // @invocableMethod(label='Insert Circuits' description='pulls all circuits from VisionMetrix and inserts them into Salesforce')
     public static List<VisionMetrix_Circuit__c> pullAllCircuits() {
-        String headerToken = visionMetrixLogin();  
+        String headerToken = visionMetrixLogin();
 
         String urlEnd = 'https://rest-api2.visionmetrix.net/1.1/circuits/query/';
         List<String> queryList = new List<String>();
@@ -437,17 +436,16 @@ public class VisionMetrixCallOut {
             request.setHeader('X-ocularip-company', 'Everstream');
             HttpResponse response = new Http(  ).send(request);
             responseList.add(response);
-            
+
         }
         System.debug('responseList' + responseList);
-        
-        circuitList= VisionMetrixHelperMethod.handleCircuits(responseList);
+
+        circuitList = VisionMetrixHelperMethod.handleCircuits(responseList);
         // if(circuitList.size() > 0){
-		// 	System.debug('Circuits: ' + circuitList);
-		// 	System.enqueueJob(new QueueableCircuitInsert(circuitList));
-		// }
+        //     System.debug('Circuits: ' + circuitList);
+        //     System.enqueueJob(new QueueableCircuitInsert(circuitList));
+        // }
         return circuitList;
-        
     }
 
     /**************************************************************************************************** */
