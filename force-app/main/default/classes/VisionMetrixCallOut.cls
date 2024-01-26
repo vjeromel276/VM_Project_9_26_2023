@@ -128,56 +128,46 @@ public class VisionMetrixCallOut {
      */
     public static String genParentPayload(List<Case> parentTickets) {
 
+        System.debug('+++++++++++++++++++Start of genParentPayload Method+++++++++++++++++++++++++++++++++++++++++++++++++++');
+
         // bulk Parent ticket wrapper
         VisionMetrixWrappers.AddBulkVMTickets bulkticketData = new VisionMetrixWrappers.AddBulkVMTickets();
         // ticket list wrapper to hold the list of Parent tickets
         List<VisionMetrixWrappers.AddTicket> ticketList = new List<VisionMetrixWrappers.AddTicket>();
         // for each parent ticekt id in the list of ticket ids
+        System.debug('genParentPayload parentTickets: ' + parentTickets.size());
         for ( Case ticket : parentTickets ) {
+            System.debug('genParentPayload ticket: ' + ticket);
             // individual Parent ticket wrapper
             VisionMetrixWrappers.AddTicket ticketData = new VisionMetrixWrappers.AddTicket();
             
-            List<Case> parentCases = [SELECT Id, ParentId, Related_Service_Order__r.Id, Service_ID__c, Account_Name_Text__c,
+            List<Case> childCases = [SELECT Id, ParentId, Related_Service_Order__r.Id, Service_ID__c, Account_Name_Text__c,
                                             CaseNumber, Related_Service_Order__c, Related_Service_Order_Text__c, Description, Subject, 
                                             NOC_Ticket_Assigment__c, Maintenance_Start__c, Maintenance_End__c
                                      FROM Case
                                      WHERE ParentId = :ticket.Id];
 
-            System.debug('child case array: ' + parentCases + ' for ticket: ' + ticket.Id);
+            System.debug('genParentPayload child case array: ' + childCases + ' for ticket: ' + ticket.Id);
             Set<String> circuitSet = new Set<String>();
             
-            // make sure the parent has a child
-            for ( Case parent : parentCases ) {
-                
-                System.debug('parent casenumber: ' + parent.CaseNumber+ ' parent id ' + parent.Related_Service_Order_Text__c);
-                
-                // List<VisionMetrix_Circuit__c> circuitList = new List<VisionMetrix_Circuit__c>();
-                // if(Test.isRunningTest()){
-                //     VisionMetrix_Circuit__c testCircuit = new VisionMetrix_Circuit__c(Id='a0C1I00000XZQ8QUAX');
-                //     testCircuit.Service_Order_Agreement__c = 'a0D1I00000XZQ8QUAX';
-                //     testCircuit.Circuit_Alias__c = 'test';
-                //     circuitList.add(testCircuit);
-                // }else{
-                //     circuitList = [ SELECT Id, Service_Order_Agreement__c, Circuit_Alias__c
-                //                     FROM VisionMetrix_Circuit__c
-                //                     WHERE Service_Order_Agreement__c = :parent.Related_Service_Order__c];
-                // }
+            for ( Case child : childCases ) {
+                System.debug('genParentPayload child case: ' + child);
                 List<VisionMetrix_Circuit__c> circuitList = [ SELECT Id, Service_Order_Agreement__c, Circuit_Alias__c
                                     FROM VisionMetrix_Circuit__c
-                                    WHERE Service_Order_Agreement__c = :parent.Related_Service_Order__c];
+                                    WHERE Service_Order_Agreement__c = :child.Related_Service_Order__c];
 
-                System.debug('circuit list: ' + circuitList);
+                System.debug('genParentPayload circuit list: ' + circuitList);
                 String circuitString = '';
                 for ( VisionMetrix_Circuit__c circuit : circuitList ) {
                     // circuitString += circuit.Circuit_Alias__c + ', ';
                     circuitSet.add(( circuit.Circuit_Alias__c ).trim().deleteWhitespace()+'&');
                 }
 
-                if ( parent != null ) {
+                if ( child != null ) {
 
                     //********Required Fields *********//
                     //^~ Ticket Id - Salesforce Ticket Case Number and todays date in the format of mm/dd/yyyy
-                    ticketData.ticket_id = ticket?.CaseNumber + ' | ' + parent?.Account_Name_Text__c + ' Maintenance | Start Date - '+ parent?.Maintenance_Start__c;
+                    ticketData.ticket_id = ticket?.CaseNumber + ' | ' + child?.Account_Name_Text__c + ' Maintenance | Start Date - '+ child?.Maintenance_Start__c;
                     // System.debug('Ticket Number: ' + ticketData.ticket_id);
 
                     //^~ Ticket Type - Ticket Type defaults to 'Exclusion Period'
@@ -215,13 +205,13 @@ public class VisionMetrixCallOut {
                     // System.debug('Severity: ' + ticketData.severity);
 
                     //^~ Start Time - Maintenance Start Time
-                    System.debug('Maintenance Start: ' + parent?.Maintenance_Start__c);
-                    Datetime start = parent?.Maintenance_Start__c;
+                    // System.debug('Maintenance Start: ' + child?.Maintenance_Start__c);
+                    Datetime start = child?.Maintenance_Start__c;
                     ticketData.start_time = Integer.valueOf(start.getTime() / 1000);
                     // System.debug('Maintenance Start: ' + ticketData.start_time);
 
                     //^~ End Time - Maintenance End Time
-                    ticketData.end_time = Integer.valueOf(parent.Maintenance_End__c.getTime() / 1000);
+                    ticketData.end_time = Integer.valueOf(child.Maintenance_End__c.getTime() / 1000);
                     // System.debug('Maintenance End: ' + ticketData.end_time);
 
                     //********Optional Fields*********//
@@ -243,15 +233,16 @@ public class VisionMetrixCallOut {
                     ticketData.internal_notes = 'SF GENERATED VM TICKET';
                     // System.debug('Description: ' + ticketData.description);
                     //^~ Description
-                    ticketData.description = parent.Description;
+                    ticketData.description = child.Description;
                     // System.debug('Description: ' + ticketData.description);
                     //^~ Subject
-                    ticketData.subject = ticket?.CaseNumber + ' | ' + parent?.Account_Name_Text__c + ' Maintenance | Start Date - '+ parent?.Maintenance_Start__c;
+                    ticketData.subject = ticket?.CaseNumber + ' | ' + child?.Account_Name_Text__c + ' Maintenance | Start Date - '+ child?.Maintenance_Start__c;
                     // System.debug('Subject: ' + ticketData.subject);
                     //^~ Support Agent
-                    ticketData.support_agent = parent.NOC_Ticket_Assigment__c;
+                    ticketData.support_agent = child.NOC_Ticket_Assigment__c;
                     // System.debug('Support Agent: ' + ticketData.support_agent);
                     //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+
                     ticketList.add(ticketData);
                 }
                 else {
@@ -288,7 +279,8 @@ public class VisionMetrixCallOut {
         //     System.debug('Subject: ' + t.subject);
         //     System.debug('Support Agent: ' + t.support_agent);
         // }
-         return JSON.serialize(bulkticketData);
+        System.debug('+++++++++++++++++++End of genParentPayload Method+++++++++++++++++++++++++++++++++++++++++++++++++++');
+        return JSON.serialize(bulkticketData);
     }
 
     /**************************************************************************************************************************************** */
@@ -327,6 +319,10 @@ public class VisionMetrixCallOut {
             testTickets.add(testTicket);
             ticketPayload = genParentPayload(testTickets);
         }else{
+            for(Case ticket: tickets){
+                System.debug('addBulkVMTicket ticket: ' + ticket.Id);
+            }
+            
             ticketPayload = genParentPayload(tickets);
         }
         
@@ -339,7 +335,7 @@ public class VisionMetrixCallOut {
         request.setHeader('X-ocularip-company', 'Everstream');
         request.setHeader('Content-Type', 'application/json');
         request.setHeader('Content-Length', String.valueOf(ticketPayload.length()));
-        System.debug('Ticket Payload: ' + ticketPayload);
+        System.debug('addBulkVMTicket Ticket Payload: ' + ticketPayload);
         for(String s: ticketPayload.split(',')){
             // System.debug(s);
         }

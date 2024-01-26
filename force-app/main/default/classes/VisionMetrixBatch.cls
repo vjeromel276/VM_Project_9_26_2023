@@ -36,6 +36,7 @@ global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulab
         
         if (Test.isRunningTest() || scope != NULL && scope.size() > 0){
             recordsParsed = scope.size();
+            System.debug('scope: ' + scope);   
             // Collect parent case IDs that meet the criteria
             for (Case c : scope){
                  List<Case> serviceAffectedCases = [SELECT Id, ParentId, Related_Service_Order__r.Id, Service_ID__c, Account_Name_Text__c,
@@ -56,7 +57,7 @@ global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulab
                 // c.VisionMETRIX_Ticket_Number__c = c.CaseNumber + '-' + c.VisionMETRIX_Ticket_Created_Date__c.format('MM/dd/yyyy');
                 parentCases.add(c);
             }
-
+            System.debug('parentCases: ' + parentCases.toString());
             if (parentCases.size() > 0){
                 // Generate VisionMetrix cases by calling the addVMTicket method for each parent case
                 // for (String parentId : parentCases){
