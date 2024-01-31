@@ -58,6 +58,7 @@ global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulab
                 parentCases.add(c);
             }
             System.debug('parentCases: ' + parentCases.toString());
+
             if (parentCases.size() > 0){
                 // Generate VisionMetrix cases by calling the addVMTicket method for each parent case
                 // for (String parentId : parentCases){
@@ -77,7 +78,7 @@ global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulab
                         c.Subject = c?.CaseNumber + ' | ' + c?.Account_Name_Text__c + ' Maintenance | Start Date - '+ c?.Maintenance_Start__c;
                         c.hasVisionMetrixTicket__c = true;                    
                     }
-                    update scope;
+                    upsert scope;
                 } else {
                     System.debug('Response: ' + res.getBody());
                 }                    
