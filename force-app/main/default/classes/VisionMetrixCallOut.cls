@@ -242,7 +242,6 @@ public class VisionMetrixCallOut {
                     // System.debug('Support Agent: ' + ticketData.support_agent);
                     //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 
-                    // ticketList.add(ticketData);
                 }
                 else {
                     //^ If the child is null throw an error
@@ -250,18 +249,14 @@ public class VisionMetrixCallOut {
                     // throw new System.QueryException('No Nodes found with the ticket number or ticket is not of correct type: ' + ticketId);
                 }
             }
-            // update Support Ticket with the VisionMetrix Ticket Number
-            // ticket.VisionMetrix_Ticket_Number__c = ticketData.ticket_id;
-            // update Service Affecting Cust List with a list of service Ids
-            // ticket.Service_Affecting_Cust_List__c = ticketData.circuits;
-            // update ticket;
+
             // add the ticket to the list of tickets
             ticketList.add(ticketData);
             System.debug('Ticket List: ' + ticketList);
             // add the list of tickets to the bulk ticket wrapper
-            // bulkticketData.tickets = ticketList;
             System.debug('genParentPayload Bulk Ticket Data: ' + bulkticketData);
         }
+        // add the list of tickets to the bulk ticket wrapper
         bulkticketData.tickets = ticketList;
         // ******* Return the payload *******
         // for ( VisionMetrixWrappers.AddTicket t : bulkticketData.tickets ) {

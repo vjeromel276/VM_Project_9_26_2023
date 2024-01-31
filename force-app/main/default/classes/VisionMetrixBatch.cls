@@ -75,7 +75,7 @@ global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulab
                         c.VisionMETRIX_Ticket_Created_Date__c = DateTime.now();
                         c.VisionMETRIX_Ticket_Number__c = c.CaseNumber + '-' + c.VisionMETRIX_Ticket_Created_Date__c.format('MM/dd/yyyy');
                         c.Subject = c?.CaseNumber + ' | ' + c?.Account_Name_Text__c + ' Maintenance | Start Date - '+ c?.Maintenance_Start__c;
-                        C.hasVisionMetrixTicket__c = true;                    
+                        c.hasVisionMetrixTicket__c = true;                    
                     }
                     update scope;
                 } else {
