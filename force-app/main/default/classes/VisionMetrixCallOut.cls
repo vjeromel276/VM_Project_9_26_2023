@@ -128,17 +128,18 @@ public class VisionMetrixCallOut {
 
         System.debug('+++++++++++++++++++Start of genParentPayload Method+++++++++++++++++++++++++++++++++++++++++++++++++++');
 
-        // bulk Parent ticket wrapper
+        // bulk Parent ticket wrapper to hold the list of Parent ticket wrappers
         VisionMetrixWrappers.AddBulkVMTickets bulkticketData = new VisionMetrixWrappers.AddBulkVMTickets();
-        // ticket list wrapper to hold the list of Parent tickets
+        // ticket list wrapper to hold the list of Parent ticket wrappers
         List<VisionMetrixWrappers.AddTicket> ticketList = new List<VisionMetrixWrappers.AddTicket>();
         // for each parent ticekt id in the list of ticket ids
         System.debug('genParentPayload parentTickets: ' + parentTickets.size());
+        // for each parent ticket in the list of parent tickets
         for ( Case ticket : parentTickets ) {
             System.debug('genParentPayload ticket: ' + ticket);
             // individual Parent ticket wrapper
             VisionMetrixWrappers.AddTicket ticketData = new VisionMetrixWrappers.AddTicket();
-
+            //pull all the child cases for the parent ticket
             List<Case> childCases = [SELECT Id, ParentId, Related_Service_Order__r.Id, Service_ID__c, 
                                             Account_Name_Text__c, CaseNumber, Related_Service_Order__c, Related_Service_Order_Text__c, 
                                             Description, Subject, NOC_Ticket_Assigment__c, Maintenance_Start__c, 
@@ -147,23 +148,28 @@ public class VisionMetrixCallOut {
                                      WHERE ParentId = :ticket.Id];
 
             System.debug('genParentPayload child case array: ' + childCases + ' for ticket: ' + ticket.Id);
+            // Set to hold the circuits
             Set<String> circuitSet = new Set<String>();
-
+            // for each child case in the list of child cases
             for ( Case child : childCases ) {
                 System.debug('genParentPayload child case: ' + child);
+                // pull all the circuits for the child case
                 List<VisionMetrix_Circuit__c> circuitList = [SELECT Id, Service_Order_Agreement__c, Circuit_Alias__c
                                                              FROM VisionMetrix_Circuit__c
                                                              WHERE Service_Order_Agreement__c = :child.Related_Service_Order__c];
 
                 System.debug('genParentPayload circuit list: ' + circuitList);
+
                 String circuitString = '';
+                // for each circuit in the list of circuits
                 for ( VisionMetrix_Circuit__c circuit : circuitList ) {
                     // circuitString += circuit.Circuit_Alias__c + ', ';
                     circuitSet.add(( circuit.Circuit_Alias__c ).trim().deleteWhitespace() + '&');
                 }
 
+                // for each circuit in the list of circuits
                 if ( child != null ) {
-
+                    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
                     //********Required Fields *********//
                     //^~ Ticket Id - Salesforce Ticket Case Number and todays date in the format of mm/dd/yyyy
                     ticketData.ticket_id = ticket?.CaseNumber + ' | ' + child?.Account_Name_Text__c + ' Maintenance | Start Date - ' + child?.Maintenance_Start__c;
@@ -248,10 +254,11 @@ public class VisionMetrixCallOut {
                     System.debug('Child was null: ');
                     // throw new System.QueryException('No Nodes found with the ticket number or ticket is not of correct type: ' + ticketId);
                 }
+                ticketList.add(ticketData);
             }
 
             // add the ticket to the list of tickets
-            ticketList.add(ticketData);
+
             System.debug('Ticket List: ' + ticketList);
             // add the list of tickets to the bulk ticket wrapper
             System.debug('genParentPayload Bulk Ticket Data: ' + bulkticketData);
