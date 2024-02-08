@@ -33,7 +33,6 @@ public with sharing class VisionMetrixHelperMethod {
 
 		Set<VisionMetrix_Circuit__c> circuitSet = new Set<VisionMetrix_Circuit__c>(existingCircuits);
 
-
 		for ( HttpResponse res : responses ) {
 			System.debug('Response: ' + res);
 			if ( res.getStatusCode() == 200 ) {
@@ -242,4 +241,59 @@ public with sharing class VisionMetrixHelperMethod {
 	}
 
 	/**************************************************************************************************************************************** */
+	/**
+	 * handleCreateChildCases()
+	 * takes a list of parent case ids and creates a child case for each parent case
+	 * by pulling the Customer_List__c field from the parent case and creating a child case for each Node__c in the list
+	 * @param List<Id> caseIds
+	 * @return void -
+	 */
+	public static void handleCreateChildCases(List<Case> cases) {
+
+		// Use a list to hold all matched strings
+		List<String> matchedStrings = new List<String>();
+		// List to hold the child cases
+		List<Case> childCases = new List<Case>();
+
+		// List<Case> parentCases = [SELECT Id, Service_ID__c, Customer_List__c, Related_Service_Order__c, 
+		//                                  Maintenance_End__c, Maintenance_Start__c, Priority, Status, 
+		//                                  Subject, Type, Description
+		//                           FROM Case IN: cases];
+
+		for ( Case c : cases ) {
+			Case child = new Case();
+			String sourceText = c.Customer_List__c;
+			// Define the regex pattern to match the specific format
+			System.Pattern pattern = System.Pattern.compile('[A-Z]{2}\\d{5}[A-Z]');
+			Matcher matcher = pattern.matcher( sourceText );
+			
+
+			// Find all matches
+			while ( matcher.find() ) {
+				System.debug('Found match: ' + matcher.group(0));
+				// Add the matched substring to the list
+				Order o = [SELECT Id, Service_ID__c
+				           FROM Order
+				           WHERE Service_ID__c = :matcher.group(0
+				)];
+
+				child.Related_Service_Order__c = o.Id;
+				// child.Subject = c.Subject;
+				// child.Description = c.Description;
+				// child.Priority = c.Priority;
+				// child.Status = c.Status;
+				// child.Maintenance_Start__c = c.Maintenance_Start__c;
+				// child.Maintenance_End__c = c.Maintenance_End__c;
+				// child.Origin = c.Origin;
+				child.VisionMetrix_Child_Case__c = true;
+				System.debug('Child Case: ' + child);
+				childCases.add(child);
+			}
+
+		}	
+		insert childCases;
+		// Now you can work with your matchedStrings list, which contains all matches
+		System.debug(childCases);
+	}
+
 }

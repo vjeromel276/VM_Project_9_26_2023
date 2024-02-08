@@ -45,12 +45,12 @@ global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulab
                                      FROM Case
                                      WHERE ParentId = :c.Id];
 
-                for (Case s : serviceAffectedCases){
-                    System.debug('Service Affected Case: ' + s.Service_ID__c);
-                    custAffectedList.add(s.Service_ID__c);
-                    // s.Subject = s?.CaseNumber + ' | ' + s?.Account_Name_Text__c + ' Maintenance | Start Date - '+ s?.Maintenance_Start__c;
-                    System.debug('Ticket Subject: ' + s.Subject);
-                }
+                // for (Case s : serviceAffectedCases){
+                //     System.debug('Service Affected Case: ' + s.Service_ID__c);
+                //     custAffectedList.add(s.Service_ID__c);
+                //     // s.Subject = s?.CaseNumber + ' | ' + s?.Account_Name_Text__c + ' Maintenance | Start Date - '+ s?.Maintenance_Start__c;
+                //     System.debug('Ticket Subject: ' + s.Subject);
+                // }
 
                 System.debug('Added Case Id to list: ' + c);
                 // c.VisionMETRIX_Ticket_Created_Date__c = DateTime.now();
@@ -71,8 +71,8 @@ global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulab
                 if (res != NULL && res.getStatusCode() == 200){
                     System.debug('Response: ' + res.getBody());
                     for (Case c : scope){
-                        c.Customer_List__c = custAffectedList.toString();
-                        System.debug('custAffectedList: ' + custAffectedList.toString());
+                        // c.Customer_List__c = custAffectedList.toString();
+                        // System.debug('custAffectedList: ' + custAffectedList.toString());
                         c.VisionMETRIX_Ticket_Created_Date__c = DateTime.now();
                         c.VisionMETRIX_Ticket_Number__c = c.CaseNumber + '-' + c.VisionMETRIX_Ticket_Created_Date__c.format('MM/dd/yyyy');
                         c.Subject = c?.CaseNumber + ' | ' + c?.Account_Name_Text__c + ' Maintenance | Start Date - '+ c?.Maintenance_Start__c;
