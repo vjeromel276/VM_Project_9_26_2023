@@ -174,7 +174,7 @@ public with sharing class VisionMetrixHelperMethod {
 
 			}
 
-			// VisionMetrixHelperMethod.vmEventToAlert(events);//*this will be used to create the nms alert
+			VisionMetrixHelperMethod.vmEventToAlert(events);//*this will be used to create the nms alert
 
 			// insert event;
 			// call queable class to insert circuits
@@ -244,9 +244,8 @@ public with sharing class VisionMetrixHelperMethod {
 	/**
 	 * handleCreateChildCases()
 	 * takes a list of parent case ids and creates a child case for each parent case
-	 * by pulling the Customer_List__c field from the parent case and creating a child 
-	 * case for each Node__c in the list
-	 * @param List<Case> cases - the list of parent cases
+	 * by pulling the Customer_List__c field from the parent case and creating a child case for each Node__c in the list
+	 * @param List<Id> caseIds
 	 * @return void -
 	 */
 	public static void handleCreateChildCases(List<Case> cases) {
@@ -255,186 +254,45 @@ public with sharing class VisionMetrixHelperMethod {
 		List<String> matchedStrings = new List<String>();
 		// List to hold the child cases
 		List<Case> childCases = new List<Case>();
-		Set<Case> caseSet = new Set<Case>();
+
+		// List<Case> parentCases = [SELECT Id, Service_ID__c, Customer_List__c, Related_Service_Order__c, 
+		//                                  Maintenance_End__c, Maintenance_Start__c, Priority, Status, 
+		//                                  Subject, Type, Description
+		//                           FROM Case IN: cases];
 
 		for ( Case c : cases ) {
+			Case child = new Case();
 			String sourceText = c.Customer_List__c;
-			System.debug('Source Text: ' + sourceText);
+			// Define the regex pattern to match the specific format
+			System.Pattern pattern = System.Pattern.compile('[A-Z]{2}\\d{5}[A-Z]');
+			Matcher matcher = pattern.matcher( sourceText );
+			
 
-			// Define the regex pattern to match the specific format for each carrier
-			switch  on c.AccountId {
-				
-				// T-mobile
-				when '0010B00001skFrkQAE' {
-					System.debug('Account: ' + c.AccountId);
-					// Define the regex pattern to match the specific format
-					System.Pattern pattern = System.Pattern.compile('[A-Z]{2}\\d+[A-Z]');
-					System.Matcher nodeMatcher = pattern.matcher( sourceText );
+			// Find all matches
+			while ( matcher.find() ) {
+				System.debug('Found match: ' + matcher.group(0));
+				// Add the matched substring to the list
+				Order o = [SELECT Id, Service_ID__c
+				           FROM Order
+				           WHERE Service_ID__c = :matcher.group(0
+				)];
 
-					// Find all matches
-					while ( nodeMatcher.find() ) {
-						Case child = new Case(
-							RecordTypeId = '0123g0000008cKUAAY'
-						);
-						System.debug('Found match: ' + nodeMatcher.group(0
-						));
-
-						Node__c n = [SELECT Id, Name, Service_Order_Agreement__c
-						             FROM Node__c
-						             WHERE Name = :nodeMatcher.group(0
-						)];
-
-						child.Related_Service_Order__c = n.Service_Order_Agreement__c;
-						child.ParentId = c.Id;
-						child.VisionMetrix_Child_Case__c = true;
-						System.debug('Child Case: ' + child);
-						childCases.add(child);
-					}
-				}
-				// AT&T Wireline (PEG) (UNC)
-				when '0013g00000Tfxq2AAB' {
-					System.debug('Account: ' + c.AccountId);
-					// Define the regex pattern to match the specific format
-					System.Pattern pattern = System.Pattern.compile('[A-Z]{2}\\d+[A-Z]');
-					System.Matcher nodeMatcher = pattern.matcher( sourceText );
-
-					// Find all matches
-					while ( nodeMatcher.find() ) {
-						Case child = new Case(
-							RecordTypeId = '0123g0000008cKUAAY'
-						);
-						System.debug('Found match: ' + nodeMatcher.group(0
-						));
-
-						Node__c n = [SELECT Id, Name, Service_Order_Agreement__c
-						             FROM Node__c
-						             WHERE Name = :nodeMatcher.group(0
-						)];
-
-						child.Related_Service_Order__c = n.Service_Order_Agreement__c;
-						child.ParentId = c.Id;
-						child.VisionMetrix_Child_Case__c = true;
-						System.debug('Child Case: ' + child);
-						childCases.add(child);
-					}
-				}
-				// AT&T Mobility
-				when '001U000001jMJS6IAO' {
-					System.debug('Account: ' + c.AccountId);
-					// Define the regex pattern to match the specific format
-					System.Pattern pattern = System.Pattern.compile('[A-Z]{2}\\d+[A-Z]');
-					System.Matcher nodeMatcher = pattern.matcher( sourceText );
-
-					// Find all matches
-					while ( nodeMatcher.find() ) {
-						Case child = new Case(
-							RecordTypeId = '0123g0000008cKUAAY'
-						);
-						System.debug('Found match: ' + nodeMatcher.group(0
-						));
-
-						Node__c n = [SELECT Id, Name, Service_Order_Agreement__c
-						             FROM Node__c
-						             WHERE Name = :nodeMatcher.group(0
-						)];
-
-						child.Related_Service_Order__c = n.Service_Order_Agreement__c;
-						child.ParentId = c.Id;
-						child.VisionMetrix_Child_Case__c = true;
-						System.debug('Child Case: ' + child);
-						childCases.add(child);
-					}
-				}
-				// AT&T Mobility (PEG) (UNC)
-				when '0013g00000TfxtOAAR' {
-					System.debug('Account: ' + c.AccountId);
-					// Define the regex pattern to match the specific format
-					System.Pattern pattern = System.Pattern.compile('[A-Z]{2}\\d+[A-Z]');
-					System.Matcher nodeMatcher = pattern.matcher( sourceText );
-
-					// Find all matches
-					while ( nodeMatcher.find() ) {
-						Case child = new Case(
-							RecordTypeId = '0123g0000008cKUAAY'
-						);
-						System.debug('Found match: ' + nodeMatcher.group(0
-						));
-
-						Node__c n = [SELECT Id, Name, Service_Order_Agreement__c
-						             FROM Node__c
-						             WHERE Name = :nodeMatcher.group(0
-						)];
-
-						child.Related_Service_Order__c = n.Service_Order_Agreement__c;
-						child.ParentId = c.Id;
-						child.VisionMetrix_Child_Case__c = true;
-						System.debug('Child Case: ' + child);
-						childCases.add(child);
-					}
-				}
-				// Dobson/AT&T Mobility
-				when '0010B00001p6Z3VQAU' {
-					System.debug('Account: ' + c.AccountId);
-					// Define the regex pattern to match the specific format
-					System.Pattern pattern = System.Pattern.compile('[A-Z]{2}\\d+[A-Z]');
-					System.Matcher nodeMatcher = pattern.matcher( sourceText );
-
-					// Find all matches
-					while ( nodeMatcher.find() ) {
-						Case child = new Case(
-							RecordTypeId = '0123g0000008cKUAAY'
-						);
-						System.debug('Found match: ' + nodeMatcher.group(0
-						));
-
-						Node__c n = [SELECT Id, Name, Service_Order_Agreement__c
-						             FROM Node__c
-						             WHERE Name = :nodeMatcher.group(0
-						)];
-
-						child.Related_Service_Order__c = n.Service_Order_Agreement__c;
-						child.ParentId = c.Id;
-						child.VisionMetrix_Child_Case__c = true;
-						System.debug('Child Case: ' + child);
-						childCases.add(child);
-					}
-				}
-				// Verizon
-				when '001U000001jMJVdIAO' {
-					System.debug('Account: ' + c.AccountId);
-					// Define the regex pattern to match the specific format
-					System.Pattern pattern = System.Pattern.compile('[A-Z]{2}\\d+[A-Z]');
-					System.Matcher nodeMatcher = pattern.matcher( sourceText );
-
-					// Find all matches
-					while ( nodeMatcher.find() ) {
-						Case child = new Case(
-							RecordTypeId = '0123g0000008cKUAAY'
-						);
-						System.debug('Found match: ' + nodeMatcher.group(0
-						));
-
-						Node__c n = [SELECT Id, Name, Service_Order_Agreement__c
-						             FROM Node__c
-						             WHERE Name = :nodeMatcher.group(0
-						)];
-
-						child.Related_Service_Order__c = n.Service_Order_Agreement__c;
-						child.ParentId = c.Id;
-						child.VisionMetrix_Child_Case__c = true;
-						System.debug('Child Case: ' + child);
-						childCases.add(child);
-					}
-				}
-				when else {
-					System.debug('Account: ' + c.AccountId);
-				}
+				child.Related_Service_Order__c = o.Id;
+				// child.Subject = c.Subject;
+				// child.Description = c.Description;
+				// child.Priority = c.Priority;
+				// child.Status = c.Status;
+				// child.Maintenance_Start__c = c.Maintenance_Start__c;
+				// child.Maintenance_End__c = c.Maintenance_End__c;
+				// child.Origin = c.Origin;
+				child.VisionMetrix_Child_Case__c = true;
+				System.debug('Child Case: ' + child);
+				childCases.add(child);
 			}
-		}
-		caseSet.addAll(childCases);
-		childCases = new List<Case>(caseSet);
-		insert childCases;
 
+		}	
+		insert childCases;
+		// Now you can work with your matchedStrings list, which contains all matches
 		System.debug(childCases);
 	}
 
