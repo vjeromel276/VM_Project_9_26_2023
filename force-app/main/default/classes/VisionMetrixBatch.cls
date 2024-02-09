@@ -15,6 +15,7 @@ global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulab
                                                 Maintenance_Start__c, Maintenance_End__c
                                          FROM Case
                                          WHERE hasVisionMetrixTicket__c != true AND Case_Record_Type__c = 'Maintenance' AND VisionMetrix_Parent_Case__c = true AND AccountId IN ( '0010B00001skFrkQAE', '0013g00000Tfxq2AAB', '001U000001jMJS6IAO', '0013g00000TfxtOAAR', '0010B00001p6Z3VQAU', '001U000001jMJVdIAO' ) AND ParentId = null]);
+        // return Database.getQueryLocator(VisionMetrixAppController.getParentCases());
     }
 
     global void execute(Database.BatchableContext context, List<Case> scope) {

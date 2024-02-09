@@ -1,7 +1,7 @@
 public with sharing class VisionMetrixAppController {
     @AuraEnabled(cacheable = true)
     public static List<Case> getParentCases() {
-        return [SELECT Id, CaseNumber, hasVisionMetrixTicket__c, Account_Name_Text__c, 
+        return [SELECT Id, CaseNumber,Customer_List__c, hasVisionMetrixTicket__c, Account_Name_Text__c, 
                        AccountId, ParentId, RecordTypeId, Case_Record_Type__c, 
                        VisionMETRIX_Ticket_Created_Date__c, VisionMETRIX_Ticket_Number__c, VisionMetrix_Parent_Case__c, NotificationType__c, 
                        Description, Subject, NOC_Ticket_Assigment__c, Maintenance_Start__c, 
