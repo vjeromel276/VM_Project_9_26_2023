@@ -289,13 +289,5 @@ public with sharing class VisionMetrixHelperMethod {
 	}
 
 	/**************************************************************************************************************************************** */
-	/**
-	 * handleCreateChildCases()
-	 * takes a list of parent case ids and creates a child case for each parent case
-	 * by pulling the Customer_List__c field from the parent case and creating a child
-	 * case for each Node__c in the list
-	 * @param List<Case> cases - the list of parent cases
-	 * @return void -
-	 */
 
 }
