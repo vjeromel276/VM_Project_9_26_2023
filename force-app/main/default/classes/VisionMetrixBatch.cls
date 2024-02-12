@@ -7,6 +7,7 @@ global class VisionMetrixBatch implements Database.Batchable<sObject>, Schedulab
     
     global Database.QueryLocator start(Database.BatchableContext context) {
         loginToken = VisionMetrixCallOut.visionMetrixLogin();
+        VisionMetrixCallout.getLatestEvents();
 
         return Database.getQueryLocator([SELECT Id, CaseNumber, Customer_List__c, hasVisionMetrixTicket__c, 
                                                 Account_Name_Text__c, AccountId, ParentId, RecordTypeId, 
