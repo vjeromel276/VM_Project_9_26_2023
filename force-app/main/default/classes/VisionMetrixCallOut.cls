@@ -297,6 +297,7 @@ public class VisionMetrixCallOut {
             }
 
             ticketPayload = genParentPayload(tickets);
+            // ticketPayload = PracticeClass.genParentPayload(tickets);
         }
 
         request.setEndpoint('https://rest-api2.visionmetrix.net/1.1/tickets/addBulk/');
