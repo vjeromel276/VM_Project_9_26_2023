@@ -21,5 +21,6 @@
   "aurahelper.documentation.useStandardJavaComments": true,
   "aurahelper.apexFormat.query.maxProjectionFieldPerLine": 4,
   "apexdox.docblock.alignItems": true,
-  "salesforcedx-vscode-apex.java.home": "C:\\Program Files\\AdoptOpenJDK\\jre-11.0.11.9-hotspot"
+  "salesforcedx-vscode-apex.java.home": "C:\\Program Files\\AdoptOpenJDK\\jre-11.0.11.9-hotspot",
+  "codeBuilder.showWelcomePage": false
 }
